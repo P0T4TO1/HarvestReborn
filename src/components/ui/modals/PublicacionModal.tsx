@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { IPublicacion, EstadoPublicacion } from "@/interfaces";
 import { DisponibilidadPublicacion } from "@prisma/client";
+import { changePublicationStatus } from "@/actions";
 
 import {
   Modal,
@@ -54,18 +55,16 @@ export const PublicacionModal = ({
       setIsLoading(false);
       return;
     }
-    await hrApi
-      .put(`/store/publication/estado/${id_publicacion}`, {
-        estado,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          toast("Estado de la publicación actualizado", SUCCESS_TOAST);
-          router.push("/store/publications");
-        }
+    await changePublicationStatus(id_publicacion, estado)
+      .then(() => {
+        toast("Estado de la publicación actualizado", SUCCESS_TOAST);
+        onClose();
       })
       .catch(() => {
-        toast("Error al actualizar el estado de la publicación", DANGER_TOAST);
+        toast.error(
+          "Error al actualizar el estado de la publicación",
+          DANGER_TOAST
+        );
       })
       .finally(() => {
         setIsLoading(false);
@@ -124,21 +123,30 @@ export const PublicacionModal = ({
                       />
                       <div className="flex flex-col justify-center">
                         <div className="flex items-center">
-                          <span className="text-red-600">
-                            {publicacion.estado_publicacion !==
-                              EstadoPublicacion.Activo &&
-                              publicacion.estado_publicacion.charAt(0) +
-                                publicacion.estado_publicacion
-                                  .slice(1)
-                                  .toLowerCase()}
-                          </span>
-                          <span className="text-md"> &#8729; </span>
+                          {publicacion.estado_publicacion !==
+                            EstadoPublicacion.Activo && (
+                            <>
+                              <span className="text-red-600">
+                                {publicacion.estado_publicacion.charAt(0) +
+                                  publicacion.estado_publicacion
+                                    .slice(1)
+                                    .toLowerCase()}
+                              </span>
+                              <span className="text-md"> &#8729; </span>
+                            </>
+                          )}
                           <p className="text-lg font-semibold">
                             {publicacion.titulo_publicacion}
                           </p>
                         </div>
                         <p className="text-sm">
-                          MX${publicacion.precio_publicacion}
+                          {publicacion.disponibilidad ===
+                          DisponibilidadPublicacion.EN_VENTA
+                            ? `MX$${publicacion.precio_publicacion}`
+                            : publicacion.disponibilidad ===
+                                DisponibilidadPublicacion.DONACION
+                              ? "Donación"
+                              : null}
                         </p>
                       </div>
                     </div>
@@ -150,7 +158,7 @@ export const PublicacionModal = ({
                         isLoading={isLoading}
                         onClick={() =>
                           onChangeEstado(
-                            publicacion.id_publicacion!,
+                            publicacion.id_publicacion,
                             (publicacion.disponibilidad ===
                             DisponibilidadPublicacion.EN_VENTA
                               ? EstadoPublicacion.Vendido
@@ -193,7 +201,12 @@ export const PublicacionModal = ({
                             }}
                             isDisabled={isLoading}
                           >
-                            <FaPauseCircle size={21} />
+                            {publicacion.estado_publicacion ===
+                            EstadoPublicacion.Pendiente ? (
+                              <FaPlayCircle size={21} />
+                            ) : (
+                              <FaPauseCircle size={21} />
+                            )}
                           </Button>
                           <p className="text-sm text-center">
                             {publicacion.estado_publicacion ===
@@ -219,7 +232,7 @@ export const PublicacionModal = ({
                         </div>
                         <div className="flex flex-col items-center">
                           <Link
-                            href={`market/item/edit/${publicacion.id_publicacion}`}
+                            href={`/market/item/edit/${publicacion.id_publicacion}`}
                           >
                             <Button
                               isIconOnly
@@ -235,7 +248,7 @@ export const PublicacionModal = ({
                         </div>
                         <div className="flex flex-col items-center">
                           <Link
-                            href={`/publicacion/${publicacion.id_publicacion}`}
+                            href={`/market/item/${publicacion.id_publicacion}`}
                           >
                             <Button
                               isIconOnly

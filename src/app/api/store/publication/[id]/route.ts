@@ -75,10 +75,7 @@ async function updatePublicacion(
         titulo_publicacion,
         descripcion_publicacion,
         precio_publicacion: parseFloat(price?.toFixed(2) ?? "0.00") ?? 0.0,
-        disponibilidad:
-          DisponibilidadPublicacion[
-            disponibilidad as keyof typeof DisponibilidadPublicacion
-          ] ?? DisponibilidadPublicacion.En_venta,
+        disponibilidad: disponibilidad as DisponibilidadPublicacion,
         images_publicacion: images_urls,
         lotes: {
           connect: lotes.map((id) => ({ id_lote: id })),
@@ -95,4 +92,52 @@ async function updatePublicacion(
   }
 }
 
-export { deletePublicacion as DELETE, updatePublicacion as PUT };
+async function getPublicactionById(
+  request: Request,
+  { params }: { params: { id: string } },
+  req: NextRequest,
+  res: NextResponse
+) {
+  if (!params.id)
+    return NextResponse.json(
+      { message: "Falta id del negocio" },
+      { status: 400 }
+    );
+
+  try {
+    const publicacion = await prisma.m_publicaciones.findUnique({
+      where: {
+        id_publicacion: parseInt(params.id),
+      },
+      include: {
+        lotes: true,
+        negocio: {
+          select: {
+            dueneg: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return NextResponse.json(publicacion, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Error al obtener la publicación" },
+      { status: 500 }
+    );
+  }
+}
+
+export {
+  deletePublicacion as DELETE,
+  updatePublicacion as PUT,
+  getPublicactionById as GET,
+};

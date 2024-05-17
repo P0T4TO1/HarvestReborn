@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/authOptions";
 import { redirect, notFound } from "next/navigation";
 import {
   OrdersCliente,
-  OrdersNegocio,
+  OrdersTable,
   SidebarWrapperNegocio,
   NavbarWrapperNegocio,
   NavbarComponent,
@@ -40,7 +40,15 @@ const OrdersPage = async () => {
       <section className="flex">
         <SidebarWrapperNegocio />
         <NavbarWrapperNegocio>
-          <OrdersNegocio orders={orders} />
+          <div className="pt-12 container mx-auto min-h-screen">
+            <div className="flex flex-col gap-4">
+              <h1 className="text-2xl font-black flex flex-col leading-none dark:text-green-600 text-green-900">
+                Pedidos
+              </h1>
+            </div>
+
+            <OrdersTable orders={orders} />
+          </div>
           <Footer />
         </NavbarWrapperNegocio>
       </section>

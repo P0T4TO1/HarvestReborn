@@ -23,22 +23,23 @@ import {
   Accordion,
   AccordionItem,
 } from "@nextui-org/react";
-import Carousel from "react-material-ui-carousel";
+import { toast } from "sonner";
 import { FaX } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
-import { toast } from "sonner";
+import { IoMdHelp } from "react-icons/io";
+import Carousel from "react-material-ui-carousel";
 import { SUCCESS_TOAST, DANGER_TOAST } from "@/components/ui";
 
 import { IoCloudUploadOutline } from "react-icons/io5";
 
+import { hrApi } from "@/api";
+import { ILote } from "@/interfaces";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/context/auth";
-import { ILote } from "@/interfaces";
-import { hrApi } from "@/api";
 
-import { postValidationSchema } from "@/validations/negocio.validation";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { postValidationSchema } from "@/validations/negocio.validation";
 
 interface IFormData {
   images_publicacion: File[];
@@ -75,6 +76,7 @@ export const PublicacionSection = ({ lotes }: Props) => {
   const [searchValue, setSearchValue] = useState("");
   const hasSearchFilter = Boolean(searchValue);
   const [isLoading, setIsLoading] = useState(false);
+  const [infoVisible, setInfoVisible] = useState(false);
 
   const router = useRouter();
 
@@ -88,12 +90,10 @@ export const PublicacionSection = ({ lotes }: Props) => {
           .includes(searchValue.toLowerCase())
       );
     } else if (filterValue === "") {
-      filteredLotes = lotes.todos;
+      filteredLotes = lotes.apuntoVencer;
     } else if (filterValue === "all") {
       filteredLotes = lotes.todos;
     } else if (filterValue === "relevant") {
-      filteredLotes = lotes.apuntoVencer;
-    } else if (filterValue === "aboutToExpire") {
       filteredLotes = lotes.apuntoVencer;
     } else if (filterValue === "goodState") {
       filteredLotes = lotes.buenEstado;
@@ -158,7 +158,6 @@ export const PublicacionSection = ({ lotes }: Props) => {
         .then((response) => {
           console.log("File uploaded successfully");
           imagesURLs.push(...response.data.secure_urls);
-          console.log(imagesURLs);
         })
         .catch((error) => {
           console.error(error, "Error al subir las imágenes a la API");
@@ -176,7 +175,6 @@ export const PublicacionSection = ({ lotes }: Props) => {
           id_negocio: user.duenonegocio.negocio.id_negocio,
         })
         .then((response) => {
-          console.log(response);
           toast("Publicación creada con éxito", SUCCESS_TOAST);
           router.push("/store/publications");
         })
@@ -327,7 +325,6 @@ export const PublicacionSection = ({ lotes }: Props) => {
             <Select
               label="Disponible para"
               id="unit"
-              className="input"
               {...register("disponibilidad")}
             >
               <SelectItem key="EN_VENTA" value="EN_VENTA">
@@ -503,7 +500,7 @@ export const PublicacionSection = ({ lotes }: Props) => {
                     </AccordionItem>
                   </Accordion>
                   {errors.lotes && (
-                    <p className="text-xs text-red-500 dark:text-red-400 text-sm">
+                    <p className="text-xs text-red-500 dark:text-red-400 text-lg">
                       {errors.lotes.message}
                     </p>
                   )}
@@ -533,7 +530,7 @@ export const PublicacionSection = ({ lotes }: Props) => {
         <aside className="pt-16 w-full md:w-1/3 lg:w-1/4 md:block md:min-w-[380px] border-l-1 border-default-500">
           <div>
             <div className="flex items-center justify-between p-4">
-              <h2 className="text-lg">Seleccionar productos</h2>
+              <h2 className="text-lg text-default-800">Seleccionar lotes</h2>
               <Button
                 color="default"
                 size="sm"
@@ -542,7 +539,7 @@ export const PublicacionSection = ({ lotes }: Props) => {
                 Cerrar
               </Button>
             </div>
-            <div className="pb-4 px-4">
+            <div className="pb-4 px-4 flex justify-between">
               <Select
                 label="Filtrar"
                 size="sm"
@@ -556,18 +553,40 @@ export const PublicacionSection = ({ lotes }: Props) => {
                 <SelectItem key="relevant" value="2">
                   Relevancia
                 </SelectItem>
-                <SelectItem key="aboutToExpire" value="3">
-                  Apunto de vencer
-                </SelectItem>
                 <SelectItem key="goodState" value="4">
                   En buen estado
                 </SelectItem>
               </Select>
+              <Button
+                isIconOnly
+                size="md"
+                variant="light"
+                onPress={() => setInfoVisible(!infoVisible)}
+              >
+                <IoMdHelp size={24} />
+              </Button>
             </div>
+            {infoVisible && (
+              <>
+                <Divider />
+                <div
+                  className="p-4 bg-gray-100 dark:bg-gray-800"
+                  style={{ maxHeight: "300px", overflowY: "auto" }}
+                >
+                  <h3 className="text-lg text-default-800">Ayuda</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Aquí puedes seleccionar los lotes que deseas publicar. Si no
+                    se muestran productos pero tienes lotes en tu inventario, es
+                    posible que los lotes hayan vencido o no estén en buen
+                    estado.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
           <Divider />
           <div className="p-4">
-            <h3 className="text-lg">Productos recomendados</h3>
+            <h3 className="text-lg text-default-800">Productos recomendados</h3>
             <Input
               isClearable
               area-label="Buscar productos"
@@ -579,6 +598,11 @@ export const PublicacionSection = ({ lotes }: Props) => {
               onValueChange={onSearchChange}
             />
             <div className="grid grid-cols-1 gap-4 mt-4">
+              {itemsToDisplay.length < 1 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No se encontraron productos
+                </p>
+              )}
               {itemsToDisplay.map((lote) => (
                 <Card key={lote.id_lote} className="w-full">
                   <CardHeader>

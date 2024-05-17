@@ -1,7 +1,8 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
 import axios, { AxiosError } from "axios";
 import { IPublicacion } from "@/interfaces";
-
-export const revalidate = 3600;
 
 export const getAllPublications = async () => {
   try {
@@ -35,6 +36,8 @@ export const getActivePublications = async (
     const { data } = await axios.get<IPublicacion[]>(
       `${process.env.NEXT_PUBLIC_API_URL}/publications/active?q=${search}&offset=${offset}&limit=${limit}`
     );
+    
+    revalidatePath("/(application)/market");
     return data as unknown as IPublicacion[];
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -51,6 +54,7 @@ export const getPublicationById = async (id: string) => {
     const { data } = await axios.get<IPublicacion>(
       `${process.env.NEXT_PUBLIC_API_URL}/publications/${id}`
     );
+    revalidatePath("/(application)/market/item/[id]", "page");
     return data as unknown as IPublicacion;
   } catch (error) {
     if (error instanceof AxiosError) {

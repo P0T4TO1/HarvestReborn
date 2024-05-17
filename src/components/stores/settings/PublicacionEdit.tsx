@@ -75,19 +75,15 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const files: File[] = [];
-    if (publicacion.images_publicacion.length > 0) {
-      publicacion.images_publicacion.forEach((url) => {
-        fetch(url)
-          .then((res) => res.blob())
-          .then((blob) => {
-            const file = new File([blob], url.split("/").pop() ?? "");
-            files.push(file);
-          });
-        images.push(...files);
-      });
-    }
-  }, [publicacion.images_publicacion, images]);
+    publicacion.images_publicacion.forEach((url) => {
+      fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const file = new File([blob], "image.jpg", { type: "image/jpg" });
+          setImages((prevFiles) => [...prevFiles, file]);
+        });
+    });
+  }, []);
 
   const {
     handleSubmit,
@@ -574,7 +570,9 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
         <aside className="pt-16 w-full md:w-1/3 lg:w-1/4 md:block md:min-w-[380px] border-l-1 border-default-500">
           <div>
             <div className="flex items-center justify-between p-4">
-              <h2 className="text-lg">Seleccionar productos</h2>
+              <h2 className="text-lg text-default-800">
+                Seleccionar productos
+              </h2>
               <Button
                 color="default"
                 size="sm"
@@ -608,7 +606,7 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
           </div>
           <Divider />
           <div className="p-4">
-            <h3 className="text-lg">Productos recomendados</h3>
+            <h3 className="text-lg text-default-800">Productos recomendados</h3>
             <Input
               isClearable
               area-label="Buscar productos"

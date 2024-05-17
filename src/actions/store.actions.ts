@@ -1,25 +1,27 @@
-"use server";
-
-import { ILote } from "@/interfaces";
 import prisma from "@/lib/prisma";
-import { today, getLocalTimeZone } from "@internationalized/date";
+import { ILote } from "@/interfaces";
 import { IOrden } from "@/interfaces";
-import { IPublicacion } from "@/interfaces";
+import axios, { AxiosError } from "axios";
+import { revalidatePath } from "next/cache";
+import { IPublicacion, EstadoLote } from "@/interfaces";
+import { today, getLocalTimeZone } from "@internationalized/date";
+
+export const revalidate = 3600;
 
 export const getPublicaciones = async (id_negocio: number) => {
   if (!id_negocio) return;
 
   try {
-    const publicaciones = (await prisma.m_publicaciones.findMany({
-      where: {
-        id_negocio,
-      },
-      include: {
-        lotes: true,
-      },
-    })) as unknown as IPublicacion[];
-    return publicaciones;
+    const { data } = await axios.get<IPublicacion[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/publication?id_negocio=${id_negocio}`
+    );
+
+    return data as unknown as IPublicacion[];
   } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.response?.data);
+      return;
+    }
     console.error(error);
     return;
   }
@@ -29,28 +31,32 @@ export const getPublicactionById = async (id_publicacion: number) => {
   if (!id_publicacion) return;
 
   try {
-    const publicacion = (await prisma.m_publicaciones.findUnique({
-      where: {
-        id_publicacion,
-      },
-      include: {
-        lotes: true,
-        negocio: {
-          select: {
-            dueneg: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })) as unknown as IPublicacion;
-    return publicacion;
+    const { data } = await axios.get<IPublicacion>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/publication/${id_publicacion}`
+    );
+
+    return data as unknown as IPublicacion;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
+export const changePublicationStatus = async (
+  id_publicacion: number,
+  estado: string
+) => {
+  if (!id_publicacion || !estado) return;
+
+  try {
+    const { data } = await axios.put<IPublicacion>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/publication/status/${id_publicacion}`,
+      {
+        estado,
+      }
+    );
+
+    return data as unknown as IPublicacion;
   } catch (error) {
     console.error(error);
     return;
@@ -179,7 +185,11 @@ export const getLotesForPosts = async (id_negocio: number) => {
       },
     })) as unknown as ILote[];
 
-    const lotesBuenEstado = lotes.filter((lote) => {
+    const allExceptExpired = lotes.filter(
+      (lote) => lote.estado_lote !== EstadoLote.Vencido && !lote.id_publicacion
+    );
+
+    const lotesBuenEstado = allExceptExpired.filter((lote) => {
       return (
         new Date(lote.fecha_vencimiento) >
         new Date(
@@ -190,7 +200,7 @@ export const getLotesForPosts = async (id_negocio: number) => {
       );
     });
 
-    const lotesRecomendados = lotes.filter((lote) => {
+    const lotesRecomendados = allExceptExpired.filter((lote) => {
       const fechaVencimiento = new Date(lote.fecha_vencimiento);
       const fechaHoy = today(getLocalTimeZone()).toDate(getLocalTimeZone());
       const diferencia = fechaVencimiento.getTime() - fechaHoy.getTime();
@@ -200,7 +210,7 @@ export const getLotesForPosts = async (id_negocio: number) => {
     });
 
     return {
-      todos: lotes,
+      todos: allExceptExpired,
       buenEstado: lotesBuenEstado,
       apuntoVencer: lotesRecomendados,
     };

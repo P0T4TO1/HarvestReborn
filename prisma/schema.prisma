@@ -390,7 +390,7 @@ model m_publicaciones {
   precio_publicacion      Float?
   images_publicacion      String[]                  @default([])
   disponibilidad          DisponibilidadPublicacion @default(EN_VENTA)
-  estado_publicacion      EstadoPublicacion         @default(PENDIENTE)
+  estado_publicacion      EstadoPublicacion         @default(ACTIVO)
 
   estado_general EstadoGeneral @default(PENDIENTE)
 

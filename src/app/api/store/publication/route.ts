@@ -32,10 +32,7 @@ async function createPost(req: NextRequest) {
         titulo_publicacion,
         descripcion_publicacion,
         precio_publicacion: parseFloat(price?.toFixed(2) ?? "0.00") ?? 0.0,
-        disponibilidad:
-          DisponibilidadPublicacion[
-            disponibilidad as keyof typeof DisponibilidadPublicacion
-          ] ?? DisponibilidadPublicacion.En_venta,
+        disponibilidad: disponibilidad as DisponibilidadPublicacion,
         images_publicacion: images_urls,
         lotes: {
           connect: lotes.map((id) => ({ id_lote: id })),
@@ -53,4 +50,34 @@ async function createPost(req: NextRequest) {
   }
 }
 
-export { createPost as POST };
+async function getAllPublicationsByStoreId(req: NextRequest) {
+  const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
+  const id_negocio = urlSearchParams.get("id_negocio");
+
+  if (!id_negocio) {
+    return NextResponse.json(
+      { message: "Falta id del negocio" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const publicaciones = await prisma.m_publicaciones.findMany({
+      where: {
+        id_negocio: parseInt(id_negocio),
+      },
+      include: {
+        lotes: true,
+      },
+    });
+    return NextResponse.json(publicaciones, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Error al obtener las publicaciones" },
+      { status: 500 }
+    );
+  }
+}
+
+export { createPost as POST, getAllPublicationsByStoreId as GET };

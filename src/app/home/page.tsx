@@ -16,7 +16,8 @@ const HomePage = async () => {
   if (!session) redirect("/auth/login");
   if (session.user.id_rol === 4) redirect("/auth/register?oauth=true");
   if (session.user.id_rol === 1) redirect("/admin/dashboard");
-  if (session.user.id_rol === 5) redirect(process.env.NEXT_PUBLIC_SUPPORT_APP_URL ?? "/");
+  if (session.user.id_rol === 5 || session.user.id_rol === 6)
+    redirect(process.env.NEXT_PUBLIC_SUPPORT_APP_URL ?? "/");
 
   return (
     <>

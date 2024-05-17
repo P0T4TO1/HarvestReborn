@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { Disponibilidad, EstadoPublicacion } from "@prisma/client";
+import { EstadoPublicacion } from "@prisma/client";
 
 async function changeEstadoPublicacion(
   request: Request,
@@ -27,6 +27,7 @@ async function changeEstadoPublicacion(
         estado_publicacion: estado,
       },
     });
+
     return NextResponse.json(publicacion, { status: 200 });
   } catch (error) {
     console.error(error);

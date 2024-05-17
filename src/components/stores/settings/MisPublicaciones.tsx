@@ -1,6 +1,7 @@
 "use client";
 
 import React, { FC, useState, useMemo, useCallback } from "react";
+import { getPublicactionById } from "@/actions";
 
 import {
   Card,
@@ -10,10 +11,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { FaSearch } from "react-icons/fa";
-import { PublicacionModal } from "@/components";
+import { DANGER_TOAST, PublicacionModal } from "@/components";
 
 import { IPublicacion } from "@/interfaces";
 import { Disponibilidad } from "@prisma/client";
+import { toast } from "sonner";
 
 interface MisPublicacionesProps {
   publicaciones: IPublicacion[];
@@ -59,16 +61,17 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
   }, []);
 
   const getPublicacion = (id_publicacion: number) => {
-    const publicacion = publicaciones.find(
-      (publicacion) => publicacion.id_publicacion === id_publicacion
-    );
-    if (!publicacion) {
-      console.error("Publicacion no encontrada");
-      return;
-    }
-    setPublicacion(publicacion);
-    setLoading(false);
-    return publicacion;
+    getPublicactionById(id_publicacion)
+      .then((data) => {
+        if (!data) return toast("No se encontró la publicación", DANGER_TOAST);
+        setPublicacion(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast("Error al obtener la publicación", DANGER_TOAST);
+        setLoading(false);
+      });
   };
 
   return (
