@@ -33,7 +33,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       const promise = data.bag.map(async (item) => {
         const order = (await prisma.d_orden.create({
           data: {
-            id_orden: generateOrderId() || "",
+            id_orden: generateOrderId() + Math.floor(Math.random() * 1000) + item.id_negocio,
             fecha_orden: new Date(fecha_orden),
             hora_orden: new Date(hora_orden),
             monto_total: item.total,
