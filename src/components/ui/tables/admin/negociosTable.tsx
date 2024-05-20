@@ -53,7 +53,7 @@ export const TableNegocios = ({ negocios }: Props) => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "fecha_orden",
     direction: "ascending",
@@ -198,14 +198,6 @@ export const TableNegocios = ({ negocios }: Props) => {
       setPage(page - 1);
     }
   }, [page]);
-
-  const onRowsPerPageChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
-    },
-    []
-  );
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {

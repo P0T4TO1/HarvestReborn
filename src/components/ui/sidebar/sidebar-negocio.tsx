@@ -27,14 +27,14 @@ export const SidebarWrapperNegocio = () => {
           collapsed: isMenuOpen,
         })}
       >
-        <div className={Sidebar.Header()}>
+        {/* <div className={Sidebar.Header()}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo.png" width={50} height={50} alt="Logo" />
             <h3 className="text-xl font-medium m-auto text-default-900 whitespace-nowrap">
               Dashboard
             </h3>
           </div>
-        </div>
+        </div> */}
         <div className="flex flex-col justify-between h-full">
           <div className={Sidebar.Body()}>
             <SidebarItem

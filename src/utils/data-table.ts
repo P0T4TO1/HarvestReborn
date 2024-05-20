@@ -23,6 +23,7 @@ export const columnsOrders = [
 export const statusOptionsOrders = [
   { name: "PENDIENTE", uid: "PENDIENTE" },
   { name: "EN PROCESO", uid: "EN_PROCESO" },
+  { name: "RECHAZADO", uid: "RECHAZADO" },
   { name: "FINALIZADO", uid: "FINALIZADO" },
   { name: "CANCELADO", uid: "CANCELADO" },
 ];

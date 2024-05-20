@@ -71,18 +71,28 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
   );
   const [filterValue, setFilterValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const hasSearchFilter = Boolean(searchValue);
   const [isLoading, setIsLoading] = useState(false);
+  const hasSearchFilter = Boolean(searchValue);
+
+  const toDataURL = (url: string) =>
+    fetch(url).then(async (response) => {
+      const contentType = response.headers.get("content-type");
+      const blob = await response.blob();
+      const file = new File([blob], "image.png", {
+        type: contentType?.toString(),
+      });
+      return file;
+    });
 
   useEffect(() => {
-    publicacion.images_publicacion.forEach((url) => {
-      fetch(url)
-        .then((response) => response.blob())
-        .then((blob) => {
-          const file = new File([blob], "image.jpg", { type: "image/jpg" });
-          setImages((prevFiles) => [...prevFiles, file]);
-        });
-    });
+    const fetchImages = async () => {
+      const imagesPromises = publicacion.images_publicacion.map((url) =>
+        toDataURL(url)
+      );
+      const imagesFiles = await Promise.all(imagesPromises);
+      setImages(imagesFiles);
+    };
+    fetchImages();
   }, []);
 
   const {
@@ -103,8 +113,6 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
       lotes: publicacion.lotes?.map((lote) => lote.id_lote) ?? [],
     },
   });
-
-  const router = useRouter();
 
   const filteredItems = useMemo(() => {
     let filteredLotes = [...lotes.todos];
@@ -459,10 +467,7 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
                 ) : images.length === 1 ? (
                   <div className="w-full h-full max-w-[490px] max-h-[596px] bg-gray-300 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                     <Image
-                      src={
-                        publicacion.images_publicacion[0] ??
-                        URL.createObjectURL(images[0])
-                      }
+                      src={URL.createObjectURL(images[0])}
                       alt="Imagen de la publicación"
                       className="object-cover w-full h-full"
                     />
@@ -540,7 +545,7 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
                     </AccordionItem>
                   </Accordion>
                   {errors.lotes && (
-                    <p className="text-xs text-red-500 dark:text-red-400 text-sm">
+                    <p className="text-red-500 dark:text-red-400 text-md">
                       {errors.lotes.message}
                     </p>
                   )}

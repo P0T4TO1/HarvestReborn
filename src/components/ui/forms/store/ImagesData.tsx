@@ -1,149 +1,188 @@
 "use client";
 
-import React, { ChangeEvent, useRef, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { negocioImagesSchema } from "@/validations/negocio.validation";
+import React, {
+  ChangeEvent,
+  useState,
+  DragEvent,
+  useMemo,
+  useEffect,
+} from "react";
+
+import { useFormContext } from "react-hook-form";
+import { IFormDataStoreSettings } from "@/components/stores";
+
 import { INegocio } from "@/interfaces";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardFooter,
-  Image,
-} from "@nextui-org/react";
+
+import { Button, Card, CardBody, CardHeader, Image } from "@nextui-org/react";
+import { FaX } from "react-icons/fa6";
+import { IoCloudUploadOutline } from "react-icons/io5";
 
 interface ImagesDataProps {
   negocio: INegocio;
 }
 
 export const ImagesForm = ({ negocio }: ImagesDataProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { handleSubmit, setValue, getValues } = useForm({
-    resolver: zodResolver(negocioImagesSchema),
-    defaultValues: {
-      images_negocio: negocio.images_negocio,
-    },
-  });
+  const [images, setImages] = useState<File[]>([]);
 
-  const onFilesSelected = async ({ target }: ChangeEvent<HTMLInputElement>) => {
-    if (!target.files || target.files.length === 0) {
-      return;
-    }
-    try {
-      for (const file of Array.from(target.files)) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const { data } = await hrApi.post("/store/upload", formData);
-        setValue(
-          "images_negocio",
-          [...getValues("images_negocio"), data.secure_url],
-          {
-            shouldValidate: true,
-          }
-        );
-      }
-    } catch (error) {
-      toast("Ocurrió un error al cargar las imágenes", DANGER_TOAST);
-      console.log({ error });
+  const {
+    setValue,
+    watch,
+    getValues,
+    formState: { errors },
+  } = useFormContext<IFormDataStoreSettings>();
+
+  const toDataURL = (url: string) =>
+    fetch(url).then(async (response) => {
+      const contentType = response.headers.get("content-type");
+      const blob = await response.blob();
+      const file = new File([blob], "image.png", {
+        type: contentType?.toString(),
+      });
+      return file;
+    });
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const imagesPromises = negocio.images_negocio.map((url) =>
+        toDataURL(url)
+      );
+      const imagesFiles = await Promise.all(imagesPromises);
+      setImages([...imagesFiles, ...(getValues("images_files") || [])]);
+    };
+    fetchImages();
+  }, []);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      const newFiles = Array.from(selectedFiles);
+      setImages((prevFiles: File[]) => [...prevFiles, ...newFiles]);
+      setValue("images_files", [...newFiles]);
     }
   };
 
-  const onDeleteImage = (image: string) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      const newFiles = Array.from(droppedFiles);
+      setImages((prevFiles: File[]) => [...prevFiles, ...newFiles]);
+      setValue("images_files", [...newFiles]);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setImages((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setValue(
-      "images_negocio",
-      getValues("images_negocio").filter((img) => img !== image),
-      { shouldValidate: true }
+      "images_files",
+      watch("images_files")?.filter((_, i) => i !== index)
     );
-  };
-
-  const onSubmit: SubmitHandler<{ images_negocio: string[] }> = async (
-    data
-  ) => {
-    try {
-      await hrApi
-        .put(`/store/${negocio.id_negocio}`, {
-          ...negocio,
-          images_negocio: data.images_negocio,
-        })
-        .then(() => {
-          toast("Datos actualizados con éxito", SUCCESS_TOAST);
-          window.location.reload();
-          return;
-        })
-        .catch((err) => {
-          toast("Ocurrió un error al actualizar los datos", DANGER_TOAST);
-          console.error(err);
-        });
-      return;
-    } catch (error) {
-      console.error(error);
-      toast("Ocurrió un error al actualizar los datos", DANGER_TOAST);
-    }
   };
 
   return (
     <div id={"imagenes"}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Card className="p-6">
-          <CardHeader className="flex justify-between">
-            <h4 className="text-lg font-semibold">Imágenes de tu negocio</h4>
-            <Button size="md" onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? "Cancelar" : "Editar"}
-            </Button>
-          </CardHeader>
-          <CardBody>
-            <div className="flex flex-col gap-4">
-              <p className="text-sm text-gray-600">
-                Agrega las imágenes de tu negocio
-              </p>
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                isDisabled={!isEditing}
-              >
-                Cargar imágenes
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/png, image/gif, image/jpeg"
-                style={{ display: "none" }}
-                onChange={onFilesSelected}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-6 mt-6">
-              {getValues("images_negocio")?.map((image, index) => (
-                <div key={index}>
-                  <Image
-                    src={image}
-                    alt={`Imagen ${index + 1}`}
-                    className="w-full max-h-96 object-cover rounded-lg"
-                  />
-                  <Button
-                    onClick={() => onDeleteImage(image)}
-                    size="sm"
-                    variant="shadow"
-                    isDisabled={!isEditing}
+      <Card className="p-6">
+        <CardHeader className="flex justify-between">
+          <h4 className="text-lg font-semibold">Imágenes de tu negocio</h4>
+        </CardHeader>
+        <CardBody>
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-gray-600">
+              Agrega las imágenes de tu negocio
+            </p>
+            <h4 className="text-sm dark:text-gray-300">
+              Imágenes - {images.length}
+              /10 - (Máximo 10 imágenes)
+            </h4>
+            {images.length < 1 ? (
+              <div className="flex items-center justify-center w-full">
+                <label
+                  htmlFor="dropzone-file"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                >
+                  <div
+                    className="flex flex-col items-center justify-center w-full h-full"
+                    onDrop={handleDrop}
+                    onDragOver={(event) => event.preventDefault()}
+                    aria-disabled="true"
                   >
-                    Eliminar
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardBody>
-          <CardFooter>
-            <Button isDisabled={!isEditing} type="submit">
-              Guardar
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+                    <IoCloudUploadOutline className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                      <span className="font-semibold">
+                        Agrega imágenes haciendo clic
+                      </span>{" "}
+                      o arrastrando y soltando
+                    </p>
+                  </div>
+                  <input
+                    id="dropzone-file"
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={!watch("isEditing")}
+                  />
+                </label>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {images.map((file, index) => (
+                  <div
+                    key={index}
+                    className="relative max-w-[6.875rem] max-h-[6.875rem] bg-gray-300 dark:bg-gray-700 rounded-lg"
+                  >
+                    <Image
+                      src={URL.createObjectURL(file)}
+                      alt="Imagen de la publicación"
+                      className="object-cover w-[6.875rem] h-[6.875rem] rounded-lg"
+                    />
+                    <Button
+                      onClick={() => handleRemoveFile(index)}
+                      isIconOnly
+                      size="sm"
+                      radius="full"
+                      className="absolute top-0 right-0 p-1 bg-red-500 z-10"
+                    >
+                      <FaX />
+                    </Button>
+                  </div>
+                ))}
+                <label
+                  htmlFor="dropzone-file"
+                  className="w-[6.875rem] h-[6.875rem] flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                >
+                  <div
+                    className="flex flex-col items-center justify-center w-full h-full"
+                    onDrop={handleDrop}
+                    onDragOver={(event) => event.preventDefault()}
+                  >
+                    <IoCloudUploadOutline className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                      <span className="font-semibold">
+                        Agregar más imágenes
+                      </span>
+                    </p>
+                  </div>
+                  <input
+                    id="dropzone-file"
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+            )}
+            {errors.images_files && (
+              <span className="text-red-500 text-sm">
+                {errors.images_files.message}
+              </span>
+            )}
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 };

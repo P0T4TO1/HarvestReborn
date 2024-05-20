@@ -1,33 +1,38 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { IProductoOrden } from "@/interfaces";
+import { IOrden, IProductoOrden } from "@/interfaces";
 import { EstadoOrden } from "@prisma/client";
 
-async function getOrdersByNegocio(
+async function getStoreOrders(
   request: Request,
   { params }: { params: { id: string } },
   req: NextRequest,
   res: NextResponse
 ) {
-  if (!params.id)
+  const { id: id_negocio } = params;
+
+  if (!id_negocio)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: "Falta id de cliente" },
       { status: 400 }
     );
+
   try {
-    const orders = await prisma.d_orden.findMany({
+    const orders = (await prisma.d_orden.findMany({
       where: {
-        id_negocio: parseInt(params.id.toString()),
+        id_negocio: Number(id_negocio),
       },
-      include: {
-        negocio: true,
-        productoOrden: {
-          include: {
-            producto: true,
-          },
-        },
+      select: {
+        id_orden: true,
+        fecha_orden: true,
+        hora_orden: true,
+        monto_total: true,
+        estado_orden: true,
+        id_cliente: true,
         cliente: {
-          include: {
+          select: {
+            id_cliente: true,
+            nombre_cliente: true,
             user: {
               select: {
                 email: true,
@@ -35,13 +40,24 @@ async function getOrdersByNegocio(
             },
           },
         },
+        productoOrden: {
+          select: {
+            id_productoOrden: true,
+            cantidad_orden: true,
+            monto: true,
+            id_orden: true,
+            orden: true,
+            id_producto: true,
+            producto: true,
+          },
+        },
       },
-    });
+    })) as unknown as IOrden[];
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return NextResponse.json(
-      { message: "Error al encontrar ordenes" },
+      { error: true, message: "Error al obtener las ordenes" },
       { status: 500 }
     );
   }
@@ -112,4 +128,4 @@ async function editOrder(
   }
 }
 
-export { getOrdersByNegocio as GET };
+export { getStoreOrders as GET };

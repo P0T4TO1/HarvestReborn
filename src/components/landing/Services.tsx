@@ -11,7 +11,7 @@ export const ServicesComponent = () => {
     <>
       <section
         className="mx-auto container flex flex-col min-h-screen items-center justify-center"
-        id="servicios"
+        id="services"
       >
         <motion.div
           initial="hidden"

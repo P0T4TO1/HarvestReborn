@@ -17,7 +17,7 @@ import {
 import { toast } from "sonner";
 import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
 
-interface RejectOrderProps {
+interface ChangeStatusProps {
   loading: boolean;
   order: IOrden;
   useDisclosure: { isOpen: boolean; onClose: () => void };
@@ -29,14 +29,14 @@ export const ChangeStatus = ({
   useDisclosure: { isOpen, onClose },
   loading,
   tipo,
-}: RejectOrderProps) => {
+}: ChangeStatusProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRejectOrder = (id_orden: string) => {
     setIsLoading(true);
     try {
       hrApi
-        .put(`/store/orders/estado/${id_orden}`, {
+        .put(`/store/orders/status/${id_orden}`, {
           estado: "RECHAZADO",
         })
         .then((res) => {
@@ -91,7 +91,7 @@ export const ChangeStatus = ({
       isKeyboardDismissDisabled={true}
     >
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <>
             {loading ? (
               <ModalBody>

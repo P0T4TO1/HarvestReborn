@@ -141,6 +141,7 @@ export const OrdersTable = ({ orders }: Props) => {
           if (res.status === 200) {
             toast("Pedido aceptado", SUCCESS_TOAST);
           }
+          window.location.reload();
         })
         .catch(() => {
           toast("Error al aceptar el pedido", DANGER_TOAST);
@@ -209,7 +210,6 @@ export const OrdersTable = ({ orders }: Props) => {
                   isIconOnly
                   variant="light"
                   onClick={() => {
-                    setLoading(true);
                     setOrderModal(order);
                     setProductsModal(order.productoOrden!);
                     onOpen();
@@ -232,7 +232,6 @@ export const OrdersTable = ({ orders }: Props) => {
                       variant="light"
                       onPress={() => {
                         setTipoModal("cancelar");
-                        setLoading(true);
                         setOrderModal(order);
                         setOpenModal(!openModal);
                       }}
@@ -263,7 +262,6 @@ export const OrdersTable = ({ orders }: Props) => {
                     variant="light"
                     onPress={() => {
                       setTipoModal("rechazar");
-                      setLoading(true);
                       setOrderModal(order);
                       setOpenModal(!openModal);
                     }}
@@ -314,7 +312,7 @@ export const OrdersTable = ({ orders }: Props) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Buscar por cliente..."
+            placeholder="Buscar por no. de orden..."
             startContent={<FaSearch size={20} />}
             value={filterValue}
             onClear={() => onClear()}
@@ -427,14 +425,9 @@ export const OrdersTable = ({ orders }: Props) => {
     onPreviousPage,
   ]);
 
-  useEffect(() => {
-    if (orderModal) {
-      setLoading(false);
-    }
-  }, [orderModal]);
-
   return (
     <div className=" w-full flex flex-col gap-4 mt-2 p-2 sm:p-4">
+      
       <OrderModal
         loading={loading}
         order={orderModal as IOrden}

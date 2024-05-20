@@ -3,7 +3,7 @@
 import { FC, useContext } from "react";
 import { AuthContext } from "@/context/auth";
 import { useSession, signOut } from "next-auth/react";
-import { SUCCESS_TOAST, showToast } from "@/components/ui/toast";
+import { usePathname } from "next/navigation";
 
 import {
   Dropdown,
@@ -14,6 +14,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import { FaBoxOpen, FaRegUserCircle } from "react-icons/fa";
+import { SUCCESS_TOAST, showToast } from "@/components/ui/toast";
 import {
   MdOutlineDashboard,
   MdOutlineInventory2,
@@ -26,6 +27,7 @@ import {
 export const DropdownComponent: FC = () => {
   const { data: session } = useSession();
   const { user } = useContext(AuthContext);
+  const pathname = usePathname();
 
   return (
     <>
@@ -95,7 +97,7 @@ export const DropdownComponent: FC = () => {
             <DropdownItem
               key="login"
               color="primary"
-              href={"/auth/login"}
+              href={`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`}
               startContent={<MdOutlineLogin size={20} />}
             >
               Iniciar sesión

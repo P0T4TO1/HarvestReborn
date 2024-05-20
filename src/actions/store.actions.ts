@@ -1,12 +1,25 @@
 import prisma from "@/lib/prisma";
-import { ILote } from "@/interfaces";
-import { IOrden } from "@/interfaces";
+import { ILote, IOrden, INegocio } from "@/interfaces";
 import axios, { AxiosError } from "axios";
-import { revalidatePath } from "next/cache";
 import { IPublicacion, EstadoLote } from "@/interfaces";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
 export const revalidate = 3600;
+
+export const getNegocioById = async (id_negocio: number) => {
+  if (!id_negocio) return;
+
+  try {
+    const { data } = await axios.get<INegocio>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/${id_negocio}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
 
 export const getPublicaciones = async (id_negocio: number) => {
   if (!id_negocio) return;
@@ -67,37 +80,11 @@ export const getOrders = async (id_negocio: number) => {
   if (!id_negocio) return;
 
   try {
-    const orders = (await prisma.d_orden.findMany({
-      where: {
-        id_negocio,
-      },
-      select: {
-        id_orden: true,
-        fecha_orden: true,
-        hora_orden: true,
-        monto_total: true,
-        estado_orden: true,
-        id_cliente: true,
-        cliente: {
-          select: {
-            id_cliente: true,
-            nombre_cliente: true,
-          },
-        },
-        productoOrden: {
-          select: {
-            id_productoOrden: true,
-            cantidad_orden: true,
-            monto: true,
-            id_orden: true,
-            orden: true,
-            id_producto: true,
-            producto: true,
-          },
-        },
-      },
-    })) as unknown as IOrden[];
-    return orders;
+    const { data } = await axios.get<IOrden[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/orders/${id_negocio}`
+    );
+
+    return data;
   } catch (error) {
     console.error(error);
     return;

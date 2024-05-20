@@ -47,7 +47,7 @@ interface Data {
   colonia: string;
   alcaldia: string;
   cp: string;
-  images_negocio?: string[];
+  images_urls?: string[];
   descripcion_negocio?: string;
 }
 
@@ -67,8 +67,8 @@ async function updateNegocioById(
     alcaldia,
     cp,
     descripcion_negocio,
-    images_negocio,
-  } = (await new Response(request.body).json()) as Data;
+    images_urls,
+  } = (await request.json()) as Data;
   const newDireccion = `${calle}, ${colonia}, ${alcaldia}, ${cp}`;
   if (!params.id)
     return NextResponse.json(
@@ -90,7 +90,7 @@ async function updateNegocioById(
             : newDireccion,
         email_negocio: email_negocio,
         descripcion_negocio: descripcion_negocio,
-        images_negocio: images_negocio ?? [],
+        images_negocio: images_urls ?? [],
       },
     });
     return NextResponse.json(negocio, { status: 200 });

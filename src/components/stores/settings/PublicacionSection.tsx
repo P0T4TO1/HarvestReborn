@@ -500,7 +500,7 @@ export const PublicacionSection = ({ lotes }: Props) => {
                     </AccordionItem>
                   </Accordion>
                   {errors.lotes && (
-                    <p className="text-xs text-red-500 dark:text-red-400 text-lg">
+                    <p className="text-red-500 dark:text-red-400 text-md">
                       {errors.lotes.message}
                     </p>
                   )}

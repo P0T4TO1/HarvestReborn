@@ -8,7 +8,6 @@ cloudinary.config({
 });
 
 export async function POST(request: NextRequest, response: NextResponse) {
-  // same code as the other upload route but with an array of files
   try {
     const data = await request.formData();
     const files: File[] = data.getAll("files") as unknown as File[];

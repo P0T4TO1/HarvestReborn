@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useContext, useState } from "react";
-import { DropdownComponent, DarkModeSwitch } from "@/components";
 import { useSession } from "next-auth/react";
-import { AuthContext } from "@/context/auth";
+import React, { useContext, useState } from "react";
+import { usePathname } from "next/navigation";
+
 import { UiContext } from "@/context/ui";
+import { AuthContext } from "@/context/auth";
 import { BagContext } from "@/context/order";
+
 import {
   Navbar,
   NavbarBrand,
@@ -19,8 +21,9 @@ import {
   Image,
   Button,
 } from "@nextui-org/react";
-import { useTheme as useNextTheme } from "next-themes";
 import { FaShoppingBag } from "react-icons/fa";
+import { useTheme as useNextTheme } from "next-themes";
+import { DropdownComponent, DarkModeSwitch } from "@/components";
 
 export const NavbarComponent = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,6 +32,7 @@ export const NavbarComponent = () => {
   const { numberOfProducts } = useContext(BagContext);
   const { toggleSideMenu } = useContext(UiContext);
   const { resolvedTheme } = useNextTheme();
+  const pathname = usePathname();
 
   return (
     <>
@@ -148,7 +152,7 @@ export const NavbarComponent = () => {
                 </Link>
               </NavbarItem>
               <NavbarItem>
-                <Link color="foreground" href="/#servicios">
+                <Link color="foreground" href="/#services">
                   Cómo funciona
                 </Link>
               </NavbarItem>
@@ -269,7 +273,7 @@ export const NavbarComponent = () => {
                 </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="foreground" href="/#servicios">
+                <Link color="foreground" href="/#services">
                   Cómo funciona
                 </Link>
               </NavbarMenuItem>
@@ -292,7 +296,10 @@ export const NavbarComponent = () => {
                 <hr />
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/auth/login"}>
+                <Link
+                  color="foreground"
+                  href={`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`}
+                >
                   Iniciar sesión
                 </Link>
               </NavbarMenuItem>

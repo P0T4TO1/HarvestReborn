@@ -1,26 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import {
   Image,
   Button,
-  Link,
   Divider,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import Carousel from "react-material-ui-carousel";
-import { IoChatbubbleEllipsesOutline, IoBookmark } from "react-icons/io5";
+import { toast } from "sonner";
 import { IoMdMore } from "react-icons/io";
+import Carousel from "react-material-ui-carousel";
+import { WARNING_TOAST, DANGER_TOAST } from "../ui";
+import { IoChatbubbleEllipsesOutline, IoBookmark } from "react-icons/io5";
 
-import { DisponibilidadPublicacion, IPublicacion } from "@/interfaces";
-import { chatHrefConstructor } from "@/utils/cn";
 import { hrApi } from "@/api";
+import { chatHrefConstructor } from "@/utils/cn";
+import { DisponibilidadPublicacion, IPublicacion } from "@/interfaces";
 
 interface Props {
   publication: IPublicacion;
@@ -33,6 +34,11 @@ export const ViewPublication = ({ publication }: Props) => {
 
   const onContact = async (id_user: string, id_dueneg: string) => {
     setIsLoading(true);
+    if (!session) {
+      toast("Debes iniciar sesión para enviar un mensaje", WARNING_TOAST);
+      setIsLoading(false);
+      return;
+    }
     await hrApi
       .post(`/chat`, {
         userId: id_user,
@@ -42,6 +48,8 @@ export const ViewPublication = ({ publication }: Props) => {
       })
       .then(() => {
         router.push(`/chats/chat/${chatHrefConstructor(id_user, id_dueneg)}`);
+      }).catch(() => {
+        return toast("Ocurrió un error al intentar enviar el mensaje", DANGER_TOAST);
       });
   };
 
@@ -86,6 +94,7 @@ export const ViewPublication = ({ publication }: Props) => {
               onClick={() =>
                 onContact(session?.user.id!, publication.negocio.dueneg.id_user)
               }
+              isLoading={isLoading}
             >
               Enviar mensaje
             </Button>

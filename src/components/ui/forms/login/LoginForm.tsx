@@ -1,14 +1,11 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { FC, useState, useContext } from "react";
 
-import { FcGoogle } from "react-icons/fc";
-import { useRouter } from "next/navigation";
 import { loginSchema } from "@/validations/auth.validation";
 import { signIn, SignInResponse } from "next-auth/react";
-import { toast } from "sonner";
-import { AuthContext } from "@/context/auth";
-import { SubmitHandler, useForm } from "react-hook-form";
+
 import {
   Input,
   Link,
@@ -18,10 +15,15 @@ import {
   CardFooter,
   Button,
 } from "@nextui-org/react";
+import { toast } from "sonner";
+import { FcGoogle } from "react-icons/fc";
 import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { isEmailVerified } from "@/helpers";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
+
+import { isEmailVerified } from "@/helpers";
+import { AuthContext } from "@/context/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface IFormData {
   user_email: string;
@@ -31,6 +33,7 @@ interface IFormData {
 export const LoginForm: FC = () => {
   const router = useRouter();
   const { loginUser } = useContext(AuthContext);
+  const searchParams = useSearchParams();
 
   const {
     handleSubmit,
@@ -79,7 +82,10 @@ export const LoginForm: FC = () => {
 
       const res: SignInResponse | undefined = await signIn("credentials", {
         ...data,
-        redirect: false,
+        redirect: true,
+        callbackUrl: searchParams.get("callbackUrl")
+          ? decodeURIComponent(searchParams.get("callbackUrl")!)
+          : "/home",
       });
 
       if (res?.error === "CredentialsSignin") {
