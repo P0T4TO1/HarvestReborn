@@ -5,5 +5,5 @@ export async function POST(request: NextRequest) {
 
   console.log(body);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true }, { status: 200 });
 }
