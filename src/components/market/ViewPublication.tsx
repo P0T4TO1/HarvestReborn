@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import {
@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { IoMdMore } from "react-icons/io";
 import Carousel from "react-material-ui-carousel";
-import { WARNING_TOAST, DANGER_TOAST } from "../ui";
+import { DANGER_TOAST } from "../ui";
 import { IoChatbubbleEllipsesOutline, IoBookmark } from "react-icons/io5";
 
 import { hrApi } from "@/api";
@@ -29,13 +29,14 @@ interface Props {
 
 export const ViewPublication = ({ publication }: Props) => {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const onContact = async (id_user: string, id_dueneg: string) => {
     setIsLoading(true);
     if (!session) {
-      toast("Debes iniciar sesión para enviar un mensaje", WARNING_TOAST);
+      router.push(`auth/login?callbackUrl=${encodeURIComponent(pathname)}`);
       setIsLoading(false);
       return;
     }
@@ -48,8 +49,12 @@ export const ViewPublication = ({ publication }: Props) => {
       })
       .then(() => {
         router.push(`/chats/chat/${chatHrefConstructor(id_user, id_dueneg)}`);
-      }).catch(() => {
-        return toast("Ocurrió un error al intentar enviar el mensaje", DANGER_TOAST);
+      })
+      .catch(() => {
+        return toast(
+          "Ocurrió un error al intentar enviar el mensaje",
+          DANGER_TOAST
+        );
       });
   };
 

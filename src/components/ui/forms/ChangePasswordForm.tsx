@@ -23,10 +23,13 @@ export const ChangePasswordForm = ({
   const [message, setMessage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleConfirm, setVisibleConfirm] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
+      setLoading(false);
       return;
     }
     const response = await hrApi.post("user/change-password", {
@@ -35,6 +38,7 @@ export const ChangePasswordForm = ({
     });
     if (response.status !== 200) {
       setMessage("Error al cambiar la contraseña");
+      setLoading(false);
       return;
     } else {
       setMessage(response.data.message);
@@ -56,7 +60,7 @@ export const ChangePasswordForm = ({
             <div className="space-y-6">
               <div className="relative">
                 <Input
-                  type="password"
+                  type={visible ? "text" : "password"}
                   label="Contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -77,7 +81,7 @@ export const ChangePasswordForm = ({
               </div>
               <div className="relative">
                 <Input
-                  type="password"
+                  type={visibleConfirm ? "text" : "password"}
                   label="Confirmar contraseña"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -88,9 +92,9 @@ export const ChangePasswordForm = ({
                       className="flex items-center absolute inset-y-0 right-0 mr-3 cursor-pointer text-sm leading-5 text-green-700"
                     >
                       {visibleConfirm ? (
-                        <MdOutlineVisibilityOff />
+                        <MdOutlineVisibilityOff size={24} />
                       ) : (
-                        <MdOutlineVisibility />
+                        <MdOutlineVisibility size={24} />
                       )}
                     </button>
                   }
@@ -100,6 +104,7 @@ export const ChangePasswordForm = ({
               <Button
                 color="secondary"
                 variant="bordered"
+                isLoading={loading}
                 onClick={handleSubmit}
               >
                 Cambiar contraseña

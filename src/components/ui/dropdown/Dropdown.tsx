@@ -97,7 +97,7 @@ export const DropdownComponent: FC = () => {
             <DropdownItem
               key="login"
               color="primary"
-              href={`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`}
+              href={"/auth/login"}
               startContent={<MdOutlineLogin size={20} />}
             >
               Iniciar sesión

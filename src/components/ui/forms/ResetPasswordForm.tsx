@@ -16,11 +16,15 @@ import { FaChevronLeft } from "react-icons/fa";
 export const ResetPasswordForm = () => {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const [buttonText, setButtonText] = useState<string>(
+    "Restablecer contraseña"
+  );
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
     setLoading(true);
+    setMessage("Enviando correo electrónico..");
     if (!email) {
       setError("El correo electrónico es requerido");
       return;
@@ -34,7 +38,8 @@ export const ResetPasswordForm = () => {
       return;
     } else {
       setError("");
-      setMessage("Enviando correo electrónico..");
+      setMessage("Correo electrónico enviado con éxito");
+      setButtonText("Volver a enviar correo");
       setLoading(false);
     }
   };
@@ -69,7 +74,7 @@ export const ResetPasswordForm = () => {
                 onClick={handleSubmit}
                 isLoading={loading}
               >
-                Restablecer contraseña
+                {buttonText}
               </Button>
               <p>{message}</p>
               <p className="text-gray-500 text-sm mt-4">

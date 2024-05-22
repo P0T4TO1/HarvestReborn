@@ -82,10 +82,7 @@ export const LoginForm: FC = () => {
 
       const res: SignInResponse | undefined = await signIn("credentials", {
         ...data,
-        redirect: true,
-        callbackUrl: searchParams.get("callbackUrl")
-          ? decodeURIComponent(searchParams.get("callbackUrl")!)
-          : "/home",
+        redirect: false,
       });
 
       if (res?.error === "CredentialsSignin") {
@@ -99,7 +96,11 @@ export const LoginForm: FC = () => {
       }
       if (res && res.ok && res.status === 200) {
         toast("¡Bienvenido!", SUCCESS_TOAST);
-        router.push("/home");
+        router.push(
+          searchParams.get("callbackUrl")
+            ? decodeURIComponent(searchParams.get("callbackUrl")!)
+            : "/home"
+        );
         router.refresh();
         return;
       }

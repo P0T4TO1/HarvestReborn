@@ -298,7 +298,7 @@ export const NavbarComponent = () => {
               <NavbarMenuItem>
                 <Link
                   color="foreground"
-                  href={`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`}
+                  href={"/auth/login"}
                 >
                   Iniciar sesión
                 </Link>
