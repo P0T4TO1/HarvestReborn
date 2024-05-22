@@ -36,7 +36,7 @@ export const ViewPublication = ({ publication }: Props) => {
   const onContact = async (id_user: string, id_dueneg: string) => {
     setIsLoading(true);
     if (!session) {
-      router.push(`auth/login?callbackUrl=${encodeURIComponent(pathname)}`);
+      router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`);
       setIsLoading(false);
       return;
     }
