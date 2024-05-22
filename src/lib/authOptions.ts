@@ -5,7 +5,6 @@ import FacebookProvider from "next-auth/providers/facebook";
 import prisma from "@/lib/prisma";
 import { compare } from "bcrypt";
 import { oAuthToDb } from "@/actions";
-import { access } from "fs";
 
 const getDomainWithoutSubdomain = (url: string) => {
   const urlParts = new URL(url).hostname.split(".");
