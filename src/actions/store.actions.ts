@@ -44,7 +44,7 @@ export const getPublicactionById = async (id_publicacion: number) => {
   if (!id_publicacion) return;
 
   try {
-    const { data } = await axios.get<IPublicacion>(
+    const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/store/publication/${id_publicacion}`
     );
 
