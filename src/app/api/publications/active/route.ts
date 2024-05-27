@@ -51,6 +51,7 @@ async function getActivePublications(req: NextRequest) {
   const publications = await prisma.m_publicaciones.findMany({
     where: {
       estado_general: EstadoGeneral.ACTIVO,
+      estado_publicacion: "ACTIVO",
     },
     include: {
       lotes: true,
