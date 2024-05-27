@@ -1,8 +1,7 @@
 import prisma from "@/lib/prisma";
-import { ILote, IOrden, INegocio } from "@/interfaces";
 import axios, { AxiosError } from "axios";
-import { IPublicacion, EstadoLote } from "@/interfaces";
 import { today, getLocalTimeZone } from "@internationalized/date";
+import { ILote, IOrden, INegocio, IPublicacion, EstadoLote } from "@/interfaces";
 
 export const revalidate = 3600;
 

@@ -136,7 +136,11 @@ export const columnsLotes = [
   { name: "CANTIDAD EN KG", uid: "cantidad_producto", sortable: true },
   { name: "FECHA DE ENTRADA", uid: "fecha_entrada", sortable: true },
   { name: "HORA DE ENTRADA", uid: "hora_entrada", sortable: true },
-  { name: "FECHA APROX. DE VENCIMIENTO", uid: "fecha_vencimiento", sortable: true },
+  {
+    name: "FECHA APROX. DE VENCIMIENTO",
+    uid: "fecha_vencimiento",
+    sortable: true,
+  },
   { name: "ACCIONES", uid: "acciones" },
 ];
 
@@ -161,4 +165,54 @@ export const storageColorMapLotes = {
   BOLSA: "success",
   CANASTA: "warning",
   OTRO: "error",
+};
+
+export const columnsPublications = [
+  { name: "ID", uid: "id_publicacion", sortable: true },
+  { name: "TÍTULO", uid: "titulo_publicacion", sortable: true },
+  { name: "DISPONIBILIDAD", uid: "disponibilidad", sortable: true },
+  { name: "ESTADO", uid: "estado_publicacion", sortable: true },
+  { name: "ESTADO GENERAL", uid: "estado_general", sortable: true },
+  { name: "FECHA DE PUBLICACIÓN", uid: "createdAt", sortable: true },
+  { name: "ACCIONES", uid: "acciones" },
+];
+
+export const availabilityOptionsPublications = [
+  { name: "EN VENTA", uid: "EN_VENTA" },
+  { name: "DONACIÓN", uid: "DONACION" },
+];
+
+export const availabilityColorMapPublications = {
+  EN_VENTA: "primary",
+  DONACION: "secondary",
+};
+
+export const statusOptionsPublications = [
+  { name: "ACTIVO", uid: "ACTIVO" },
+  { name: "INACTIVA", uid: "INACTIVA" },
+  { name: "PENDIENTE", uid: "PENDIENTE" },
+  { name: "RECHAZADA", uid: "RECHAZADA" },
+  { name: "VENDIDO", uid: "VENDIDO" },
+  { name: "DONADO", uid: "DONADO" },
+];
+
+export const statusColorMapPublications = {
+  ACTIVO: "success",
+  INACTIVA: "danger",
+  PENDIENTE: "warning",
+  RECHAZADA: "danger",
+  VENDIDO: "secondary",
+  DONADO: "secondary",
+};
+
+export const statusOptionsPublicationsGeneral = [
+  { name: "ACTIVO", uid: "ACTIVO" },
+  { name: "INACTIVO", uid: "INACTIVO" },
+  { name: "PENDIENTE", uid: "PENDIENTE" },
+];
+
+export const statusColorMapPublicationsGeneral = {
+  ACTIVO: "success",
+  INACTIVO: "danger",
+  PENDIENTE: "warning",
 };

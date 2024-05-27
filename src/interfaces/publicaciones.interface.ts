@@ -17,7 +17,7 @@ export interface IPublicacion {
 
   lotes?: ILote[];
 
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
   deletedAt?: string;
 }

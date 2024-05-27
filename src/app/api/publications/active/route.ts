@@ -7,11 +7,23 @@ async function getActivePublications(req: NextRequest) {
   const search = urlSearchParams.get("q");
   const offset = urlSearchParams.get("offset");
   const limit = urlSearchParams.get("limit");
+  const api_key = urlSearchParams.get("api_key");
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          "You are not authorized to access this route. Please provide a valid API key.",
+      },
+      { status: 401 }
+    );
+  }
 
   if (search) {
     const publications = await prisma.m_publicaciones.findMany({
       where: {
         estado_general: EstadoGeneral.ACTIVO,
+        estado_publicacion: EstadoGeneral.ACTIVO,
         OR: [
           {
             titulo_publicacion: {
@@ -39,6 +51,7 @@ async function getActivePublications(req: NextRequest) {
   const publications = await prisma.m_publicaciones.findMany({
     where: {
       estado_general: EstadoGeneral.ACTIVO,
+      estado_publicacion: EstadoGeneral.ACTIVO,
     },
     include: {
       lotes: true,

@@ -23,24 +23,24 @@ import {
   Image,
   Accordion,
   AccordionItem,
-  image,
+  Tooltip,
 } from "@nextui-org/react";
 import Carousel from "react-material-ui-carousel";
 import { FaX } from "react-icons/fa6";
-import { FaSearch } from "react-icons/fa";
+import { FaCheck, FaSearch } from "react-icons/fa";
 import { toast } from "sonner";
 import { SUCCESS_TOAST, DANGER_TOAST } from "@/components/ui";
 
 import { IoCloudUploadOutline } from "react-icons/io5";
 
-import { useRouter } from "next/navigation";
 import { AuthContext } from "@/context/auth";
-import { ILote, IPublicacion } from "@/interfaces";
+import { Estado, ILote, IPublicacion } from "@/interfaces";
 import { hrApi } from "@/api";
 
 import { postValidationSchema } from "@/validations/negocio.validation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MdBlock } from "react-icons/md";
 
 interface IFormData {
   images_publicacion: File[];
@@ -59,9 +59,10 @@ type Props = {
     apuntoVencer: ILote[];
   };
   publicacion: IPublicacion;
+  isAdmin?: boolean;
 };
 
-export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
+export const PublicacionEdit = ({ lotes, publicacion, isAdmin }: Props) => {
   const { user } = useContext(AuthContext);
 
   const [images, setImages] = useState<File[]>([]);
@@ -202,7 +203,25 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
           });
       }
 
-      if (!user?.duenonegocio?.negocio.id_negocio) {
+      if (isAdmin) {
+        await hrApi
+          .put(`/store/publication/${publicacion.id_publicacion}`, {
+            ...data,
+            images_urls: imagesURLs ?? data.images_urls,
+            id_negocio: publicacion.id_negocio,
+          })
+          .then((response) => {
+            console.log(response);
+            toast("Publicación creada con éxito", SUCCESS_TOAST);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error(error, "Error al crear la publicación en la API");
+            toast("Ocurrió un error al crear la publicación", DANGER_TOAST);
+          });
+      }
+
+      if (!user?.duenonegocio?.negocio?.id_negocio) {
         toast("No se encontró el negocio del usuario", DANGER_TOAST);
         return;
       }
@@ -229,15 +248,68 @@ export const PublicacionEdit = ({ lotes, publicacion }: Props) => {
     }
   };
 
+  const handleChangeStatus = async (id: number, status: string) => {
+    try {
+      await hrApi.put(`/publications/status/${id}`, { status }).then(() => {
+        toast("Se ha cambiado el estado exitosamente", SUCCESS_TOAST);
+        window.location.reload();
+      });
+    } catch (error) {
+      console.log(error);
+      toast("Error al cambiar estado", DANGER_TOAST);
+    }
+  };
+
   return (
     <>
-      <aside className="pt-16 w-full md:w-1/3 lg:w-1/4 md:block md:min-w-[380px] border-r-1 border-default-500">
+      <aside
+        className={`${isAdmin ? "pt-4" : "pt-16"} w-full md:w-1/3 lg:w-1/4 md:block md:min-w-[380px] border-r-1 border-default-500`}
+      >
         <div className="flex flex-col gap-2 p-4 text-sm top-12">
           <h4 className="text-md dark:text-gray-300">Harvest Reborn</h4>
           <h2 className="mb-4 text-2xl font-semibold dark:text-gray-300">
             Editar publicación
           </h2>
         </div>
+        {isAdmin && (
+          <div className="pb-4 px-4">
+            <Tooltip
+              content={
+                publicacion.estado_general === Estado.Activo
+                  ? "Desactivar publicación"
+                  : "Activar publicación"
+              }
+              placement="top"
+            >
+              <Button
+                size="md"
+                variant="light"
+                startContent={
+                  publicacion.estado_general === Estado.Activo ? (
+                    <MdBlock size={21} />
+                  ) : (
+                    <FaCheck size={21} />
+                  )
+                }
+                color="primary"
+                onPress={() =>
+                  handleChangeStatus(
+                    publicacion.id_publicacion,
+                    publicacion.estado_general === Estado.Activo
+                      ? Estado.Inactivo
+                      : Estado.Activo
+                  )
+                }
+              >
+                {publicacion.estado_general === Estado.Activo
+                  ? "Desactivar"
+                  : "Activar"}
+              </Button>
+            </Tooltip>
+          </div>
+        )}
+
+        <Divider />
         <div className="p-4">
           <h4 className="text-sm dark:text-gray-300">
             Imágenes - {images.length}

@@ -1,19 +1,21 @@
 "use client";
 
 import React, { useContext } from "react";
+import { Image } from "@nextui-org/react";
+
+import { UiContext } from "@/context/ui";
+import { usePathname } from "next/navigation";
+
 import { Sidebar } from "./sidebar.styles";
 import { SidebarMenu, SidebarItem } from "@/components";
-import { usePathname } from "next/navigation";
-import { UiContext } from "@/context/ui";
-import { Image } from "@nextui-org/react";
+
 import {
   MdOutlineDashboard,
-  MdOutlineForum,
-  MdOutlineQuiz,
   MdOutlineStorefront,
 } from "react-icons/md";
+import { BsFilePost } from "react-icons/bs";
+import { FaAppleAlt } from "react-icons/fa";
 import { FaPeopleGroup, FaTicket, FaUserGroup } from "react-icons/fa6";
-import { FaAppleAlt, FaShoppingBag } from "react-icons/fa";
 
 export const SidebarWrapper = () => {
   const pathname = usePathname();
@@ -71,16 +73,10 @@ export const SidebarWrapper = () => {
                 href="/admin/dashboard/customers"
               />
               <SidebarItem
-                isActive={pathname === "/admin/dashboard/orders"}
-                title="Ordenes"
-                icon={<FaShoppingBag size={24} />}
-                href="/admin/dashboard/orders"
-              />
-              <SidebarItem
-                isActive={pathname === "/admin/dashboard/chats"}
-                title="Chats"
-                icon={<MdOutlineForum size={24} />}
-                href="/admin/dashboard/chats"
+                isActive={pathname === "/admin/dashboard/publications"}
+                title="Publicaciones"
+                icon={<BsFilePost size={24} />}
+                href="/admin/dashboard/publications"
               />
             </SidebarMenu>
             <SidebarMenu title="Dashboard soporte">
