@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   Modal,
@@ -7,7 +9,7 @@ import {
   ModalHeader,
 } from "@nextui-org/react";
 
-import React from "react";
+import React, { useState } from "react";
 import { hrApi } from "@/api";
 import { toast } from "sonner";
 import { SUCCESS_TOAST, DANGER_TOAST } from "@/components";
@@ -26,7 +28,10 @@ export const DeleteUserConfirm = ({
   loading,
   id,
 }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDelete = async (id: string) => {
+    setIsLoading(true);
     try {
       await hrApi.delete(`/admin/users/${id}`).then(() => {
         toast("Usuario eliminado correctamente", SUCCESS_TOAST);
@@ -34,6 +39,7 @@ export const DeleteUserConfirm = ({
       });
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
       toast("Error al eliminar el usuario", DANGER_TOAST);
     }
   };
@@ -56,15 +62,15 @@ export const DeleteUserConfirm = ({
             <ModalFooter>
               <Button
                 onClick={onClose}
-                disabled={loading}
                 color="primary"
                 variant="ghost"
+                isDisabled={isLoading}
               >
                 Cancelar
               </Button>
               <Button
                 onClick={() => handleDelete(id)}
-                isLoading={loading}
+                isLoading={isLoading}
                 color="danger"
               >
                 Eliminar

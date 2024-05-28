@@ -145,7 +145,7 @@ model m_lote {
   proveedor    c_proveedor? @relation(fields: [id_proveedor], references: [id_proveedor])
 
   id_publicacion Int?
-  publicacion    m_publicaciones? @relation(fields: [id_publicacion], references: [id_publicacion])
+  publicacion    m_publicaciones? @relation(fields: [id_publicacion], references: [id_publicacion], onDelete: Cascade)
 
   productoOrden m_prodcutoOrden[]
 
@@ -209,7 +209,7 @@ model m_prodcutoOrden {
   monto            Float
 
   id_orden String?
-  orden    d_orden? @relation(fields: [id_orden], references: [id_orden])
+  orden    d_orden? @relation(fields: [id_orden], references: [id_orden], onDelete: Cascade)
 
   id_producto Int
   producto    m_producto @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
@@ -242,13 +242,13 @@ model d_orden {
   estado_orden EstadoOrden @default(PENDIENTE)
 
   id_cliente Int
-  cliente    d_cliente @relation(fields: [id_cliente], references: [id_cliente])
+  cliente    d_cliente @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade)
 
   id_historial Int?
-  historial    c_historial? @relation(fields: [id_historial], references: [id_historial])
+  historial    c_historial? @relation(fields: [id_historial], references: [id_historial], onDelete: Cascade)
 
   id_negocio Int
-  negocio    m_negocio @relation(fields: [id_negocio], references: [id_negocio])
+  negocio    m_negocio @relation(fields: [id_negocio], references: [id_negocio], onDelete: Cascade)
 
   productoOrden m_prodcutoOrden[]
 
@@ -333,7 +333,7 @@ model d_participantes {
   user    m_user? @relation(fields: [id_user], references: [id], onDelete: Cascade)
 
   id_chat String
-  chat    m_chat @relation(fields: [id_chat], references: [id_chat])
+  chat    m_chat @relation(fields: [id_chat], references: [id_chat], onDelete: Cascade)
 
   @@index([id_user])
   @@index([id_chat])
@@ -362,7 +362,7 @@ model d_mensajes {
   deletedAt      DateTime?
 
   id_chat String
-  chat    m_chat? @relation(fields: [id_chat], references: [id_chat])
+  chat    m_chat? @relation(fields: [id_chat], references: [id_chat], onDelete: Cascade)
 
   id_user String
   user    m_user? @relation(fields: [id_user], references: [id], onDelete: Cascade)

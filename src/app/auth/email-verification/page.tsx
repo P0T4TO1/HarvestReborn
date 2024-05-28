@@ -21,8 +21,8 @@ const VerifyEmailPage = async ({ searchParams }: VerifyEmailPageProps) => {
     if (!user) {
       return (
         <section className="relative min-h-screen sm:flex sm:flex-row justify-center bg-transparent">
-          <div className="flex justify-center self-center z-10 shadow-xl">
-            <div className="p-12 bg-white mx-auto rounded-3xl w-[386px]">
+          <div className="flex justify-center self-center z-10">
+            <div className="w-full max-w-md p-6">
               <div className="mb-7">
                 <h3 className="font-semibold text-2xl text-gray-800">
                   Token de verificación inválido

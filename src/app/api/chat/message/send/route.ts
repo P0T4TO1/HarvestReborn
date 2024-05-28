@@ -109,7 +109,7 @@ async function sendMessage(req: NextRequest, res: NextResponse) {
               ? `Nuevo mensaje del negocio ${friend?.duenonegocio?.negocio?.nombre_negocio}`
               : "Nuevo mensaje",
           body: message.cuerpo_mensaje,
-          deep_link: `https://harvest-reborn.me/chats/chat/${chatId}`,
+          deep_link: `https://harvestreborn.me/chats/chat/${chatId}`,
         },
       },
     });

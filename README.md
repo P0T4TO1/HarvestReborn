@@ -2,7 +2,7 @@
 
 # Harvest Reborn
 
-#### URL del proyecto: [https://harvest-reborn-pa.vercel.app/](https://harvest-reborn-pa.vercel.app/)
+#### URL del proyecto: [https://harvestreborn.me](https://harvestreborn.me)
 
 ## Descripción
 
@@ -15,7 +15,7 @@ en el cual ...
 
 - Node.js 18.19.0 o superior
 - npm 8.11.0 o superior
-- MySQL 8.0.19 o superior / MongoDB
+- Postgresql 16.2 o superior
 
 ---
 

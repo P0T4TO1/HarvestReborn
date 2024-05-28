@@ -111,7 +111,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         if (process.env.NODE_ENV === "development") {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
-          link = `https://www.harvest-reborn.me/auth/email-verification?token=${emailVerificationToken}`;
+          link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
         }
 
         const emailHtml = render(
@@ -252,7 +252,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         if (process.env.NODE_ENV === "development") {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
-          link = `https://www.harvest-reborn.me/auth/email-verification?token=${emailVerificationToken}`;
+          link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
         }
 
         const emailHtml = render(

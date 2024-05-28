@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Image, Card, CardBody } from "@nextui-org/react";
+import { Image, Card, CardBody, Button, Link } from "@nextui-org/react";
 
 type Props = {
   email?: string;
@@ -39,6 +39,9 @@ export const EmailVerificationForm = ({ email }: Props) => {
                 revise su bandeja de correo no deseado.
               </strong>
             </p>
+            <Button as={Link} href="/" className="mt-6">
+              Volver al inicio
+            </Button>
           </CardBody>
         </Card>
       </div>

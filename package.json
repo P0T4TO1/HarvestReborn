@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate && prisma db push && prisma generate --schema=./prisma-second/schema.prisma"
+    "postinstall": "prisma generate && prisma generate --schema=./prisma-second/schema.prisma"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

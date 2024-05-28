@@ -43,17 +43,16 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
   if (process.env.NODE_ENV === "development") {
     link = `http://localhost:3000/auth/reset-password?token=${resetPasswordToken}`;
   } else {
-    link = `https://www.harvest-reborn.me/auth/reset-password?token=${resetPasswordToken}`;
+    link = `https://harvestreborn.me/auth/reset-password?token=${resetPasswordToken}`;
   }
 
   const emailHtml = render(
     ResetPassEmail({ resetPasswordToken: link, email }) as React.ReactElement
   );
 
-  // Send email with reset password token with SendGrid
   const msg = {
-    from: "Harvest Reborn<harvestreborn@gmail.com>", // Use the email address or domain you verified above
-    to: email, // Change to your recipient
+    from: "Harvest Reborn<harvestreborn@gmail.com>",
+    to: email,
     subject: "Restablecer tu contraseña",
     html: emailHtml,
   };
