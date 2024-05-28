@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { Estado } from "@/interfaces";
+import { hash } from "bcrypt";
 
 async function getAccountData(
   request: Request,
@@ -50,7 +50,7 @@ async function updateAccountData(
     },
     data: {
       email,
-      password,
+      password: await hash(password, 10),
     },
   });
 

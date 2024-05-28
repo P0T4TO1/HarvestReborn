@@ -48,7 +48,6 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         : 2 || 3;
 
     const emailVerificationToken = crypto.randomBytes(32).toString("base64url");
-    console.log(tipo, ceo);
 
     if (tipo === "cliente") {
       const newUser = await prisma.m_user.upsert({
