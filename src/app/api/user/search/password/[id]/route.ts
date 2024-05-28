@@ -8,7 +8,7 @@ async function searchPassword(
   req: NextRequest,
   res: NextResponse
 ) {
-  const { password } = (await req.json()) as {
+  const { password } = (await request.json()) as {
     password: string;
   };
   try {
