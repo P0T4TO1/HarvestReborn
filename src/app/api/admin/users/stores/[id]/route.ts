@@ -73,7 +73,7 @@ async function updateNegocioData(
     email_negocio,
     descripcion_negocio,
     estado_negocio,
-  } = (await new Response(request.body).json()) as Data;
+  } = (await req.json()) as Data;
   const dir_negocio = calle.concat(", ", colonia, ", ", alcaldia, ", ", cp);
 
   const updatedNegocio = await prisma.m_negocio.update({

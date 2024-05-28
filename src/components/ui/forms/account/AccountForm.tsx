@@ -1,255 +1,275 @@
 "use client";
 
-import { FC, useContext, useEffect, useState } from "react";
-import { Estado, IUser } from "@/interfaces";
+import { FC, useState, useContext } from "react";
 import { AuthContext } from "@/context/auth";
+import { useRouter } from "next/navigation";
+
 import { hrApi } from "@/api";
-import { CircularProgress } from "@nextui-org/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { Input, Button } from "@nextui-org/react";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { accountSchema } from "@/validations/profile.validation";
-import { toast } from "sonner";
+import { Estado, IUser } from "@/interfaces";
 import { verifyOldPassword } from "@/helpers";
 
-type Errors = {
-  email?: string;
-  oldPassword?: string;
-  password?: string;
-  confirmPassword?: string;
-  estado?: string;
-} | null;
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { accountSchema } from "@/validations/profile.validation";
+
+import {
+  Input,
+  Button,
+  Modal,
+  ModalContent,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
+import { toast } from "sonner";
+import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
 
 interface IFormData {
-  email: string;
   oldPassword: string;
   password: string;
   confirmPassword: string;
   estado?: Estado;
 }
 
-export const AccountForm: FC = () => {
-  const methods = useForm<IFormData>();
-  const { handleSubmit, register } = methods;
-  const { user } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  user: IUser;
+}
+
+export const AccountForm: FC<Props> = ({ user }) => {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setError,
+  } = useForm<IFormData>({
+    resolver: zodResolver(accountSchema),
+  });
+  const router = useRouter();
+  const { logout } = useContext(AuthContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(user.email);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
-  const [account, setAccount] = useState<IUser>();
-  const [error, setError] = useState(false);
-  const [errors, setErrors] = useState<Errors>(null);
 
-  useEffect(() => {
-    if (!user?.id) {
-      return;
-    }
-    hrApi
-      .get(`/user/account/${user?.id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setAccount(res.data);
-        }
+  const onSubmitEmail = async () => {
+    if (!email) return setErrorMessage("Email no puede estar vacío");
+    setLoading(true);
+
+    await hrApi
+      .put(`/user/account/${user.id}`, { email })
+      .then(() => {
+        toast("Perfil actualizado", SUCCESS_TOAST);
+        window.location.reload();
+      })
+      .catch((err) => {
+        toast("Error al actualizar perfil", DANGER_TOAST);
+        console.error(err);
         setLoading(false);
+        return null;
+      });
+  };
+
+  const onDeactivate = async () => {
+    setLoading(true);
+    await hrApi
+      .put(`/user/account/${user.id}`, { estado: Estado.Inactivo })
+      .then(() => {
+        toast("Cuenta desactivada", SUCCESS_TOAST);
+        logout();
+        router.refresh();
       })
       .catch(() => {
-        setError(true);
+        toast("Error al desactivar cuenta", DANGER_TOAST);
         setLoading(false);
+        return null;
       });
-  }, [user?.id]);
-
-  const onSubmitEmail = async (data: IFormData) => {
-    try {
-      const res = await hrApi
-        .put(`/user/account/${user?.id}`, data)
-        .then(() => {
-          toast("Perfil actualizado", SUCCESS_TOAST);
-        })
-        .catch((err) => {
-          toast("Error al actualizar perfil", DANGER_TOAST);
-          console.error(err);
-          return null;
-        });
-      if (res) {
-        return res;
-      }
-    } catch (error) {
-      toast("Hubo un error", DANGER_TOAST);
-      console.error(error);
-    }
   };
 
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
+    setLoading(true);
     try {
-      const validations = accountSchema.safeParse(data);
-      if (!validations.success) {
-        console.log("error", validations.error.issues);
-        let newErrors: Errors = {};
-
-        validations.error.issues.forEach((issue) => {
-          newErrors = { ...newErrors, [issue.path[0]]: issue.message };
-        });
-        setErrors(newErrors);
-        return null;
-      } else {
-        setErrors(null);
-      }
-
       const passwordExists = await verifyOldPassword(
         user?.id as string,
         data.oldPassword
       );
       if (passwordExists.message === "Contraseña incorrecta") {
-        setErrors({ oldPassword: "Contraseña incorrecta" });
+        setError("oldPassword", { message: "Contraseña incorrecta" });
         return null;
       }
 
-      const res = await hrApi
-        .put(`/user/account/${user?.id}`, data)
+      await hrApi
+        .put(`/user/account/${user.id}`, data)
         .then(() => {
           toast("Perfil actualizado", SUCCESS_TOAST);
+          window.location.reload();
         })
-        .catch((err) => {
+        .catch(() => {
+          toast("Error al actualizar perfil", DANGER_TOAST);
+          setLoading(false);
           return null;
         });
-      if (res) {
-        return res;
-      }
     } catch (error) {
+      toast("Error al actualizar perfil", DANGER_TOAST);
+      setLoading(false);
       console.error(error);
     }
   };
 
   return (
-    <div className="w-full min-h-screen py-1 md:w-2/3 lg:w-3/4">
-      <div className="p-2 md:p-4">
-        <div className="w-full pb-8 mt-8 sm:max-w-3xl sm:rounded-lg">
-          <h2 className="text-2xl font-bold sm:text-xl dark:text-gray-300">
-            Cuenta
-          </h2>
-          {loading ? (
-            <CircularProgress
-              size="lg"
-              aria-label="Loading..."
-              className="mt-4"
-            />
-          ) : error ? (
-            <p>Hubo un error</p>
-          ) : (
-            <>
-              {user?.oAuthId ? (
-                <>
-                  <div className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4">
-                    <div className="w-full flex flex-col gap-4">
-                      <Input
-                        type="email"
-                        label="Email"
-                        placeholder="Email"
-                        defaultValue={user?.email}
-                        isDisabled
-                      />
-                      <div className="text-red-400">
-                        No puedes cambiar tu correo electrónico porque te
-                        registraste con Google
-                      </div>
-                      <div className="text-red-400">
-                        Si deseas cambiar tu correo electrónico, contacta a
-                        soporte
-                      </div>
+    <>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>Desactivar cuenta</ModalHeader>
+          <ModalBody>
+            ¿Estás seguro de que deseas desactivar tu cuenta? Esta acción no se
+            puede deshacer.
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onPress={onClose}>
+              Cancelar
+            </Button>
+            <Button
+              color="success"
+              onPress={() => {
+                onDeactivate();
+                onClose();
+              }}
+            >
+              Desactivar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <div className="w-full min-h-screen py-1 md:w-2/3 lg:w-3/4">
+        <div className="p-2 md:p-4">
+          <div className="w-full pb-8 mt-8 sm:max-w-3xl sm:rounded-lg">
+            <h2 className="text-2xl font-bold sm:text-xl dark:text-gray-300">
+              Cuenta
+            </h2>
+            {user.oAuthId ? (
+              <>
+                <div className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4">
+                  <div className="w-full flex flex-col gap-4">
+                    <Input
+                      type="email"
+                      label="Email"
+                      placeholder="Email"
+                      defaultValue={email}
+                      isDisabled
+                    />
+                    <div className="text-red-400">
+                      No puedes cambiar tu correo electrónico porque te
+                      registraste con Google
+                    </div>
+                    <div className="text-red-400">
+                      Si deseas cambiar tu correo electrónico, contacta a
+                      soporte
                     </div>
                   </div>
-                </>
-              ) : (
-                <>
+                </div>
+              </>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  onClick={() => setIsEditing(!isEditing)}
+                  variant="solid"
+                  color="success"
+                >
+                  {isEditing ? "Cancelar" : "Editar"}
+                </Button>
+                <form
+                  className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4"
+                  onSubmit={() => onSubmitEmail()}
+                >
+                  <div className="w-full flex flex-col">
+                    <Input
+                      type="email"
+                      label="Email"
+                      placeholder="Email"
+                      defaultValue={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      isDisabled={!isEditing}
+                    />
+                    {errorMessage && (
+                      <span className="text-red-500 text-sm">
+                        {errorMessage}
+                      </span>
+                    )}
+                  </div>
                   <Button
-                    type="button"
-                    onClick={() => setIsEditing(!isEditing)}
-                    variant="solid"
+                    type="submit"
                     color="success"
+                    variant="solid"
+                    isLoading={loading}
+                    isDisabled={!isEditing}
                   >
-                    {isEditing ? "Cancelar" : "Editar"}
+                    Guardar cambios
                   </Button>
-                  <form
-                    className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4"
-                    onSubmit={handleSubmit(onSubmitEmail)}
+                </form>
+                <form
+                  className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
+                  <div className="w-full flex flex-col">
+                    <Input
+                      type="password"
+                      label="Contraseña actual  "
+                      {...register("oldPassword")}
+                    />
+                    {errors.oldPassword && (
+                      <span className="text-red-500 text-sm">
+                        {errors.oldPassword.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-full flex flex-col">
+                    <Input
+                      type="password"
+                      label="Nueva contraseña"
+                      {...register("password")}
+                    />
+                    {errors.password && (
+                      <span className="text-red-500 text-sm">
+                        {errors.password.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-full flex flex-col">
+                    <Input
+                      type="password"
+                      label="Confirmar contraseña"
+                      {...register("confirmPassword")}
+                    />
+                    {errors.confirmPassword && (
+                      <span className="text-red-500 text-sm">
+                        {errors.confirmPassword.message}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    type="submit"
+                    color="success"
+                    variant="solid"
+                    isLoading={loading}
+                    isDisabled={!isEditing}
                   >
-                    <div className="w-full flex flex-col gap-4">
-                      <Input
-                        type="email"
-                        label="Email"
-                        placeholder="Email"
-                        defaultValue={account?.email}
-                        isDisabled={!isEditing}
-                        {...register("email")}
-                      />
-                      {errors?.email && (
-                        <span className="text-red-500">{errors?.email}</span>
-                      )}
-                    </div>
-                    <Button type="submit" color="success" variant="solid">
-                      {loading ? (
-                        <CircularProgress size="md" />
-                      ) : (
-                        "Guardar cambios"
-                      )}
-                    </Button>
-                  </form>
-                  <form
-                    className="flex flex-col items-center mt-8 sm:mt-14 text-[#202142] justify-center w-full gap-4"
-                    onSubmit={handleSubmit(onSubmit)}
-                  >
-                    <div className="w-full flex flex-col gap-4">
-                      <Input
-                        type="password"
-                        label="Contraseña actual  "
-                        {...register("oldPassword")}
-                      />
-                      {errors?.oldPassword && (
-                        <span className="text-red-500">
-                          {errors?.oldPassword}
-                        </span>
-                      )}
-                    </div>
-                    <div className="w-full flex flex-col gap-4">
-                      <Input
-                        type="password"
-                        label="Nueva contraseña"
-                        {...register("password")}
-                      />
-                      {errors?.password && (
-                        <span className="text-red-500">{errors?.password}</span>
-                      )}
-                    </div>
-                    <div className="w-full flex flex-col gap-4">
-                      <Input
-                        type="password"
-                        label="Confirmar contraseña"
-                        {...register("confirmPassword")}
-                      />
-                      {errors?.confirmPassword && (
-                        <span className="text-red-500">
-                          {errors?.confirmPassword}
-                        </span>
-                      )}
-                    </div>
-                    <Button type="submit" color="success" variant="solid">
-                      {loading ? (
-                        <CircularProgress size="md" />
-                      ) : (
-                        "Guardar cambios"
-                      )}
-                    </Button>
-                  </form>
-                </>
-              )}
-            </>
-          )}
+                    Guardar cambios
+                  </Button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-center items-center">
+          <Button type="button" color="danger" onPress={() => onOpen()}>
+            Desactivar cuenta
+          </Button>
         </div>
       </div>
-      <div className="flex justify-center items-center">
-        <Button type="button" color="danger">
-          Desactivar cuenta
-        </Button>
-      </div>
-    </div>
+    </>
   );
 };

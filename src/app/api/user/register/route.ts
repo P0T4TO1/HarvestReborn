@@ -38,7 +38,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
     colonia = "",
     alcaldia = "",
     cp = "",
-  } = (await new Response(req.body).json()) as Data;
+  } = (await req.json()) as Data;
   try {
     const ceo: number =
       email === "jaretgarciagomez@gmail.com" ||

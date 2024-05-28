@@ -29,7 +29,7 @@ async function addUser(req: NextRequest, res: NextResponse) {
     colonia,
     alcaldia,
     cp,
-  } = (await new Response(req.body).json()) as {
+  } = (await req.json()) as {
     email: string;
     password: string;
     nombre: string;

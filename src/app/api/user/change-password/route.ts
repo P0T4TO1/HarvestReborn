@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 async function changePassword(req: NextRequest, res: NextResponse) {
-  const { resetToken, password } = (await new Response(req.body).json()) as {
+  const { resetToken, password } = (await req.json()) as {
     resetToken: string;
     password: string;
   };

@@ -55,7 +55,7 @@ export const DescriptionComponent: FC = () => {
               </Link>
             )}
 
-            <Link href={"/#servicios"}>
+            <Link href={"/#services"}>
               <Button color="success" size="lg" className="ml-2 sm:ml-3">
                 Conoce más
               </Button>

@@ -95,8 +95,7 @@ async function updateProfile(
   req: NextRequest,
   res: NextResponse
 ) {
-  const data: ProfileData = await new Response(request.body).json();
-  console.log(data, params.id);
+  const data: ProfileData = await req.json();
 
   if (!params.id)
     return NextResponse.json(

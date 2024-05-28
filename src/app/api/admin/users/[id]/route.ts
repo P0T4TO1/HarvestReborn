@@ -67,7 +67,7 @@ async function updateUser(
     colonia,
     alcaldia,
     cp,
-  } = (await new Response(request.body).json()) as Data;
+  } = (await req.json()) as Data;
 
   if (!params.id)
     return NextResponse.json(

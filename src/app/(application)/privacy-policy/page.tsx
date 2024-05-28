@@ -1,10 +1,7 @@
 export default function PrivacyPolicyPage() {
   return (
     <>
-      <section
-          className="mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20"
-          id="servicios"
-      >
+      <section className="mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
         <div className="mb-10 mx-auto text-center md:mb-12">
           <div>
             <p className="inline-block px-3 py-px mb-4 text-xs font-bold tracking-wider text-teal-900 uppercase rounded-full bg-teal-accent-400">
@@ -34,9 +31,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <div className="mb-10 md:mx-auto md:mb-12">
-          <h3 className="text-xl md:mx-auto mb-3">
-            Información recopilada
-          </h3>
+          <h3 className="text-xl md:mx-auto mb-3">Información recopilada</h3>
           <p className="text-base md:mx-auto mb-3">
             Recopilamos la siguiente información personal cuando usted utiliza
             nuestra aplicación:
@@ -70,9 +65,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <div className="mb-10 md:mx-auto md:mb-12">
-          <h3 className="text-xl md:mx-auto mb-3">
-            Uso de la información
-          </h3>
+          <h3 className="text-xl md:mx-auto mb-3">Uso de la información</h3>
           <p className="text-base  md:mx-auto mb-3">
             Utilizamos la información que recopilamos para los siguientes
             propósitos:
@@ -116,9 +109,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <div className="mb-10 md:mx-auto md:mb-12">
-          <h3 className="text-xl  md:mx-auto mb-3">
-            Derechos del Usuario
-          </h3>
+          <h3 className="text-xl  md:mx-auto mb-3">Derechos del Usuario</h3>
           <p className="text-base  md:mx-auto mb-3">
             Usted tiene ciertos derechos en relación con su información
             personal, incluyendo el derecho a acceder, corregir, actualizar,
@@ -128,9 +119,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </div>
         <div className="mb-10 md:mx-auto md:mb-12">
-          <h3 className="text-xl  md:mx-auto mb-3">
-            Menores de Edad
-          </h3>
+          <h3 className="text-xl  md:mx-auto mb-3">Menores de Edad</h3>
           <p className="text-base  md:mx-auto mb-3">
             Nuestra aplicación no está dirigida a menores de 18 años y no
             recopilamos intencionalmente información personal de personas
@@ -153,9 +142,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <div className="mb-10 md:mx-auto md:mb-12">
-          <h3 className="text-xl  md:mx-auto mb-3">
-            Contacto
-          </h3>
+          <h3 className="text-xl  md:mx-auto mb-3">Contacto</h3>
           <div className="text-base  md:mx-auto mb-3 flex flex-col">
             <p className="text-base  mb-3">
               Si tiene alguna pregunta, inquietud o solicitud relacionada con

@@ -51,7 +51,7 @@ interface Data {
 
 async function updateProduct(req: NextRequest, res: NextResponse) {
   try {
-    const body = await new Response(req.body).json()
+    const body = await req.json()
     const { id, nombre_producto, file, descripcion, enTemporada, categoria } =
       validateUpdateProduct(body);
 
@@ -81,7 +81,7 @@ async function updateProduct(req: NextRequest, res: NextResponse) {
 }
 
 async function deleteProduct(req: NextRequest, res: NextResponse) {
-  const { id } = (await new Response(req.body).json()) as { id: string };
+  const { id } = (await req.json()) as { id: string };
 
   if (!id) {
     return NextResponse.json(

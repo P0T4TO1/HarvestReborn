@@ -8,7 +8,7 @@ async function searchPassword(
   req: NextRequest,
   res: NextResponse
 ) {
-  const { password } = (await new Response(req.body).json()) as {
+  const { password } = (await req.json()) as {
     password: string;
   };
   try {
@@ -35,7 +35,7 @@ async function searchPassword(
 
     const match = await bcrypt.compare(password, user.password!);
     if (match) {
-      return NextResponse.json({ user, message: "Contraseña correcta" });
+      return NextResponse.json({ user, message: "Contraseña correcta" }, { status: 200 });
     }
 
     return NextResponse.json({
@@ -52,3 +52,5 @@ async function searchPassword(
     );
   }
 }
+
+export { searchPassword as POST };

@@ -33,9 +33,7 @@ async function updateAccountData(
   req: NextRequest,
   res: NextResponse
 ) {
-  const { email, password, estado } = (await new Response(
-    request.body
-  ).json()) as {
+  const { email, password, estado } = (await req.json()) as {
     email: string;
     password: string;
     estado: string;

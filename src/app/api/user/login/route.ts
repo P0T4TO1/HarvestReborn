@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 async function loginUser(req: NextRequest, res: NextResponse) {
-  const { email = "", password = "" } = await new Response(req.body).json();
+  const { email, password } = (await req.json()) as {
+    email: string;
+    password: string;
+  };
 
   const user = await prisma.m_user.findUnique({
     where: {

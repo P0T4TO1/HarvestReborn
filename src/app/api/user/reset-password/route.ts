@@ -7,7 +7,7 @@ import { render } from "@react-email/render";
 import { sendEmail } from "@/utils/sendEmail";
 
 async function resetPassword(req: NextRequest, res: NextResponse) {
-  const { email } = (await new Response(req.body).json()) as { email: string };
+  const { email } = (await req.json()) as { email: string };
 
   const user = await prisma.m_user.findFirst({
     where: {
