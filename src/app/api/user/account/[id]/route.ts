@@ -33,10 +33,9 @@ async function updateAccountData(
   req: NextRequest,
   res: NextResponse
 ) {
-  const { email, password, estado } = (await req.json()) as {
+  const { email, password } = (await request.json()) as {
     email: string;
     password: string;
-    estado: string;
   };
 
   if (!params.id)
@@ -52,7 +51,6 @@ async function updateAccountData(
     data: {
       email,
       password,
-      estado: estado as Estado,
     },
   });
 

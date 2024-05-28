@@ -8,7 +8,7 @@ async function deactivateAccount(
   req: NextRequest,
   res: NextResponse
 ) {
-  const { estado } = (await req.json()) as {
+  const { estado } = (await request.json()) as {
     estado: string;
   };
 
