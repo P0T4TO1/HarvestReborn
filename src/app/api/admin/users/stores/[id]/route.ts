@@ -1,11 +1,10 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { Estado } from "@/interfaces";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 import { NegocioActivationEmail } from "@/components";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+import { sendEmail } from "@/utils/sendEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -108,21 +107,11 @@ async function updateNegocioData(
     }) as React.ReactElement
   );
 
-  const msg = {
-    from: "Harvest Reborn<harvestreborn@gmail.com>",
-    to: user?.email,
-    subject: "Estado de tu negocio en Harvest Reborn",
-    html: emailHtml,
-  };
-  try {
-    await sgMail.send(msg);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Error al enviar correo" },
-      { status: 400 }
-    );
-  }
+  await sendEmail(
+    user?.email as string,
+    "Estado de tu negocio en Harvest Reborn",
+    emailHtml
+  );
 
   return NextResponse.json(updatedNegocio, { status: 200 });
 }

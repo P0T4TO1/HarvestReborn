@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { VencimientoNotificationEmail } from "@/components";
 import { ILote } from "@/interfaces";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? "");
+import mailgun from "mailgun-js";
+import { m } from "framer-motion";
+
+const mg = mailgun({
+  apiKey: process.env.MAILGUN_API_KEY || "",
+  domain: process.env.MAILGUN_DOMAIN || "",
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -78,18 +83,11 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    try {
-      await sgMail.send(msgs);
-    } catch (error) {
-      console.error(error);
-      return NextResponse.json(
-        {
-          error: true,
-          message: "Error al enviar correos",
-        },
-        { status: 500 }
-      );
-    }
+    await Promise.all(
+      msgs.map((msg) => {
+        return mg.messages().send(msg);
+      })
+    );
 
     return NextResponse.json(lotesParaAvisar, {
       status: 200,

@@ -1,10 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { hash } from "bcrypt";
 import crypto from "crypto";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+import { sendEmail } from "@/utils/sendEmail";
 
 import { signToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
@@ -121,15 +120,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
           }) as React.ReactElement
         );
 
-        const msg = {
-          from: "Harvest Reborn<harvestreborn@gmail.com>", // Use the email address or domain you verified above
-          to: email, // Change to your recipient
-          subject: "Verifica tu correo electrónico",
-          html: emailHtml,
-        };
-
         try {
-          await sgMail.send(msg);
+          await sendEmail(email, "Verifica tu correo electrónico", emailHtml);
         } catch (error) {
           console.error(error);
           return NextResponse.json(
@@ -270,7 +262,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         };
 
         try {
-          await sgMail.send(msg);
+          await sendEmail(email, "Verifica tu correo electrónico", emailHtml);
         } catch (error) {
           console.error(error);
           return NextResponse.json(

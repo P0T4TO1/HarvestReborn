@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { EstadoOrden } from "@prisma/client";
 
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 import { OrderStatusEmail } from "@/components";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? "");
+import { sendEmail } from "@/utils/sendEmail";
 
 async function changeEstadoOrder(
   request: Request,
@@ -62,22 +61,7 @@ async function changeEstadoOrder(
       })
     );
 
-    const msg = {
-      to: email,
-      from: "Harvest Reborn<harvestreborn@gmail.com>",
-      subject: "Estado de tu orden",
-      html: emailHtml,
-    };
-
-    try {
-      await sgMail.send(msg);
-    } catch (error) {
-      console.error(error);
-      return NextResponse.json(
-        { message: "Error al enviar correo de notificación" },
-        { status: 500 }
-      );
-    }
+    await sendEmail(email, "Estado de tu orden", emailHtml);
 
     return NextResponse.json(order, { status: 200 });
   } catch (error) {

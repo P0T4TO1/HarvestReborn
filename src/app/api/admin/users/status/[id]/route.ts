@@ -1,10 +1,9 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 import { UserStatusEmail } from "@/components";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+import { sendEmail } from "@/utils/sendEmail";
 
 async function patchStatusUser(
   request: Request,
@@ -39,22 +38,12 @@ async function patchStatusUser(
         }) as React.ReactElement
       );
 
-      const msg = {
-        from: "Harvest Reborn<harvestreborn@gmail.com>",
-        to: user?.email,
-        subject: "Estado de tu usuario en Harvest Reborn",
-        html: emailHtml,
-      };
+      await sendEmail(
+        user?.email as string,
+        "Estado de tu usuario en Harvest Reborn",
+        emailHtml
+      );
 
-      try {
-        await sgMail.send(msg);
-      } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-          { message: "Error al enviar correo" },
-          { status: 400 }
-        );
-      }
       return NextResponse.json(user, { status: 200 });
     } else if (status === "INACTIVO") {
       const user = await prisma.m_user.update({
@@ -73,22 +62,12 @@ async function patchStatusUser(
         }) as React.ReactElement
       );
 
-      const msg = {
-        from: "Harvest Reborn<harvestreborn@gmail.com>",
-        to: user?.email,
-        subject: "Estado de tu usuario en Harvest Reborn",
-        html: emailHtml,
-      };
+      await sendEmail(
+        user?.email as string,
+        "Estado de tu usuario en Harvest Reborn",
+        emailHtml
+      );
 
-      try {
-        await sgMail.send(msg);
-      } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-          { message: "Error al enviar correo" },
-          { status: 400 }
-        );
-      }
       return NextResponse.json(user, { status: 200 });
     }
   } catch (error) {

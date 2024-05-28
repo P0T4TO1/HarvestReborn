@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { BagType, Estado, IOrden } from "@/interfaces";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 import { OrderNotificationEmail } from "@/components";
 import { generateOrderId } from "@/utils/orderid";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+import { sendEmail } from "@/utils/sendEmail";
 
 interface Data {
   fecha_orden: string;
@@ -33,7 +32,10 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       const promise = data.bag.map(async (item) => {
         const order = (await prisma.d_orden.create({
           data: {
-            id_orden: generateOrderId() + Math.floor(Math.random() * 1000) + item.id_negocio,
+            id_orden:
+              generateOrderId() +
+              Math.floor(Math.random() * 1000) +
+              item.id_negocio,
             fecha_orden: new Date(fecha_orden),
             hora_orden: new Date(hora_orden),
             monto_total: item.total,
@@ -163,16 +165,11 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       };
     });
 
-    try {
-      await sgMail.send(msgs);
-    } catch (error) {
-      console.error(error);
-      return NextResponse.json(
-        { message: "Error al enviar correos" },
-        { status: 400 }
-      );
-    }
-
+    await Promise.all(
+      msgs.map((msg) => {
+        return sendEmail(msg.to, msg.subject, msg.html);
+      })
+    );
 
     return NextResponse.json(
       {

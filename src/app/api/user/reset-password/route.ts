@@ -2,10 +2,9 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { ResetPassEmail } from "@/components";
-import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "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");
+import { sendEmail } from "@/utils/sendEmail";
 
 async function resetPassword(req: NextRequest, res: NextResponse) {
   const { email } = (await new Response(req.body).json()) as { email: string };
@@ -50,24 +49,7 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
     ResetPassEmail({ resetPasswordToken: link, email }) as React.ReactElement
   );
 
-  const msg = {
-    from: "Harvest Reborn<harvestreborn@gmail.com>",
-    to: email,
-    subject: "Restablecer tu contraseña",
-    html: emailHtml,
-  };
-
-  try {
-    await sgMail.send(msg);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "Error al enviar el correo",
-      },
-      { status: 500 }
-    );
-  }
+  await sendEmail(email, "Restablecer tu contraseña", emailHtml);
 
   return NextResponse.json(
     {

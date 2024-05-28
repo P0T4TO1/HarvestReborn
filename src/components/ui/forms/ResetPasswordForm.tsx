@@ -23,14 +23,15 @@ export const ResetPasswordForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setMessage("Enviando correo electrónico..");
     if (!email) {
       setError("El correo electrónico es requerido");
+      setLoading(false);
       return;
     } else {
       setError("");
     }
+    setLoading(true);
+    setMessage("Enviando correo electrónico..");
     const response = await hrApi.post("user/reset-password", { email });
     if (response.data.error) {
       setError(response.data.error);
