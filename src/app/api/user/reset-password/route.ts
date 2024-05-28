@@ -5,7 +5,7 @@ import { ResetPassEmail } from "@/components";
 import sgMail from "@sendgrid/mail";
 import { render } from "@react-email/render";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "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");
 
 async function resetPassword(req: NextRequest, res: NextResponse) {
   const { email } = (await new Response(req.body).json()) as { email: string };
@@ -27,7 +27,7 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
 
   const resetPasswordToken = crypto.randomBytes(32).toString("base64url");
   const today = new Date();
-  const expiryDate = new Date(today.setDate(today.getDate() + 1)); // 24 hours from now
+  const expiryDate = new Date(today.setDate(today.getDate() + 1));
 
   await prisma.m_user.update({
     where: {
@@ -68,7 +68,7 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
       { status: 500 }
     );
   }
-  
+
   return NextResponse.json(
     {
       message: "Correo enviado",
