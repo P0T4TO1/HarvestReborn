@@ -97,6 +97,7 @@ export const AccountForm: FC<Props> = ({ user }) => {
       );
       if (passwordExists.message === "Contraseña incorrecta") {
         setError("oldPassword", { message: "Contraseña incorrecta" });
+        setLoading(false);
         return null;
       }
 
