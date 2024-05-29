@@ -35,7 +35,6 @@ export const getAccount = async (id_user: string) => {
 export const getUsersForAdmin = async () => {
   try {
     const { data } = await axios.get<IUser[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`);
-    console.log(data);
     return data as unknown as IUser[];
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -49,8 +48,7 @@ export const getUsersForAdmin = async () => {
 
 export const getUsersForSuperAdmin = async () => {
   try {
-    const { data } = await axios.get<IUser[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/all/users`);
-    console.log(data);
+    const { data } = await axios.get<IUser[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`);
     return data as unknown as IUser[];
   } catch (error) {
     if (error instanceof AxiosError) {
