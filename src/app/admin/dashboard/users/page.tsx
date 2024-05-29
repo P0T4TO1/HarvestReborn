@@ -11,7 +11,7 @@ const UsersPage = async () => {
     if (!users) {
       return (
         <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
-          <h1>No hay publicaciones</h1>
+          <h1>No hay usuarios</h1>
         </section>
       );
     }
@@ -23,7 +23,7 @@ const UsersPage = async () => {
   }
 
   const users = await getUsersForAdmin();
-  
+
   if (!users) {
     return (
       <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
