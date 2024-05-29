@@ -1,5 +1,5 @@
 import { IUser } from '@/interfaces';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { serverApi } from '@/api/hrApi';
 
 export const getProfile = async (id_user: string) => {
@@ -32,7 +32,7 @@ export const getAccount = async (id_user: string) => {
 
 export const getUsersForAdmin = async () => {
   try {
-    const { data } = await serverApi.get<IUser[]>('/admin/users');
+    const { data } = await axios.get<IUser[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`);
     return data as unknown as IUser[];
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -46,7 +46,7 @@ export const getUsersForAdmin = async () => {
 
 export const getUsersForSuperAdmin = async () => {
   try {
-    const { data } = await serverApi.get<IUser[]>('/admin/all/users');
+    const { data } = await axios.get<IUser[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/all/users`);
     return data as unknown as IUser[];
   } catch (error) {
     if (error instanceof AxiosError) {
