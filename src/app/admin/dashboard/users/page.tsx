@@ -5,6 +5,7 @@ import { getUsersForAdmin, getUsersForSuperAdmin } from '@/actions';
 
 const UsersPage = async () => {
   const session = await getServerSession(authOptions);
+  console.log(session);
 
   if(session?.user.id_rol === 1) {
     const users = await getUsersForSuperAdmin();
