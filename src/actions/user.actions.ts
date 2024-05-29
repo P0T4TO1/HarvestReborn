@@ -1,3 +1,5 @@
+'use server';
+
 import { IUser } from '@/interfaces';
 import axios, { AxiosError } from 'axios';
 import { serverApi } from '@/api/hrApi';
