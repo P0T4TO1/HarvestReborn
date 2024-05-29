@@ -12,13 +12,13 @@ export const getActivePublications = async (
   try {
     if (!search) {
       const { data } = await axios.get<IPublicacion[]>(
-        `${process.env.NEXT_PUBLIC_API_URL}/publications/active?offset=${offset}&limit=${limit}?api_key=${process.env.API_KEY}`
+        `${process.env.NEXT_PUBLIC_API_URL}/publications/active?offset=${offset}&limit=${limit}&api_key=${process.env.API_KEY}`
       );
       return data as unknown as IPublicacion[];
     }
 
     const { data } = await axios.get<IPublicacion[]>(
-      `${process.env.NEXT_PUBLIC_API_URL}/publications/active?q=${search}&offset=${offset}&limit=${limit}?api_key=${process.env.API_KEY}`
+      `${process.env.NEXT_PUBLIC_API_URL}/publications/active?q=${search}&offset=${offset}&limit=${limit}&api_key=${process.env.API_KEY}`
     );
     
     revalidatePath("/(application)/market");

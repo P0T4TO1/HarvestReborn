@@ -1,6 +1,7 @@
-import prisma from "@/lib/prisma";
+import prisma from '@/lib/prisma';
+import { cache } from 'react';
 
-export const getChatsByUserId = async (userId: string) => {
+export const getChatsByUserId = cache(async (userId: string) => {
   const chats = await prisma.m_chat.findMany({
     where: {
       participantes: {
@@ -60,4 +61,4 @@ export const getChatsByUserId = async (userId: string) => {
     },
   });
   return chats;
-};
+});

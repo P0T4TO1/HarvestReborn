@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   BreadcrumbItem,
@@ -7,20 +7,20 @@ import {
   Input,
   Select,
   SelectItem,
-} from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import axios from "axios";
-import { adminAddUserValidation } from "@/validations/admin.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { useRouter } from "next/navigation";
-import { searchUserByEmail } from "@/helpers";
-import { FaHome } from "react-icons/fa";
-import { FaPeopleGroup } from "react-icons/fa6";
-import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
+} from '@nextui-org/react';
+import React, { useEffect, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import axios from 'axios';
+import { adminAddUserValidation } from '@/validations/admin.validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components';
+import { useRouter } from 'next/navigation';
+import { searchUserByEmail } from '@/helpers';
+import { FaHome } from 'react-icons/fa';
+import { FaPeopleGroup } from 'react-icons/fa6';
+import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 
 interface IResponse {
   c_cve_ciudad: string;
@@ -60,18 +60,18 @@ interface IFormData {
 }
 
 const months = {
-  "01": "Enero",
-  "02": "Febrero",
-  "03": "Marzo",
-  "04": "Abril",
-  "05": "Mayo",
-  "06": "Junio",
-  "07": "Julio",
-  "08": "Agosto",
-  "09": "Septiembre",
-  "10": "Octubre",
-  "11": "Noviembre",
-  "12": "Diciembre",
+  '01': 'Enero',
+  '02': 'Febrero',
+  '03': 'Marzo',
+  '04': 'Abril',
+  '05': 'Mayo',
+  '06': 'Junio',
+  '07': 'Julio',
+  '08': 'Agosto',
+  '09': 'Septiembre',
+  '10': 'Octubre',
+  '11': 'Noviembre',
+  '12': 'Diciembre',
 };
 
 export const AddUserForm = () => {
@@ -91,26 +91,26 @@ export const AddUserForm = () => {
   const [visibleConfirm, setVisibleConfirm] = useState<boolean>(false);
 
   useEffect(() => {
-    if (getValues("cp").length === 5) {
-      axios.get("/CP_CDMX.json").then((direction) => {
+    if (getValues('cp').length === 5) {
+      axios.get('/CP_CDMX.json').then((direction) => {
         if (direction) {
           if (
             direction.data.some(
-              (item: IResponse) => item.d_codigo === getValues("cp")
+              (item: IResponse) => item.d_codigo === getValues('cp')
             )
           ) {
-            setError("cp", { message: "" });
+            setError('cp', { message: '' });
           } else {
-            setError("cp", { message: "Código postal no encontrado" });
+            setError('cp', { message: 'Código postal no encontrado' });
             return;
           }
           direction.data.map((item: IResponse) => {
-            if (item.d_codigo !== getValues("cp")) {
+            if (item.d_codigo !== getValues('cp')) {
               return;
             } else {
-              setValue("colonia", item.d_asenta);
-              setValue("alcaldia", item.D_mnpio);
-              setError("cp", { message: "" });
+              setValue('colonia', item.d_asenta);
+              setValue('alcaldia', item.D_mnpio);
+              setError('cp', { message: '' });
             }
           });
         } else {
@@ -125,32 +125,32 @@ export const AddUserForm = () => {
       data.fecha_nacimiento = `${data.dia_nacimiento}-${data.mes_nacimiento}-${data.year_nacimiento}`;
       const userExists = await searchUserByEmail(data.email);
 
-      if (userExists.message === "Este correo ya esta registrado") {
-        setError("email", { message: "Este correo ya esta registrado" });
+      if (userExists.message === 'Este correo ya esta registrado') {
+        setError('email', { message: 'Este correo ya esta registrado' });
         return null;
       }
 
       const res = await hrApi
-        .post("/admin/users", data)
+        .post('/admin/users', data)
         .then(() => {
-          toast("Usuario agregado con éxito", SUCCESS_TOAST);
-          router.push("/admin/dashboard/users");
+          toast('Usuario agregado con éxito', SUCCESS_TOAST);
+          router.push('/admin/dashboard/users');
           return true;
         })
         .catch((err) => {
-          toast("Hubo un error", DANGER_TOAST);
+          toast('Hubo un error', DANGER_TOAST);
           console.log(err);
           return null;
         });
       if (res) {
-        console.log("Usuario agregado");
+        console.log('Usuario agregado');
       } else {
-        console.log("Hubo un error data");
+        console.log('Hubo un error data');
       }
     } catch (error) {
-      toast("Hubo un error", DANGER_TOAST);
+      toast('Hubo un error', DANGER_TOAST);
       console.log(error);
-      console.log("Hubo un error");
+      console.log('Hubo un error');
     }
   };
 
@@ -158,18 +158,17 @@ export const AddUserForm = () => {
     <div className="my-10 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
       <Breadcrumbs size="lg">
         <BreadcrumbItem
-          href={"/admin/dashboard"}
+          href={'/admin/dashboard'}
           startContent={<FaHome size={20} />}
         >
           Home
         </BreadcrumbItem>
         <BreadcrumbItem
-          href={"/admin/dashboard/users"}
+          href={'/admin/dashboard/users'}
           startContent={<FaPeopleGroup size={20} />}
         >
           Usuarios
         </BreadcrumbItem>
-        <BreadcrumbItem href={"/admin/dashboard/users"}>Listado</BreadcrumbItem>
         <BreadcrumbItem>Agregar</BreadcrumbItem>
       </Breadcrumbs>
 
@@ -180,7 +179,7 @@ export const AddUserForm = () => {
           className="grid grid-cols-3 gap-4"
         >
           <div>
-            <Input label="Email" variant="bordered" {...register("email")} />
+            <Input label="Email" variant="bordered" {...register('email')} />
             {errors?.email && (
               <p className="text-red-700 text-xs">{errors?.email.message}</p>
             )}
@@ -188,9 +187,9 @@ export const AddUserForm = () => {
           <div className="relative">
             <Input
               label="Contraseña"
-              type={`${visible ? "text" : "password"}`}
+              type={`${visible ? 'text' : 'password'}`}
               variant="bordered"
-              {...register("password")}
+              {...register('password')}
               endContent={
                 <button
                   onClick={() => setVisible(!visible)}
@@ -212,9 +211,9 @@ export const AddUserForm = () => {
           <div className="relative">
             <Input
               label="Confirmar contraseña"
-              type={`${visibleConfirm ? "text" : "password"}`}
+              type={`${visibleConfirm ? 'text' : 'password'}`}
               variant="bordered"
-              {...register("confirmPassword")}
+              {...register('confirmPassword')}
               endContent={
                 <button
                   onClick={() => setVisibleConfirm(!visibleConfirm)}
@@ -239,7 +238,7 @@ export const AddUserForm = () => {
             <Input
               label="Nombre(s)"
               variant="bordered"
-              {...register("nombre")}
+              {...register('nombre')}
             />
             {errors?.nombre && (
               <p className="text-red-700 text-xs">{errors?.nombre.message}</p>
@@ -249,7 +248,7 @@ export const AddUserForm = () => {
             <Input
               label="Apellidos"
               variant="bordered"
-              {...register("apellidos")}
+              {...register('apellidos')}
             />
             {errors?.apellidos && (
               <p className="text-red-700 text-xs">
@@ -264,7 +263,7 @@ export const AddUserForm = () => {
               variant="bordered"
               type="text"
               label="Día"
-              {...register("dia_nacimiento")}
+              {...register('dia_nacimiento')}
             />
             {errors?.dia_nacimiento && (
               <p className="text-red-700 text-xs">
@@ -279,7 +278,7 @@ export const AddUserForm = () => {
               id="mes_nacimiento"
               label="Mes"
               variant="bordered"
-              {...register("mes_nacimiento")}
+              {...register('mes_nacimiento')}
             >
               {Object.entries(months).map(([key, value]) => (
                 <SelectItem value={key} key={key}>
@@ -300,7 +299,7 @@ export const AddUserForm = () => {
               type="text"
               label="Año"
               variant="bordered"
-              {...register("year_nacimiento")}
+              {...register('year_nacimiento')}
             />
             {errors?.year_nacimiento && (
               <p className="text-red-700 text-xs">
@@ -315,7 +314,7 @@ export const AddUserForm = () => {
               label="Tipo de usuario"
               id="tipo"
               variant="bordered"
-              {...register("tipo")}
+              {...register('tipo')}
             >
               <SelectItem value="admin" key="admin">
                 Administrador
@@ -337,8 +336,8 @@ export const AddUserForm = () => {
               id="nombreNegocio"
               label="Nombre del negocio"
               variant="bordered"
-              isRequired={getValues("tipo") === "negocio"}
-              {...register("nombre_negocio")}
+              isRequired={getValues('tipo') === 'negocio'}
+              {...register('nombre_negocio')}
             />
             {errors?.nombre_negocio && (
               <p className="text-red-700 text-xs">
@@ -352,7 +351,7 @@ export const AddUserForm = () => {
               id="telefono"
               label="Número de teléfono"
               variant="bordered"
-              {...register("telefono")}
+              {...register('telefono')}
             />
             {errors?.telefono && (
               <p className="text-red-700 text-xs">{errors?.telefono.message}</p>
@@ -364,7 +363,7 @@ export const AddUserForm = () => {
               id="cp"
               label="Código postal"
               variant="bordered"
-              {...register("cp")}
+              {...register('cp')}
             />
             {errors?.cp && (
               <p className="text-red-700 text-xs">{errors?.cp.message}</p>
@@ -377,9 +376,9 @@ export const AddUserForm = () => {
               label="Colonia"
               variant="bordered"
               isDisabled
-              defaultValue={getValues("colonia")}
-              value={getValues("colonia")}
-              {...register("colonia")}
+              defaultValue={getValues('colonia')}
+              value={getValues('colonia')}
+              {...register('colonia')}
             />
             {errors?.colonia && (
               <p className="text-red-700 text-xs">{errors?.colonia.message}</p>
@@ -391,7 +390,7 @@ export const AddUserForm = () => {
               id="calle"
               variant="bordered"
               label="Calle y número"
-              {...register("calle")}
+              {...register('calle')}
             />
             {errors?.calle && (
               <p className="text-red-700 text-xs">{errors?.calle.message}</p>
@@ -404,9 +403,9 @@ export const AddUserForm = () => {
               label="Alcaldía"
               variant="bordered"
               isDisabled
-              defaultValue={getValues("alcaldia")}
-              value={getValues("alcaldia")}
-              {...register("alcaldia")}
+              defaultValue={getValues('alcaldia')}
+              value={getValues('alcaldia')}
+              {...register('alcaldia')}
             />
             {errors?.alcaldia && (
               <p className="text-red-700 text-xs">{errors?.alcaldia.message}</p>

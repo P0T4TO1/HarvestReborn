@@ -24,7 +24,7 @@ export const EmailVerified = () => {
               Gracias por verificar tu cuenta. Ahora puedes disfrutar de todos
               los beneficios de nuestra aplicación.
             </p>
-            <Link href={"/auth/login"} className="rounded-lg">
+            <Link href={"/auth/login?q=registered"} className="rounded-lg">
               <Button color="primary" className="w-full mt-6">
                 Iniciar sesión
               </Button>

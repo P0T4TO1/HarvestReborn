@@ -85,7 +85,7 @@ export const Messages: FC<MessagesProps> = ({
                   <span
                     className={`ml-2 text-xs text-gray-400 ${isCurrentUser && "text-gray-300"}`}
                   >
-                    {new Date(message.createdAt).toLocaleTimeString("es-MX", {
+                    {new Date(message.createdAt.toString()).toLocaleTimeString("es-MX", {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}

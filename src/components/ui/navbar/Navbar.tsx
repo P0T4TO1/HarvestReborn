@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useSession } from "next-auth/react";
-import React, { useContext, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useSession } from 'next-auth/react';
+import React, { useContext, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
-import { UiContext } from "@/context/ui";
-import { AuthContext } from "@/context/auth";
-import { BagContext } from "@/context/order";
+import { UiContext } from '@/context/ui';
+import { AuthContext } from '@/context/auth';
+import { BagContext } from '@/context/order';
 
 import {
   Navbar,
@@ -20,10 +20,10 @@ import {
   Badge,
   Image,
   Button,
-} from "@nextui-org/react";
-import { FaShoppingBag } from "react-icons/fa";
-import { useTheme as useNextTheme } from "next-themes";
-import { DropdownComponent, DarkModeSwitch } from "@/components";
+} from '@nextui-org/react';
+import { FaShoppingBag } from 'react-icons/fa';
+import { useTheme as useNextTheme } from 'next-themes';
+import { DropdownComponent, DarkModeSwitch } from '@/components';
 
 export const NavbarComponent = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,7 +32,6 @@ export const NavbarComponent = () => {
   const { numberOfProducts } = useContext(BagContext);
   const { toggleSideMenu } = useContext(UiContext);
   const { resolvedTheme } = useNextTheme();
-  const pathname = usePathname();
 
   return (
     <>
@@ -42,7 +41,7 @@ export const NavbarComponent = () => {
         className="fixed"
         maxWidth="xl"
       >
-        {user?.id_rol === 1 ? (
+        {session?.user.id_rol === 1 || session?.user.id_rol === 7 ? (
           <NavbarContent>
             <button onClick={toggleSideMenu} className="md:hidden">
               <svg
@@ -62,16 +61,16 @@ export const NavbarComponent = () => {
             </button>
 
             <NavbarMenuToggle
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               className="sm:hidden"
             />
 
             <NavbarBrand>
               <Image
                 src={
-                  resolvedTheme === "dark"
-                    ? "/images/logo-white.png"
-                    : "/images/logo.png"
+                  resolvedTheme === 'dark'
+                    ? '/images/logo-white.png'
+                    : '/images/logo.png'
                 }
                 alt="Harvest Reborn"
                 width={50}
@@ -82,7 +81,7 @@ export const NavbarComponent = () => {
         ) : (
           <NavbarContent>
             <NavbarMenuToggle
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               className="sm:hidden"
             />
             <NavbarBrand>
@@ -100,24 +99,24 @@ export const NavbarComponent = () => {
           {session && user?.id_rol !== 4 ? (
             <>
               <NavbarItem>
-                <Link color="foreground" href={"/home"}>
+                <Link color="foreground" href={'/home'}>
                   Inicio
                 </Link>
               </NavbarItem>
               {user?.id_rol === 2 ? (
                 <>
                   <NavbarItem>
-                    <Link color="foreground" href={"/inventory"}>
+                    <Link color="foreground" href={'/inventory'}>
                       Inventario
                     </Link>
                   </NavbarItem>
                   <NavbarItem>
-                    <Link color="foreground" href={"/orders"}>
+                    <Link color="foreground" href={'/orders'}>
                       Pedidos
                     </Link>
                   </NavbarItem>
                   <NavbarItem>
-                    <Link color="foreground" href={"/chats"}>
+                    <Link color="foreground" href={'/chats'}>
                       Chats
                     </Link>
                   </NavbarItem>
@@ -126,17 +125,17 @@ export const NavbarComponent = () => {
                 user?.id_rol === 3 && (
                   <>
                     <NavbarItem>
-                      <Link color="foreground" href={"/stores"}>
+                      <Link color="foreground" href={'/stores'}>
                         Recauderías
                       </Link>
                     </NavbarItem>
                     <NavbarItem>
-                      <Link color="foreground" href={"/market"}>
+                      <Link color="foreground" href={'/market'}>
                         Publicaciones
                       </Link>
                     </NavbarItem>
                     <NavbarItem>
-                      <Link color="foreground" href={"/chats"}>
+                      <Link color="foreground" href={'/chats'}>
                         Chats
                       </Link>
                     </NavbarItem>
@@ -162,12 +161,12 @@ export const NavbarComponent = () => {
                 </Link>
               </NavbarItem>
               <NavbarItem>
-                <Link color="foreground" href={"/stores"}>
+                <Link color="foreground" href={'/stores'}>
                   Recauderías
                 </Link>
               </NavbarItem>
               <NavbarItem>
-                <Link color="foreground" href={"/market"}>
+                <Link color="foreground" href={'/market'}>
                   Publicaciones
                 </Link>
               </NavbarItem>
@@ -180,7 +179,7 @@ export const NavbarComponent = () => {
               <Link
                 className="flex items-center"
                 color="foreground"
-                href={"/bag"}
+                href={'/bag'}
               >
                 <Button variant="light" isIconOnly>
                   <Badge
@@ -205,24 +204,24 @@ export const NavbarComponent = () => {
           {session ? (
             <>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/home"}>
+                <Link color="foreground" href={'/home'}>
                   Inicio
                 </Link>
               </NavbarMenuItem>
               {user?.id_rol === 2 ? (
                 <>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/inventory"}>
+                    <Link color="foreground" href={'/inventory'}>
                       Inventario
                     </Link>
                   </NavbarMenuItem>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/orders"}>
+                    <Link color="foreground" href={'/orders'}>
                       Pedidos
                     </Link>
                   </NavbarMenuItem>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/chats"}>
+                    <Link color="foreground" href={'/chats'}>
                       Chats
                     </Link>
                   </NavbarMenuItem>
@@ -230,17 +229,17 @@ export const NavbarComponent = () => {
               ) : user?.id_rol === 3 ? (
                 <>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/stores"}>
+                    <Link color="foreground" href={'/stores'}>
                       Recauderías
                     </Link>
                   </NavbarMenuItem>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/market"}>
+                    <Link color="foreground" href={'/market'}>
                       Publicaciones
                     </Link>
                   </NavbarMenuItem>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/chats"}>
+                    <Link color="foreground" href={'/chats'}>
                       Chats
                     </Link>
                   </NavbarMenuItem>
@@ -248,19 +247,19 @@ export const NavbarComponent = () => {
               ) : (
                 <>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/admin/dashboard"}>
+                    <Link color="foreground" href={'/admin/dashboard'}>
                       Dashboard
                     </Link>
                   </NavbarMenuItem>
                   <NavbarMenuItem>
-                    <Link color="foreground" href={"/admin/tickets"}>
+                    <Link color="foreground" href={'/admin/tickets'}>
                       Tickets
                     </Link>
                   </NavbarMenuItem>
                 </>
               )}
               <NavbarMenuItem>
-                <Link color="foreground" href={"/auth/logout"}>
+                <Link color="foreground" href={'/auth/logout'}>
                   Cerrar sesión
                 </Link>
               </NavbarMenuItem>
@@ -268,7 +267,7 @@ export const NavbarComponent = () => {
           ) : (
             <>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/#"}>
+                <Link color="foreground" href={'/#'}>
                   Inicio
                 </Link>
               </NavbarMenuItem>
@@ -283,12 +282,12 @@ export const NavbarComponent = () => {
                 </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/stores"}>
+                <Link color="foreground" href={'/stores'}>
                   Recauderías
                 </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/market"}>
+                <Link color="foreground" href={'/market'}>
                   Publicaciones
                 </Link>
               </NavbarMenuItem>
@@ -296,15 +295,12 @@ export const NavbarComponent = () => {
                 <hr />
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link
-                  color="foreground"
-                  href={"/auth/login"}
-                >
+                <Link color="foreground" href={'/auth/login'}>
                   Iniciar sesión
                 </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="foreground" href={"/auth/register"}>
+                <Link color="foreground" href={'/auth/register'}>
                   Regístrate
                 </Link>
               </NavbarMenuItem>

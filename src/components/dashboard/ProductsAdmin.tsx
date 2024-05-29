@@ -46,7 +46,6 @@ export const ProductsAdmin = () => {
         >
           Productos
         </BreadcrumbItem>
-        <BreadcrumbItem>Listado</BreadcrumbItem>
       </Breadcrumbs>
 
       <h3 className="text-xl font-semibold">Todos los productos</h3>

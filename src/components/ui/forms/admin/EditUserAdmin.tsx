@@ -1,15 +1,18 @@
-"use client";
+'use client';
 
-import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import axios from "axios";
-import { adminEditUserValidation } from "@/validations/admin.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { IUser } from "@/interfaces";
+import React, { useEffect, useState } from 'react';
+
+import { toast } from 'sonner';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components';
+import { Button, Input, Select, SelectItem } from '@nextui-org/react';
+
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { adminEditUserValidation } from '@/validations/admin.validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import axios from 'axios';
+import { hrApi } from '@/api';
+import { IUser } from '@/interfaces';
 
 interface IResponse {
   c_cve_ciudad: string;
@@ -47,28 +50,28 @@ interface IFormData {
 }
 
 const roles = [
-  { name: "Admin", id_rol: 1 },
-  { name: "Negocio", id_rol: 2 },
-  { name: "Cliente", id_rol: 3 },
-  { name: "oAuth", id_rol: 4 },
-  { name: "Soporte", id_rol: 5 },
-  { name: "Admin soporte", id_rol: 6 },
-  { name: "Super admin", id_rol: 7 },
+  { name: 'Super admin', id_rol: 1 },
+  { name: 'Negocio', id_rol: 2 },
+  { name: 'Cliente', id_rol: 3 },
+  { name: 'oAuth', id_rol: 4 },
+  { name: 'Soporte', id_rol: 5 },
+  { name: 'Admin soporte', id_rol: 6 },
+  { name: 'Admin', id_rol: 7 },
 ];
 
 const months = [
-  { key: "01", value: "Enero" },
-  { key: "02", value: "Febrero" },
-  { key: "03", value: "Marzo" },
-  { key: "04", value: "Abril" },
-  { key: "05", value: "Mayo" },
-  { key: "06", value: "Junio" },
-  { key: "07", value: "Julio" },
-  { key: "08", value: "Agosto" },
-  { key: "09", value: "Septiembre" },
-  { key: "10", value: "Octubre" },
-  { key: "11", value: "Noviembre" },
-  { key: "12", value: "Diciembre" },
+  { key: '01', value: 'Enero' },
+  { key: '02', value: 'Febrero' },
+  { key: '03', value: 'Marzo' },
+  { key: '04', value: 'Abril' },
+  { key: '05', value: 'Mayo' },
+  { key: '06', value: 'Junio' },
+  { key: '07', value: 'Julio' },
+  { key: '08', value: 'Agosto' },
+  { key: '09', value: 'Septiembre' },
+  { key: '10', value: 'Octubre' },
+  { key: '11', value: 'Noviembre' },
+  { key: '12', value: 'Diciembre' },
 ];
 
 interface Props {
@@ -77,6 +80,7 @@ interface Props {
 }
 
 export const EditUserForm = ({ user, isEditing }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     handleSubmit,
     register,
@@ -84,85 +88,86 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
     setError,
     getValues,
     setValue,
+    watch,
   } = useForm<IFormData>({
     resolver: zodResolver(adminEditUserValidation),
     defaultValues: {
       email: user.email,
       nombre:
-        user.duenonegocio?.nombre_dueneg ?? user.cliente?.nombre_cliente ?? "",
+        user.duenonegocio?.nombre_dueneg ?? user.cliente?.nombre_cliente ?? '',
       apellidos:
         user.duenonegocio?.apellidos_dueneg ??
         user.cliente?.apellidos_cliente ??
-        "",
+        '',
       fecha_nacimiento:
         user.duenonegocio?.fecha_nacimiento ??
         user.cliente?.fecha_nacimiento ??
-        "",
+        '',
       dia_nacimiento:
-        user.duenonegocio?.fecha_nacimiento.split("-")[2].split("T")[0] ??
-        user.cliente?.fecha_nacimiento.split("-")[2].split("T")[0] ??
-        "",
+        user.duenonegocio?.fecha_nacimiento.split('-')[2].split('T')[0] ??
+        user.cliente?.fecha_nacimiento.split('-')[2].split('T')[0] ??
+        '',
       mes_nacimiento:
-        user.duenonegocio?.fecha_nacimiento.split("-")[1] ??
-        user.cliente?.fecha_nacimiento.split("-")[1] ??
-        "",
+        user.duenonegocio?.fecha_nacimiento.split('-')[1] ??
+        user.cliente?.fecha_nacimiento.split('-')[1] ??
+        '',
       year_nacimiento:
-        user.duenonegocio?.fecha_nacimiento.split("-")[0] ??
-        user.cliente?.fecha_nacimiento.split("-")[0] ??
-        "",
+        user.duenonegocio?.fecha_nacimiento.split('-')[0] ??
+        user.cliente?.fecha_nacimiento.split('-')[0] ??
+        '',
       tipo:
-        user.id_rol === 1 ? "admin" : user.id_rol === 2 ? "negocio" : "cliente",
+        roles.find((role) => role.id_rol === user.id_rol)?.name ?? '',
       nombre_negocio:
         user.duenonegocio?.negocio?.nombre_negocio ??
         user.cliente?.nombre_negocio ??
-        "",
+        '',
       telefono:
         user.duenonegocio?.negocio?.telefono_negocio ??
         user.cliente?.telefono_cliente ??
-        "",
+        '',
       calle:
-        user.duenonegocio?.negocio?.direccion_negocio.split(", ")[0] ??
-        user.cliente?.direccion_negocio?.split(", ")[0] ??
-        "",
+        user.duenonegocio?.negocio?.direccion_negocio.split(', ')[0] ??
+        user.cliente?.direccion_negocio?.split(', ')[0] ??
+        '',
       colonia:
-        user.duenonegocio?.negocio?.direccion_negocio.split(", ")[1] ??
-        user.cliente?.direccion_negocio?.split(", ")[1] ??
-        "",
+        user.duenonegocio?.negocio?.direccion_negocio.split(', ')[1] ??
+        user.cliente?.direccion_negocio?.split(', ')[1] ??
+        '',
       alcaldia:
-        user.duenonegocio?.negocio?.direccion_negocio.split(", ")[2] ??
-        user.cliente?.direccion_negocio?.split(", ")[2] ??
-        "",
+        user.duenonegocio?.negocio?.direccion_negocio.split(', ')[2] ??
+        user.cliente?.direccion_negocio?.split(', ')[2] ??
+        '',
       cp:
-        user.duenonegocio?.negocio?.direccion_negocio.split(", ")[3] ??
-        user.cliente?.direccion_negocio?.split(", ")[3] ??
-        "",
+        user.duenonegocio?.negocio?.direccion_negocio.split(', ')[3] ??
+        user.cliente?.direccion_negocio?.split(', ')[3] ??
+        '',
     },
   });
 
   useEffect(() => {
-    if (!getValues("cp")) {
+    if (!watch('cp')) {
       return;
     }
-    if (getValues("cp")?.length === 5) {
-      axios.get("/CP_CDMX.json").then((direction) => {
+    if (watch('cp')?.length === 5) {
+      axios.get('/CP_CDMX.json').then((direction) => {
         if (direction) {
           if (
             direction.data.some(
-              (item: IResponse) => item.d_codigo === getValues("cp")!
+              (item: IResponse) => item.d_codigo === watch('cp')!
             )
           ) {
-            setError("cp", { message: "" });
+            setError('cp', { message: '' });
           } else {
-            setError("cp", { message: "Código postal no encontrado" });
+            setError('cp', { message: 'Código postal no encontrado' });
             return;
           }
           direction.data.map((item: IResponse) => {
-            if (item.d_codigo !== getValues("cp")!) {
+            if (item.d_codigo !== watch('cp')!) {
               return;
             } else {
-              setValue("colonia", item.d_asenta);
-              setValue("alcaldia", item.D_mnpio);
-              setError("cp", { message: "" });
+              setValue('colonia', item.d_asenta);
+              setValue('alcaldia', item.D_mnpio);
+              setError('cp', { message: '' });
             }
           });
         } else {
@@ -173,28 +178,26 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
   }, [getValues, setError, setValue]);
 
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
+    setIsLoading(true);
     try {
       data.fecha_nacimiento = `${data.dia_nacimiento}-${data.mes_nacimiento}-${data.year_nacimiento}`;
-      const res = await hrApi
+      await hrApi
         .put(`/admin/users/${user.id}`, data)
         .then(() => {
-          toast("Usuario editado con éxito", SUCCESS_TOAST);
+          toast('Usuario editado con éxito', SUCCESS_TOAST);
           window.location.reload();
           return true;
         })
         .catch((err) => {
-          toast("Hubo un error", DANGER_TOAST);
+          toast('Hubo un error', DANGER_TOAST);
+          setIsLoading(false);
           console.log(err);
           return null;
         });
-      if (res) {
-        console.log("Usuario editado");
-      } else {
-        console.log("Hubo un error data");
-      }
     } catch (error) {
       console.log(error);
-      console.log("Hubo un error");
+      setIsLoading(false);
+      console.log('Hubo un error');
     }
   };
 
@@ -209,7 +212,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
             <Input
               label="Email"
               variant="bordered"
-              {...register("email")}
+              {...register('email')}
               defaultValue={user.email}
               isDisabled={!isEditing}
             />
@@ -221,7 +224,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
             <Input
               label="Nombre(s)"
               variant="bordered"
-              {...register("nombre")}
+              {...register('nombre')}
               defaultValue={
                 user.duenonegocio?.nombre_dueneg || user.cliente?.nombre_cliente
               }
@@ -235,7 +238,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
             <Input
               label="Apellidos"
               variant="bordered"
-              {...register("apellidos")}
+              {...register('apellidos')}
               defaultValue={
                 user.duenonegocio?.apellidos_dueneg ||
                 user.cliente?.apellidos_cliente
@@ -255,12 +258,12 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               variant="bordered"
               type="text"
               label="Día"
-              {...register("dia_nacimiento")}
+              {...register('dia_nacimiento')}
               defaultValue={
                 user.duenonegocio?.fecha_nacimiento
-                  .split("-")[2]
-                  .split("T")[0] ||
-                user.cliente?.fecha_nacimiento.split("-")[2].split("T")[0]
+                  .split('-')[2]
+                  .split('T')[0] ||
+                user.cliente?.fecha_nacimiento.split('-')[2].split('T')[0]
               }
               isDisabled={!isEditing}
             />
@@ -277,7 +280,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               id="mes_nacimiento"
               label="Mes"
               variant="bordered"
-              {...register("mes_nacimiento")}
+              {...register('mes_nacimiento')}
               isDisabled={!isEditing}
               defaultSelectedKeys={[
                 months.find(
@@ -285,8 +288,8 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
                     month.key ===
                       user?.duenonegocio?.fecha_nacimiento
                         .toString()
-                        .split("-")[1] ||
-                    user?.cliente?.fecha_nacimiento?.toString().split("-")[1]
+                        .split('-')[1] ||
+                    user?.cliente?.fecha_nacimiento?.toString().split('-')[1]
                 )?.key as string,
               ]}
             >
@@ -309,10 +312,10 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               type="text"
               label="Año"
               variant="bordered"
-              {...register("year_nacimiento")}
+              {...register('year_nacimiento')}
               defaultValue={
-                user.duenonegocio?.fecha_nacimiento.split("-")[0] ||
-                user.cliente?.fecha_nacimiento.split("-")[0]
+                user.duenonegocio?.fecha_nacimiento.split('-')[0] ||
+                user.cliente?.fecha_nacimiento.split('-')[0]
               }
               isDisabled={!isEditing}
             />
@@ -329,11 +332,12 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               label="Tipo de usuario"
               id="tipo"
               variant="bordered"
-              {...register("tipo")}
+              {...register('tipo')}
               isDisabled={!isEditing}
-              defaultSelectedKeys={
-                roles.find((role) => role.id_rol === user.id_rol)?.name
-              }
+              defaultSelectedKeys={[
+                roles.find((role) => role.id_rol === user.id_rol)
+                  ?.name as string,
+              ]}
             >
               {roles.map((role) => (
                 <SelectItem key={role.name} value={role.name}>
@@ -351,8 +355,8 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               id="nombreNegocio"
               label="Nombre del negocio"
               variant="bordered"
-              isRequired={getValues("tipo") === "negocio"}
-              {...register("nombre_negocio")}
+              isRequired={getValues('tipo') === 'negocio'}
+              {...register('nombre_negocio')}
               defaultValue={
                 user.duenonegocio?.negocio?.nombre_negocio ||
                 user.cliente?.nombre_negocio
@@ -371,7 +375,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               id="telefono"
               label="Número de teléfono"
               variant="bordered"
-              {...register("telefono")}
+              {...register('telefono')}
               defaultValue={
                 user.duenonegocio?.negocio?.telefono_negocio ||
                 user.cliente?.telefono_cliente
@@ -388,10 +392,10 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               id="cp"
               label="Código postal"
               variant="bordered"
-              {...register("cp")}
+              {...register('cp')}
               defaultValue={
-                user.duenonegocio?.negocio?.direccion_negocio.split(", ")[3] ||
-                user.cliente?.direccion_negocio?.split(", ")[3]
+                user.duenonegocio?.negocio?.direccion_negocio.split(', ')[3] ||
+                user.cliente?.direccion_negocio?.split(', ')[3]
               }
               isDisabled={!isEditing}
             />
@@ -406,9 +410,9 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               label="Colonia"
               variant="bordered"
               isDisabled
-              defaultValue={getValues("colonia")}
-              value={getValues("colonia")}
-              {...register("colonia")}
+              defaultValue={getValues('colonia')}
+              value={getValues('colonia')}
+              {...register('colonia')}
             />
             {errors?.colonia && (
               <p className="text-red-700 text-xs">{errors?.colonia.message}</p>
@@ -420,10 +424,10 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               id="calle"
               variant="bordered"
               label="Calle y número"
-              {...register("calle")}
+              {...register('calle')}
               defaultValue={
-                user.duenonegocio?.negocio?.direccion_negocio.split(", ")[0] ||
-                user.cliente?.direccion_negocio?.split(", ")[0]
+                user.duenonegocio?.negocio?.direccion_negocio.split(', ')[0] ||
+                user.cliente?.direccion_negocio?.split(', ')[0]
               }
               isDisabled={!isEditing}
             />
@@ -438,16 +442,21 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
               label="Alcaldía"
               variant="bordered"
               isDisabled
-              defaultValue={getValues("alcaldia")}
-              value={getValues("alcaldia")}
-              {...register("alcaldia")}
+              defaultValue={getValues('alcaldia')}
+              value={getValues('alcaldia')}
+              {...register('alcaldia')}
             />
             {errors?.alcaldia && (
               <p className="text-red-700 text-xs">{errors?.alcaldia.message}</p>
             )}
           </div>
           <div>
-            <Button color="primary" type="submit" isDisabled={!isEditing}>
+            <Button
+              color="primary"
+              type="submit"
+              isDisabled={!isEditing}
+              isLoading={isLoading}
+            >
               Guardar cambios
             </Button>
           </div>

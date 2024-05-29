@@ -16,7 +16,7 @@ async function patchStatusUser(
       { message: "Falta id del usuario" },
       { status: 400 }
     );
-  const { status } = (await req.json()) as {
+  const { status } = (await request.json()) as {
     status: string;
   };
 

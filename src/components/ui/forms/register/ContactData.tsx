@@ -120,7 +120,7 @@ export const ContactDataForm = () => {
       } else {
         toast("¡Registro exitoso!", SUCCESS_TOAST);
         if (userData.isEmailVerified) {
-          logout();
+          logout("/auth/login?q=registered");
           setIndexActive(1);
         } else {
           router.push(`/auth/email-verification?u=${userData.email}`);

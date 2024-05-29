@@ -1,17 +1,19 @@
-import { SidebarWrapperChats } from "@/components";
-import { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { getChatsByUserId } from "@/helpers/get-chats-by-user-id";
-import { IChatWithLastMessage } from "@/interfaces";
+import { SidebarWrapperChats } from '@/components';
+import { ReactNode } from 'react';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
+import { getChatsByUserId } from '@/helpers/get-chats-by-user-id';
+import { IChatWithLastMessage } from '@/interfaces';
+
+export const revalidate = 3600;
 
 export default async function ChatsLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/auth/login");
-  if (session.user.id_rol === 4) redirect("/auth/register?oauth=true");
+  if (!session) redirect('/auth/login');
+  if (session.user.id_rol === 4) redirect('/auth/register?oauth=true');
 
   const chats = await getChatsByUserId(session.user.id);
 
@@ -22,9 +24,9 @@ export default async function ChatsLayout({
         id: chat.id_chat,
         name: chat.nombre_chat,
         lastMessage: {
-          text: "No hay mensajes aún",
-          senderId: "",
-          senderName: "",
+          text: 'No hay mensajes aún',
+          senderId: '',
+          senderName: '',
         },
       } as IChatWithLastMessage;
     }

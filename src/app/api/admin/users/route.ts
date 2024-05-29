@@ -1,11 +1,16 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcrypt";
+import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { hash } from 'bcrypt';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 async function getAllUsers(req: NextRequest, res: NextResponse) {
   const users = await prisma.m_user.findMany({
+    where: {
+      id_rol: {
+        not: 1,
+      },
+    },
     include: {
       duenonegocio: true,
       cliente: true,
@@ -45,7 +50,7 @@ async function addUser(req: NextRequest, res: NextResponse) {
   };
 
   try {
-    if (tipo === "negocio") {
+    if (tipo === 'negocio') {
       const newUser = await prisma.m_user.create({
         data: {
           email,
@@ -61,7 +66,7 @@ async function addUser(req: NextRequest, res: NextResponse) {
                   nombre_negocio,
                   telefono_negocio: telefono,
                   direccion_negocio:
-                    calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                    calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
                   inventario: {
                     create: {},
                   },
@@ -72,7 +77,7 @@ async function addUser(req: NextRequest, res: NextResponse) {
         },
       });
       return NextResponse.json(newUser, { status: 201 });
-    } else if (tipo === "cliente") {
+    } else if (tipo === 'cliente') {
       const newUser = await prisma.m_user.create({
         data: {
           email,
@@ -84,15 +89,15 @@ async function addUser(req: NextRequest, res: NextResponse) {
               apellidos_cliente: apellidos,
               telefono_cliente: telefono,
               fecha_nacimiento: new Date(fecha_nacimiento),
-              nombre_negocio: nombre_negocio || "",
+              nombre_negocio: nombre_negocio || '',
               direccion_negocio:
-                calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
             },
           },
         },
       });
       return NextResponse.json(newUser, { status: 201 });
-    } else if (tipo === "admin") {
+    } else if (tipo === 'admin') {
       const newUser = await prisma.m_user.create({
         data: {
           email,
@@ -104,7 +109,7 @@ async function addUser(req: NextRequest, res: NextResponse) {
     }
   } catch (error) {
     return NextResponse.json(
-      { message: "Error al crear el usuario" },
+      { message: 'Error al crear el usuario' },
       { status: 500 }
     );
   }

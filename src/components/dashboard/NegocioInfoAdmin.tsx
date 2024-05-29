@@ -87,9 +87,6 @@ export const NegocioInfoAdmin = ({ id_negocio }: NegocioInfoAdminProps) => {
         >
           Negocios
         </BreadcrumbItem>
-        <BreadcrumbItem href={"/admin/dashboard/stores"}>
-          Listado
-        </BreadcrumbItem>
         <BreadcrumbItem>Info</BreadcrumbItem>
       </Breadcrumbs>
 

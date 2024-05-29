@@ -253,13 +253,6 @@ async function registerUser(req: NextRequest, res: NextResponse) {
           }) as React.ReactElement
         );
 
-        const msg = {
-          from: "Admin No reply<harvestreborn@gmail.com>", // Use the email address or domain you verified above
-          to: email, // Change to your recipient
-          subject: "Verifica tu correo electrónico",
-          html: emailHtml,
-        };
-
         try {
           await sendEmail(email, "Verifica tu correo electrónico", emailHtml);
         } catch (error) {

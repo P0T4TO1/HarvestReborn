@@ -53,7 +53,6 @@ export const UserInfoAdmin = ({ id_user }: UserInfoAdminProps) => {
         >
           Usuarios
         </BreadcrumbItem>
-        <BreadcrumbItem href={"/admin/dashboard/users"}>Listado</BreadcrumbItem>
         <BreadcrumbItem>Info</BreadcrumbItem>
       </Breadcrumbs>
 

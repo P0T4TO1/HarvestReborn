@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext } from "react";
-import { IUser } from "@/interfaces";
+import { createContext } from 'react';
+import { IUser } from '@/interfaces';
 
 interface ContextProps {
   isLoggedIn: boolean;
@@ -24,9 +24,9 @@ interface ContextProps {
     cp: string;
   }) => Promise<{ hasError: boolean; message?: string }>;
 
-  logout: () => void;
+  logout: (callback?: string) => void;
 
-  userData: { email: string; password: string, isEmailVerified: boolean};
+  userData: { email: string; password: string; isEmailVerified: boolean };
   personalData: {
     nombre: string;
     apellidos: string;
@@ -42,7 +42,11 @@ interface ContextProps {
   };
   indexActive: number;
 
-  setUserData: (userData: { email: string; password: string, isEmailVerified: boolean }) => void;
+  setUserData: (userData: {
+    email: string;
+    password: string;
+    isEmailVerified: boolean;
+  }) => void;
   setPersonalData: (data: {
     nombre: string;
     apellidos: string;

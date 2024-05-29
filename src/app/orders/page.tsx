@@ -1,6 +1,6 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { redirect, notFound } from "next/navigation";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
+import { redirect, notFound } from 'next/navigation';
 import {
   OrdersCliente,
   OrdersTable,
@@ -8,16 +8,17 @@ import {
   NavbarWrapperNegocio,
   NavbarComponent,
   Footer,
-} from "@/components";
-import { getOrders as getOrdersNegocio } from "@/actions";
-import { getOrdersById as getOrdersCliente } from "@/actions";
-import prisma from "@/lib/prisma";
+} from '@/components';
+import { getOrders as getOrdersNegocio } from '@/actions';
+import { getOrdersById as getOrdersCliente } from '@/actions';
+import prisma from '@/lib/prisma';
 
 const OrdersPage = async () => {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/auth/login");
-  if (session.user.id_rol === 4) redirect("/auth/register?oauth=true");
-  if (session.user.id_rol === 1) redirect("/admin/dashboard");
+  if (!session) redirect('/auth/login');
+  if (session.user.id_rol === 4) redirect('/auth/register?oauth=true');
+  if (session.user.id_rol === 1 || session?.user.id_rol === 7)
+    redirect('/admin/dashboard');
 
   if (session.user.id_rol === 2) {
     const user = await prisma.d_duenonegocio.findUnique({

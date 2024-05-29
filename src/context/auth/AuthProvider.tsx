@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useReducer, useEffect, ReactNode } from "react";
-import { useSession, signOut } from "next-auth/react";
+import React, { useReducer, useEffect, ReactNode } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
-import Cookies from "js-cookie";
-import axios from "axios";
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
-import { AuthContext, authReducer } from "./";
+import { AuthContext, authReducer } from './';
 
-import { IUser } from "@/interfaces";
-import { hrApi } from "@/api";
+import { IUser } from '@/interfaces';
+import { hrApi } from '@/api';
 
 export interface AuthState {
   isLoggedIn: boolean;
@@ -34,19 +34,19 @@ export interface AuthState {
 const AUTH_INITIAL_STATE: AuthState = {
   isLoggedIn: false,
   user: undefined,
-  userData: { email: "", password: "", isEmailVerified: false },
+  userData: { email: '', password: '', isEmailVerified: false },
   personalData: {
-    nombre: "",
-    apellidos: "",
-    fecha_nacimiento: "",
-    tipo: "",
+    nombre: '',
+    apellidos: '',
+    fecha_nacimiento: '',
+    tipo: '',
   },
   contactData: {
-    nombreNegocio: "",
-    telefono: "",
-    calle: "",
-    colonia: "",
-    cp: "",
+    nombreNegocio: '',
+    telefono: '',
+    calle: '',
+    colonia: '',
+    cp: '',
   },
   indexActive: 1,
 };
@@ -56,8 +56,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { data, status } = useSession();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      dispatch({ type: "[Auth] - Login", payload: data?.user as IUser });
+    if (status === 'authenticated') {
+      dispatch({ type: '[Auth] - Login', payload: data?.user as IUser });
     }
   }, [status, data]);
 
@@ -66,10 +66,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      const { data } = await hrApi.post("/user/login", { email, password });
+      const { data } = await hrApi.post('/user/login', { email, password });
       const { token, user } = data;
-      Cookies.set("token", token);
-      dispatch({ type: "[Auth] - Login", payload: user });
+      Cookies.set('token', token);
+      dispatch({ type: '[Auth] - Login', payload: user });
       return true;
     } catch (error) {
       return false;
@@ -91,10 +91,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     cp: string;
   }): Promise<{ hasError: boolean; message?: string }> => {
     try {
-      const { data } = await hrApi.post("/user/register", registerData);
+      const { data } = await hrApi.post('/user/register', registerData);
       const { token, user } = data;
-      Cookies.set("token", token);
-      dispatch({ type: "[Auth] - Login", payload: user });
+      Cookies.set('token', token);
+      dispatch({ type: '[Auth] - Login', payload: user });
       return {
         hasError: false,
       };
@@ -107,19 +107,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return {
         hasError: true,
-        message: "No se pudo crear el usuario - intente de nuevo",
+        message: 'No se pudo crear el usuario - intente de nuevo',
       };
     }
   };
 
-  const logout = () => {
-    Cookies.remove("token");
-    Cookies.remove("next-auth.session-token");
-    Cookies.remove("next-auth.csrf-token");
-    Cookies.remove("next-auth.callback-url");
+  const logout = (callback?: string) => {
+    Cookies.remove('token');
+    Cookies.remove('next-auth.session-token');
+    Cookies.remove('next-auth.csrf-token');
+    Cookies.remove('next-auth.callback-url');
 
-    signOut({ callbackUrl: "/auth/login", redirect: true }).then(() => {
-      dispatch({ type: "[Auth] - Logout" });
+    signOut({ callbackUrl: callback, redirect: true }).then(() => {
+      dispatch({ type: '[Auth] - Logout' });
     });
   };
 
@@ -128,19 +128,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string;
     isEmailVerified: boolean;
   }) => {
-    dispatch({ type: "[Auth] - SetUserData", payload: userData });
+    dispatch({ type: '[Auth] - SetUserData', payload: userData });
   };
 
   const setPersonalData = (data: any) => {
-    dispatch({ type: "[Auth] - SetPersonalData", payload: data });
+    dispatch({ type: '[Auth] - SetPersonalData', payload: data });
   };
 
   const setContactData = (data: any) => {
-    dispatch({ type: "[Auth] - SetContactData", payload: data });
+    dispatch({ type: '[Auth] - SetContactData', payload: data });
   };
 
   const setIndexActive = (index: number): void => {
-    dispatch({ type: "[Auth] - SetIndexActive", payload: index });
+    dispatch({ type: '[Auth] - SetIndexActive', payload: index });
   };
 
   return (

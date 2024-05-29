@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, Key, ChangeEvent } from "react";
+import { useState, useMemo, useCallback, Key } from 'react';
 import {
   Chip,
   Table,
@@ -22,55 +22,55 @@ import {
   SortDescriptor,
   ChipProps,
   useDisclosure,
-} from "@nextui-org/react";
-import { IUser } from "@/interfaces";
-import { hrApi } from "@/api";
+} from '@nextui-org/react';
+import { IUser } from '@/interfaces';
+import { hrApi } from '@/api';
 import {
   columnsUsuarios as columns,
   rolOptionsUsuarios,
   statusColorMapUsuarios as statusColorMap,
   statusOptionsUsuarios as statusOptions,
-} from "@/utils/data-table";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST, DeleteUserConfirm } from "@/components";
+} from '@/utils/data-table';
+import { toast } from 'sonner';
+import { DANGER_TOAST, SUCCESS_TOAST, DeleteUserConfirm } from '@/components';
 import {
   FaCheck,
   FaChevronDown,
   FaEdit,
   FaRegTrashAlt,
   FaSearch,
-} from "react-icons/fa";
-import { MdOutlinePersonOff } from "react-icons/md";
-import { capitalize } from "@/utils/capitalize";
+} from 'react-icons/fa';
+import { MdOutlinePersonOff } from 'react-icons/md';
+import { capitalize } from '@/utils/capitalize';
 
 interface Props {
   users: IUser[];
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "duenonegocio?.nombre_dueneg ?? cliente?.nombre_cliente",
-  "duenonegocio?.apellidos_dueneg ?? cliente?.apellidos_cliente",
-  "email",
-  "id_rol",
-  "estado",
-  "emailVerified",
-  "acciones",
+  'duenonegocio?.nombre_dueneg ?? cliente?.nombre_cliente',
+  'duenonegocio?.apellidos_dueneg ?? cliente?.apellidos_cliente',
+  'email',
+  'id_rol',
+  'estado',
+  'emailVerified',
+  'acciones',
 ];
 
 export const TableUsers = ({ users }: Props) => {
   const { isOpen, onOpenChange, onOpen } = useDisclosure();
-  const [id, setId] = useState("");
-  const [filterValue, setFilterValue] = useState("");
+  const [id, setId] = useState('');
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [roleFilter, setRoleFilter] = useState<Selection>("all");
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
+  const [roleFilter, setRoleFilter] = useState<Selection>('all');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_orden",
-    direction: "ascending",
+    column: 'fecha_orden',
+    direction: 'ascending',
   });
 
   const [page, setPage] = useState(1);
@@ -78,7 +78,7 @@ export const TableUsers = ({ users }: Props) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -100,7 +100,7 @@ export const TableUsers = ({ users }: Props) => {
       );
     }
     if (
-      statusFilter !== "all" &&
+      statusFilter !== 'all' &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       console.log(statusFilter);
@@ -109,7 +109,7 @@ export const TableUsers = ({ users }: Props) => {
       );
     }
     if (
-      roleFilter !== "all" &&
+      roleFilter !== 'all' &&
       Array.from(roleFilter).length !== rolOptionsUsuarios.length
     ) {
       filteredOrders = filteredOrders.filter((user) =>
@@ -133,11 +133,11 @@ export const TableUsers = ({ users }: Props) => {
     const { column, direction } = sortDescriptor;
 
     return items.sort((a, b) => {
-      if ((a[column as keyof IUser] ?? "") < (b[column as keyof IUser] ?? "")) {
-        return direction === "ascending" ? -1 : 1;
+      if ((a[column as keyof IUser] ?? '') < (b[column as keyof IUser] ?? '')) {
+        return direction === 'ascending' ? -1 : 1;
       }
-      if ((a[column as keyof IUser] ?? "") > (b[column as keyof IUser] ?? "")) {
-        return direction === "ascending" ? 1 : -1;
+      if ((a[column as keyof IUser] ?? '') > (b[column as keyof IUser] ?? '')) {
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -148,61 +148,54 @@ export const TableUsers = ({ users }: Props) => {
       const cellValue = user[columnKey as keyof IUser];
 
       switch (columnKey) {
-        case "id":
+        case 'id':
           return <>{user.id}</>;
-        case "duenonegocio?.nombre_dueneg ?? cliente?.nombre_cliente":
+        case 'duenonegocio?.nombre_dueneg ?? cliente?.nombre_cliente':
           return (
             <>
               {user.duenonegocio?.nombre_dueneg ??
                 user.cliente?.nombre_cliente ??
-                "N/A"}
+                'N/A'}
             </>
           );
-        case "duenonegocio?.apellidos_dueneg ?? cliente?.apellidos_cliente":
+        case 'duenonegocio?.apellidos_dueneg ?? cliente?.apellidos_cliente':
           return (
             <>
               {user.duenonegocio?.apellidos_dueneg ??
                 user.cliente?.apellidos_cliente ??
-                "N/A"}
+                'N/A'}
             </>
           );
-        case "correo":
+        case 'correo':
           return <>{user.email}</>;
-        case "id_rol":
+        case 'id_rol':
           return (
             <>
-              {user.id_rol === 1
-                ? "Admin"
-                : user.id_rol === 2
-                  ? "Dueño de negocio"
-                  : user.id_rol === 3
-                    ? "Cliente"
-                    : user.id_rol === 4
-                      ? "Registro oAuth"
-                      : "Soporte"}
+              {rolOptionsUsuarios.find((rol) => rol.uid === user.id_rol)
+                ?.name ?? 'N/A'}
             </>
           );
-        case "estado":
+        case 'estado':
           return (
             <Chip
               size="sm"
               variant="flat"
-              color={statusColorMap[user.estado] as ChipProps["color"]}
+              color={statusColorMap[user.estado] as ChipProps['color']}
             >
               {user.estado.charAt(0) + user.estado.slice(1).toLowerCase()}
             </Chip>
           );
-        case "emailVerified":
+        case 'emailVerified':
           return (
             <Chip
               size="sm"
               variant="flat"
-              color={user.emailVerified ? "success" : "danger"}
+              color={user.emailVerified ? 'success' : 'danger'}
             >
-              {user.emailVerified ? "Verificado" : "No verificado"}
+              {user.emailVerified ? 'Verificado' : 'No verificado'}
             </Chip>
           );
-        case "acciones":
+        case 'acciones':
           return (
             <div className="flex items-center gap-4">
               <div>
@@ -216,7 +209,7 @@ export const TableUsers = ({ users }: Props) => {
               </div>
               <div>
                 <Tooltip
-                  content={user.estado === "ACTIVO" ? "Desactivar" : "Activar"}
+                  content={user.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'}
                   color="warning"
                 >
                   <Button
@@ -224,7 +217,7 @@ export const TableUsers = ({ users }: Props) => {
                     variant="light"
                     onPress={() => handleChangeStatus(user.id, user.estado)}
                   >
-                    {user.estado === "ACTIVO" ? (
+                    {user.estado === 'ACTIVO' ? (
                       <MdOutlinePersonOff size={20} />
                     ) : (
                       <FaCheck size={20} />
@@ -276,12 +269,12 @@ export const TableUsers = ({ users }: Props) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -385,8 +378,8 @@ export const TableUsers = ({ users }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los clientes seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los clientes seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} clientes seleccionados`}
         </span>
         <Pagination
@@ -431,14 +424,14 @@ export const TableUsers = ({ users }: Props) => {
     try {
       await hrApi.patch(`/admin/users/status/${id}`, { status }).then(() => {
         toast(
-          "Se ha cambiado el estado del usuario exitosamente",
+          'Se ha cambiado el estado del usuario exitosamente',
           SUCCESS_TOAST
         );
         window.location.reload();
       });
     } catch (error) {
       console.log(error);
-      toast("Error al desactivar el usuario", DANGER_TOAST);
+      toast('Error al desactivar el usuario', DANGER_TOAST);
     }
   };
 
@@ -469,14 +462,14 @@ export const TableUsers = ({ users }: Props) => {
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
+                align={column.uid === 'actions' ? 'center' : 'start'}
                 allowsSorting={column.sortable}
               >
                 {column.name}
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={"No hay usuarios 😭"} items={sortedItems}>
+          <TableBody emptyContent={'No hay usuarios 😭'} items={sortedItems}>
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (
