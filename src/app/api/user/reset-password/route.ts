@@ -1,12 +1,24 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { ResetPassEmail } from "@/components";
-import { render } from "@react-email/render";
+import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { ResetPassEmail } from '@/components';
+import { render } from '@react-email/render';
 
-import { sendEmail } from "@/utils/sendEmail";
+import { sendEmail } from '@/utils/sendEmail';
 
-async function resetPassword(req: NextRequest, res: NextResponse) {
+async function resetPassword(req: NextRequest) {
+  const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'You are not authorized to access this route. Please provide a valid API key.',
+      },
+      { status: 401 }
+    );
+  }
   const { email } = (await req.json()) as { email: string };
 
   const user = await prisma.m_user.findFirst({
@@ -18,13 +30,13 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
   if (!user) {
     return NextResponse.json(
       {
-        message: "Correo no encontrado",
+        message: 'Correo no encontrado',
       },
       { status: 400 }
     );
   }
 
-  const resetPasswordToken = crypto.randomBytes(32).toString("base64url");
+  const resetPasswordToken = crypto.randomBytes(32).toString('base64url');
   const today = new Date();
   const expiryDate = new Date(today.setDate(today.getDate() + 1));
 
@@ -38,8 +50,8 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
     },
   });
 
-  let link = "";
-  if (process.env.NODE_ENV === "development") {
+  let link = '';
+  if (process.env.NODE_ENV === 'development') {
     link = `http://localhost:3000/auth/reset-password?token=${resetPasswordToken}`;
   } else {
     link = `https://harvestreborn.me/auth/reset-password?token=${resetPasswordToken}`;
@@ -49,11 +61,11 @@ async function resetPassword(req: NextRequest, res: NextResponse) {
     ResetPassEmail({ resetPasswordToken: link, email }) as React.ReactElement
   );
 
-  await sendEmail(email, "Restablecer tu contraseña", emailHtml);
+  await sendEmail(email, 'Restablecer tu contraseña', emailHtml);
 
   return NextResponse.json(
     {
-      message: "Correo enviado",
+      message: 'Correo enviado',
     },
     { status: 200 }
   );

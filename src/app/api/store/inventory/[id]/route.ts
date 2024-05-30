@@ -1,6 +1,8 @@
-import { NextResponse, NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
-import { TipoAlmacenaje } from "@/interfaces";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { TipoAlmacenaje } from '@/interfaces';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 type Data = {
   id: number;
@@ -16,9 +18,18 @@ type Data = {
 async function addProductToInventory(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const body = await request.json();
   const {
     id,
@@ -33,7 +44,7 @@ async function addProductToInventory(
 
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del producto" },
+      { message: 'Falta Id del producto' },
       { status: 400 }
     );
 
@@ -47,7 +58,7 @@ async function addProductToInventory(
     !inventory_id
   ) {
     return NextResponse.json(
-      { message: "Faltan datos del producto" },
+      { message: 'Faltan datos del producto' },
       { status: 400 }
     );
   }
@@ -79,7 +90,7 @@ async function addProductToInventory(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al agregar producto al inventario" },
+      { message: 'Error al agregar producto al inventario' },
       { status: 500 }
     );
   }
@@ -88,12 +99,21 @@ async function addProductToInventory(
 async function deleteProductFromInventory(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del producto" },
+      { message: 'Falta Id del producto' },
       { status: 400 }
     ) as any;
 
@@ -107,13 +127,10 @@ async function deleteProductFromInventory(
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Error al borrar producto del inventario" },
+      { message: 'Error al borrar producto del inventario' },
       { status: 500 }
     );
   }
 }
 
-export {
-  addProductToInventory as POST,
-  deleteProductFromInventory as DELETE,
-};
+export { addProductToInventory as POST, deleteProductFromInventory as DELETE };

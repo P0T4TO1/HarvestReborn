@@ -1,16 +1,27 @@
-import { NextResponse, NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
-import { EstadoPublicacion } from "@prisma/client";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { EstadoPublicacion } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function changeEstadoPublicacion(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
   const { estado } = (await request.json()) as {
@@ -32,7 +43,7 @@ async function changeEstadoPublicacion(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Error al actualizar la publicación" },
+      { message: 'Error al actualizar la publicación' },
       { status: 500 }
     );
   }

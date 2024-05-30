@@ -1,18 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function searchProductByName(
   request: Request,
   { params }: { params: { name: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
+
   try {
     if (!params.name) {
       return NextResponse.json(
         {
-          error: "Internal Server Error",
-          message: "No se ha enviado el nombre",
+          error: 'Internal Server Error',
+          message: 'No se ha enviado el nombre',
         },
         { status: 200 }
       );
@@ -24,7 +36,7 @@ async function searchProductByName(
       },
     });
     const removeAccents = (str: string) => {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     };
 
     if (product) {
@@ -35,8 +47,8 @@ async function searchProductByName(
       if (nameWithoutAccents === productNameWithoutAccents) {
         return NextResponse.json(
           {
-            error: "Internal Server Error",
-            message: "Este producto ya esta registrado",
+            error: 'Internal Server Error',
+            message: 'Este producto ya esta registrado',
           },
           { status: 200 }
         );
@@ -44,15 +56,15 @@ async function searchProductByName(
     }
 
     return NextResponse.json(
-      { product, message: "No existe el producto" },
+      { product, message: 'No existe el producto' },
       { status: 200 }
     );
   } catch (error) {
     console.log(error);
     return NextResponse.json(
       {
-        error: "Internal Server Error",
-        message: "Error al buscar el producto",
+        error: 'Internal Server Error',
+        message: 'Error al buscar el producto',
       },
       { status: 500 }
     );

@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { EstadoGeneral } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { EstadoGeneral } from '@prisma/client';
 
 async function getActivePublications(req: NextRequest) {
   const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
-  const search = urlSearchParams.get("q");
-  const offset = urlSearchParams.get("offset");
-  const limit = urlSearchParams.get("limit");
-  const api_key = urlSearchParams.get("api_key");
+  const search = urlSearchParams.get('q');
+  const offset = urlSearchParams.get('offset');
+  const limit = urlSearchParams.get('limit');
+  const api_key = urlSearchParams.get('api_key');
 
   if (api_key !== process.env.API_KEY) {
     return NextResponse.json(
       {
         message:
-          "You are not authorized to access this route. Please provide a valid API key.",
+          'You are not authorized to access this route. Please provide a valid API key.',
       },
       { status: 401 }
     );
@@ -28,13 +28,13 @@ async function getActivePublications(req: NextRequest) {
           {
             titulo_publicacion: {
               contains: search,
-              mode: "insensitive",
+              mode: 'insensitive',
             },
           },
           {
             descripcion_publicacion: {
               contains: search,
-              mode: "insensitive",
+              mode: 'insensitive',
             },
           },
         ],
@@ -51,7 +51,7 @@ async function getActivePublications(req: NextRequest) {
   const publications = await prisma.m_publicaciones.findMany({
     where: {
       estado_general: EstadoGeneral.ACTIVO,
-      estado_publicacion: "ACTIVO",
+      estado_publicacion: 'ACTIVO',
     },
     include: {
       lotes: true,

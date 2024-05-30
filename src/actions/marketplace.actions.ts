@@ -36,7 +36,7 @@ export const getActivePublications = async (
 export const getPublicationById = async (id: string) => {
   try {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/publications/${id}`
+      `${process.env.NEXT_PUBLIC_API_URL}/publications/${id}?api_key=${process.env.API_KEY}`
     );
     revalidatePath("/(application)/market/item/[id]", "page");
     return data as unknown as IPublicacion;

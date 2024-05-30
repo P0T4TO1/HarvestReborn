@@ -1,16 +1,27 @@
-import { NextResponse, NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
-import { DisponibilidadPublicacion } from "@/interfaces";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { DisponibilidadPublicacion } from '@/interfaces';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function deletePublicacion(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
   const { id } = params;
@@ -25,7 +36,7 @@ async function deletePublicacion(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Error al eliminar la publicación" },
+      { message: 'Error al eliminar la publicación' },
       { status: 500 }
     );
   }
@@ -45,12 +56,21 @@ interface Data {
 async function updatePublicacion(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
   const { id } = params;
@@ -74,7 +94,7 @@ async function updatePublicacion(
         id_negocio: Number(id_negocio),
         titulo_publicacion,
         descripcion_publicacion,
-        precio_publicacion: parseFloat(price?.toFixed(2) ?? "0.00") ?? 0.0,
+        precio_publicacion: parseFloat(price?.toFixed(2) ?? '0.00') ?? 0.0,
         disponibilidad: disponibilidad as DisponibilidadPublicacion,
         images_publicacion: images_urls,
         lotes: {
@@ -86,7 +106,7 @@ async function updatePublicacion(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Error al actualizar la publicación" },
+      { message: 'Error al actualizar la publicación' },
       { status: 500 }
     );
   }
@@ -95,12 +115,21 @@ async function updatePublicacion(
 async function getPublicactionById(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
 
@@ -130,7 +159,7 @@ async function getPublicactionById(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Error al obtener la publicación" },
+      { message: 'Error al obtener la publicación' },
       { status: 500 }
     );
   }

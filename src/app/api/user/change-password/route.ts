@@ -1,8 +1,20 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcrypt';
 
-async function changePassword(req: NextRequest, res: NextResponse) {
+async function changePassword(req: NextRequest) {
+  const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'You are not authorized to access this route. Please provide a valid API key.',
+      },
+      { status: 401 }
+    );
+  }
   const { resetToken, password } = (await req.json()) as {
     resetToken: string;
     password: string;
@@ -16,7 +28,7 @@ async function changePassword(req: NextRequest, res: NextResponse) {
   if (!user) {
     return NextResponse.json(
       {
-        message: "Token inválido",
+        message: 'Token inválido',
       },
       { status: 400 }
     );
@@ -25,7 +37,7 @@ async function changePassword(req: NextRequest, res: NextResponse) {
   if (!resetPasswordTokenExpiry) {
     return NextResponse.json(
       {
-        message: "Token expirado",
+        message: 'Token expirado',
       },
       { status: 400 }
     );
@@ -34,7 +46,7 @@ async function changePassword(req: NextRequest, res: NextResponse) {
   if (now > resetPasswordTokenExpiry) {
     return NextResponse.json(
       {
-        message: "Token expirado",
+        message: 'Token expirado',
       },
       { status: 400 }
     );
@@ -53,7 +65,7 @@ async function changePassword(req: NextRequest, res: NextResponse) {
   });
   return NextResponse.json(
     {
-      message: "Contraseña actualizada",
+      message: 'Contraseña actualizada',
     },
     { status: 200 }
   );

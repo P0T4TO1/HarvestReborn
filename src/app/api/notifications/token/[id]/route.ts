@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import PushNotifications from "@pusher/push-notifications-server";
 
 const beamsClient = new PushNotifications({
@@ -9,8 +9,6 @@ const beamsClient = new PushNotifications({
 async function getToken(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
   const { id } = params;
   if (!id) {

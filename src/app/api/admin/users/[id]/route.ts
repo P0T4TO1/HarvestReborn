@@ -1,15 +1,26 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function deleteUser(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del usuario" },
+      { message: 'Falta id del usuario' },
       { status: 400 }
     );
 
@@ -23,7 +34,7 @@ async function deleteUser(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al eliminar el usuario" },
+      { message: 'Error al eliminar el usuario' },
       { status: 500 }
     );
   }
@@ -49,9 +60,18 @@ interface Data {
 async function updateUser(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const {
     email,
     nombre,
@@ -71,12 +91,12 @@ async function updateUser(
 
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del usuario" },
+      { message: 'Falta id del usuario' },
       { status: 400 }
     );
 
   try {
-    if (tipo === "negocio") {
+    if (tipo === 'negocio') {
       const user = await prisma.m_user.update({
         where: {
           id: params.id,
@@ -97,7 +117,7 @@ async function updateUser(
                   nombre_negocio,
                   telefono_negocio: telefono,
                   direccion_negocio:
-                    calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                    calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
                 },
               },
             },
@@ -105,7 +125,7 @@ async function updateUser(
         },
       });
       return NextResponse.json(user, { status: 200 });
-    } else if (tipo === "cliente") {
+    } else if (tipo === 'cliente') {
       const user = await prisma.m_user.update({
         where: {
           id: params.id,
@@ -126,7 +146,7 @@ async function updateUser(
         },
       });
       return NextResponse.json(user, { status: 200 });
-    } else if (tipo === "admin") {
+    } else if (tipo === 'admin') {
       const user = await prisma.m_user.update({
         where: {
           id: params.id,
@@ -137,7 +157,7 @@ async function updateUser(
         },
       });
       return NextResponse.json(user, { status: 200 });
-    } else if (tipo === "soporte") {
+    } else if (tipo === 'soporte') {
       const user = await prisma.m_user.update({
         where: {
           id: params.id,
@@ -150,14 +170,14 @@ async function updateUser(
       return NextResponse.json(user, { status: 200 });
     } else {
       return NextResponse.json(
-        { message: "Tipo de usuario no válido" },
+        { message: 'Tipo de usuario no válido' },
         { status: 400 }
       );
     }
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al actualizar el usuario" },
+      { message: 'Error al actualizar el usuario' },
       { status: 500 }
     );
   }
@@ -166,12 +186,21 @@ async function updateUser(
 async function getUser(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del usuario" },
+      { message: 'Falta id del usuario' },
       { status: 400 }
     );
 
@@ -193,7 +222,7 @@ async function getUser(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al obtener el usuario" },
+      { message: 'Error al obtener el usuario' },
       { status: 500 }
     );
   }

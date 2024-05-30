@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import { NextRequest, NextResponse } from 'next/server';
+import { v2 as cloudinary } from 'cloudinary';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,10 +9,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST(request: NextRequest, response: NextResponse) {
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   try {
     const data = await request.formData();
-    const file: File | null = data.get("file") as unknown as File;
+    const file: File | null = data.get('file') as unknown as File;
 
     if (!file) {
       return NextResponse.json({ success: false });
@@ -18,20 +31,20 @@ export async function POST(request: NextRequest, response: NextResponse) {
 
     const bytes = await file.arrayBuffer();
     let mime = file.type;
-    const encoding = "base64";
-    const base64Data = Buffer.from(bytes).toString("base64");
-    let fileUri = "data:" + mime + ";" + encoding + "," + base64Data;
+    const encoding = 'base64';
+    const base64Data = Buffer.from(bytes).toString('base64');
+    let fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
 
     const { secure_url } = await cloudinary.uploader.upload(fileUri, {
       invalidate: true,
-      folder: "negocios",
+      folder: 'negocios',
     });
 
     return NextResponse.json({ fileUri, secure_url }, { status: 200 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(
-      { message: "Error al subir imagen a cloudinary" },
+      { message: 'Error al subir imagen a cloudinary' },
       { status: 500 }
     );
   }

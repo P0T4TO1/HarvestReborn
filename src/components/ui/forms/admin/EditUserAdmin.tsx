@@ -175,7 +175,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
         }
       });
     }
-  }, [getValues, setError, setValue]);
+  }, [getValues, setError, setValue, watch('cp')]);
 
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
     setIsLoading(true);

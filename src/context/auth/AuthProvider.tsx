@@ -2,6 +2,7 @@
 
 import React, { useReducer, useEffect, ReactNode } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { loginAction, registerAction } from '@/actions';
 
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -66,7 +67,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      const { data } = await hrApi.post('/user/login', { email, password });
+      const data = await loginAction(email, password);
+      if (!data) {
+        return false;
+      }
       const { token, user } = data;
       Cookies.set('token', token);
       dispatch({ type: '[Auth] - Login', payload: user });
@@ -91,7 +95,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     cp: string;
   }): Promise<{ hasError: boolean; message?: string }> => {
     try {
-      const { data } = await hrApi.post('/user/register', registerData);
+      const data = await registerAction(registerData);
+      if (!data) {
+        return {
+          hasError: true,
+          message: 'No se pudo crear el usuario - intente de nuevo',
+        };
+      }
       const { token, user } = data;
       Cookies.set('token', token);
       dispatch({ type: '[Auth] - Login', payload: user });

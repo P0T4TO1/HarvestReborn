@@ -1,11 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { BagType, Estado, IOrden } from "@/interfaces";
-import { render } from "@react-email/render";
-import { OrderNotificationEmail } from "@/components";
-import { generateOrderId } from "@/utils/orderid";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { BagType, Estado, IOrden } from '@/interfaces';
+import { render } from '@react-email/render';
+import { OrderNotificationEmail } from '@/components';
+import { generateOrderId } from '@/utils/orderid';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
-import { sendEmail } from "@/utils/sendEmail";
+import { sendEmail } from '@/utils/sendEmail';
 
 interface Data {
   fecha_orden: string;
@@ -16,7 +18,19 @@ interface Data {
   bag: BagType;
 }
 
-async function createOrder(req: NextRequest, res: NextResponse) {
+async function createOrder(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
+
   const data = (await req.json()) as Data;
   const {
     fecha_orden,
@@ -47,7 +61,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
               createMany: {
                 data: item.productos.map((product) => {
                   if (!product.lote) {
-                    throw new Error("No se ha seleccionado un lote");
+                    throw new Error('No se ha seleccionado un lote');
                   }
                   return {
                     id_producto: product.id_producto,
@@ -102,7 +116,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       return NextResponse.json(
         {
           error: true,
-          message: "No se encontró el cliente",
+          message: 'No se encontró el cliente',
         },
         { status: 404 }
       );
@@ -127,7 +141,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       });
 
       if (!negocio) {
-        throw new Error("Negocio no encontrado");
+        throw new Error('Negocio no encontrado');
       }
       return negocio.email_negocio || negocio.dueneg.user.email;
     });
@@ -138,7 +152,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
       return NextResponse.json(
         {
           error: true,
-          message: "No se encontraron los correos de los negocios",
+          message: 'No se encontraron los correos de los negocios',
         },
         { status: 404 }
       );
@@ -159,8 +173,8 @@ async function createOrder(req: NextRequest, res: NextResponse) {
     const msgs = emails.map((email, index) => {
       return {
         to: email,
-        from: "Harvest Reborn<harvestreborn@gmail.com>",
-        subject: "Nueva orden en Harvest Reborn",
+        from: 'Harvest Reborn<harvestreborn@gmail.com>',
+        subject: 'Nueva orden en Harvest Reborn',
         html: emailsHTML[index],
       };
     });
@@ -174,7 +188,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
     return NextResponse.json(
       {
         orders: ordersPromised,
-        message: "Orden creada con éxito",
+        message: 'Orden creada con éxito',
       },
       { status: 201 }
     );
@@ -183,7 +197,7 @@ async function createOrder(req: NextRequest, res: NextResponse) {
     return NextResponse.json(
       {
         error: true,
-        message: "Error al crear la order",
+        message: 'Error al crear la order',
       },
       { status: 500 }
     );

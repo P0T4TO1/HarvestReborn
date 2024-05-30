@@ -1,17 +1,28 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 async function getProfile(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del usuario" },
+      { message: 'Falta Id del usuario' },
       { status: 400 }
     );
 
@@ -22,7 +33,7 @@ async function getProfile(
   });
   if (!profile)
     return NextResponse.json(
-      { message: "No existe usuario por ese id" },
+      { message: 'No existe usuario por ese id' },
       { status: 400 }
     );
 
@@ -92,14 +103,23 @@ interface ProfileData {
 async function updateProfile(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const data: ProfileData = await request.json();
 
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del usuario" },
+      { message: 'Falta Id del usuario' },
       { status: 400 }
     );
 
@@ -124,7 +144,7 @@ async function updateProfile(
                     nombre_negocio: data.dueneg.negocio.nombre_negocio,
                     telefono_negocio: data.dueneg.negocio.telefono_negocio,
                     direccion_negocio: data.dueneg.negocio.direccion_negocio,
-                    email_negocio: data.dueneg.negocio.email_negocio || "",
+                    email_negocio: data.dueneg.negocio.email_negocio || '',
                   },
                 },
               },
@@ -133,7 +153,7 @@ async function updateProfile(
         },
       });
       return NextResponse.json(
-        { message: "Usuario dueño de negocio actualizado correctamente" },
+        { message: 'Usuario dueño de negocio actualizado correctamente' },
         { status: 200 }
       );
     } else if (data.cliente) {
@@ -158,14 +178,14 @@ async function updateProfile(
         },
       });
       return NextResponse.json(
-        { message: "Usuario cliente actualizado correctamente" },
+        { message: 'Usuario cliente actualizado correctamente' },
         { status: 200 }
       );
     }
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al actualizar usuario" },
+      { message: 'Error al actualizar usuario' },
       { status: 400 }
     );
   }

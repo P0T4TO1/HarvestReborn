@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { hrApi } from "@/api";
+import React, { useState } from 'react';
+import { hrApi } from '@/api';
+import { resetPassword } from '@/actions';
 import {
   Input,
   Button,
@@ -10,37 +11,37 @@ import {
   CardHeader,
   CardFooter,
   Link,
-} from "@nextui-org/react";
-import { FaChevronLeft } from "react-icons/fa";
+} from '@nextui-org/react';
+import { FaChevronLeft } from 'react-icons/fa';
 
 export const ResetPasswordForm = () => {
-  const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
   const [buttonText, setButtonText] = useState<string>(
-    "Restablecer contraseña"
+    'Restablecer contraseña'
   );
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
     if (!email) {
-      setError("El correo electrónico es requerido");
+      setError('El correo electrónico es requerido');
       setLoading(false);
       return;
     } else {
-      setError("");
+      setError('');
     }
     setLoading(true);
-    setMessage("Enviando correo electrónico..");
-    const response = await hrApi.post("user/reset-password", { email });
-    if (response.data.error) {
-      setError(response.data.error);
+    setMessage('Enviando correo electrónico..');
+    const response = await resetPassword(email);
+    if (response?.message === 'No se pudo enviar el correo electrónico - intente de nuevo') {
+      setError('No se pudo enviar el correo electrónico - intente de nuevo mas tarde');
       setLoading(false);
       return;
     } else {
-      setError("");
-      setMessage("Correo electrónico enviado con éxito");
-      setButtonText("Volver a enviar correo");
+      setError('');
+      setMessage('Correo electrónico enviado con éxito');
+      setButtonText('Volver a enviar correo');
       setLoading(false);
     }
   };
@@ -51,7 +52,7 @@ export const ResetPasswordForm = () => {
         <Card className="p-6 mx-auto w-[386px]">
           <CardHeader className="flex flex-col">
             <h3 className="font-semibold text-2xl dark:text-gray-200 text-gray-800">
-              Restablecer contraseña{" "}
+              Restablecer contraseña{' '}
             </h3>
             <p className="text-gray-500 text-sm mt-4">
               Ingrese su dirección de correo electrónico y le enviaremos un
@@ -85,7 +86,7 @@ export const ResetPasswordForm = () => {
             </div>
           </CardBody>
           <CardFooter>
-            <Link href={"/auth/login"}>
+            <Link href={'/auth/login'}>
               <Button
                 startContent={<FaChevronLeft size={20} />}
                 color="primary"

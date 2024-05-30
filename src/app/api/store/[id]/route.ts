@@ -1,15 +1,29 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function getNegocioById(
   request: Request,
-  { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
+  { params }: { params: { id: string } }
 ) {
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'No tienes autorización para acceder a esta ruta. Por favor proporciona una API key válida.',
+      },
+      { status: 401 }
+    );
+  }
+
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
 
@@ -24,7 +38,7 @@ async function getNegocioById(
             include: {
               producto: true,
             },
-            distinct: ["id_producto"],
+            distinct: ['id_producto'],
           },
         },
       },
@@ -53,10 +67,20 @@ interface Data {
 
 async function updateNegocioById(
   request: Request,
-  { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
+  { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
+
   const {
     nombre_negocio,
     telefono_negocio,
@@ -72,7 +96,7 @@ async function updateNegocioById(
   const newDireccion = `${calle}, ${colonia}, ${alcaldia}, ${cp}`;
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
 
@@ -85,7 +109,7 @@ async function updateNegocioById(
         nombre_negocio: nombre_negocio,
         telefono_negocio: telefono_negocio,
         direccion_negocio:
-          newDireccion === "undefined, undefined, undefined, undefined"
+          newDireccion === 'undefined, undefined, undefined, undefined'
             ? direccion_negocio
             : newDireccion,
         email_negocio: email_negocio,
@@ -97,7 +121,7 @@ async function updateNegocioById(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al actualizar el negocio" },
+      { message: 'Error al actualizar el negocio' },
       { status: 500 }
     );
   }

@@ -1,16 +1,27 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcrypt";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { hash } from 'bcrypt';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function getAccountData(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del usuario" },
+      { message: 'Falta Id del usuario' },
       { status: 400 }
     );
 
@@ -21,7 +32,7 @@ async function getAccountData(
   });
   if (!account)
     return NextResponse.json(
-      { message: "No existe usuario por ese id" },
+      { message: 'No existe usuario por ese id' },
       { status: 400 }
     );
   return NextResponse.json({ ...account }, { status: 200 });
@@ -30,9 +41,18 @@ async function getAccountData(
 async function updateAccountData(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const { email, password } = (await request.json()) as {
     email: string;
     password: string;
@@ -40,7 +60,7 @@ async function updateAccountData(
 
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta Id del usuario" },
+      { message: 'Falta Id del usuario' },
       { status: 400 }
     );
 

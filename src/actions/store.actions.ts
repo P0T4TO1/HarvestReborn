@@ -1,16 +1,21 @@
-import prisma from "@/lib/prisma";
-import axios, { AxiosError } from "axios";
-import { today, getLocalTimeZone } from "@internationalized/date";
-import { ILote, IOrden, INegocio, IPublicacion, EstadoLote } from "@/interfaces";
+'use server';
 
-export const revalidate = 3600;
+import prisma from '@/lib/prisma';
+import axios, { AxiosError } from 'axios';
+import { today, getLocalTimeZone } from '@internationalized/date';
+import {
+  ILote,
+  IOrden,
+  INegocio,
+  IPublicacion,
+  EstadoLote,
+} from '@/interfaces';
 
 export const getNegocioById = async (id_negocio: number) => {
   if (!id_negocio) return;
-
   try {
     const { data } = await axios.get<INegocio>(
-      `${process.env.NEXT_PUBLIC_API_URL}/store/${id_negocio}`
+      `${process.env.NEXT_PUBLIC_API_URL}/store/${id_negocio}?api_key=${process.env.API_KEY}`
     );
 
     return data;
@@ -103,7 +108,7 @@ export const getLotes = async (id_negocio: number) => {
       include: {
         productoOrden: {
           orderBy: {
-            cantidad_orden: "desc",
+            cantidad_orden: 'desc',
           },
         },
       },
@@ -200,6 +205,34 @@ export const getLotesForPosts = async (id_negocio: number) => {
       buenEstado: lotesBuenEstado,
       apuntoVencer: lotesRecomendados,
     };
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
+export const getAllActiveStores = async () => {
+  try {
+    const { data } = await axios.get<INegocio[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/active?api_key=${process.env.API_KEY}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
+export const getDistinctProducts = async (id_negocio: number) => {
+  if (!id_negocio) return;
+
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/inventory/batch/all/distinct/${id_negocio}?api_key=${process.env.API_KEY}`
+    );
+
+    return data as unknown as ILote[];
   } catch (error) {
     console.error(error);
     return;

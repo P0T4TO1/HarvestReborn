@@ -75,7 +75,7 @@ export const AccountForm: FC<Props> = ({ user }) => {
   const onDeactivate = async () => {
     setLoading(true);
     await hrApi
-      .put(`/user/account/${user.id}`, { estado: Estado.Inactivo })
+      .put(`/user/account/deactivate/${user.id}`, { estado: Estado.Inactivo })
       .then(() => {
         toast("Cuenta desactivada", SUCCESS_TOAST);
         logout();

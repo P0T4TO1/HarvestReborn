@@ -1,14 +1,28 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 async function getPublicationById(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'No tienes autorización para acceder a esta ruta. Por favor proporciona una API key válida.',
+      },
+      { status: 401 }
+    );
+  }
+
   const { id } = params;
   if (!id) {
     return NextResponse.json(
-      { message: "Falta id de la publicación" },
+      { message: 'Falta id de la publicación' },
       { status: 400 }
     );
   }
@@ -33,7 +47,7 @@ async function getPublicationById(
 
   if (!publication) {
     return NextResponse.json(
-      { message: "No se encontró la publicación" },
+      { message: 'No se encontró la publicación' },
       { status: 404 }
     );
   }

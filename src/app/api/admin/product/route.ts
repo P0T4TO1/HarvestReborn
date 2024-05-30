@@ -1,29 +1,37 @@
-import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
-import prisma from "@/lib/prisma";
-import { Category } from "@/interfaces";
+import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
+import prisma from '@/lib/prisma';
+import { Category } from '@/interfaces';
 import {
   validateUpdateProduct,
   validateCreateProduct,
-} from "@/validations/admin.validation";
+} from '@/validations/admin.validation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
-async function createProduct(req: NextRequest, res: NextResponse) {
+async function createProduct(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   try {
     const body = await req.json();
 
-    const {
-      categoria,
-      descripcion,
-      enTemporada,
-      file,
-      nombre_producto,
-    } = validateCreateProduct(body);
+    const { categoria, descripcion, enTemporada, file, nombre_producto } =
+      validateCreateProduct(body);
 
     const product = await prisma.m_producto.create({
       data: {
         nombre_producto,
         imagen_producto: file,
-        descripcion: descripcion || "",
+        descripcion: descripcion || '',
         enTemporada,
         categoria: categoria.toUpperCase() as Category,
       },
@@ -31,27 +39,28 @@ async function createProduct(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
-    console.log(error, "error al crear el producto");
+    console.log(error, 'error al crear el producto');
     return NextResponse.json(
-      { message: "Error al crear el producto" },
+      { message: 'Error al crear el producto' },
       { status: 500 }
     );
   }
 }
 
-interface Data {
-  id: number;
-  nombre_producto: string;
-  file: string;
-  descripcion: string;
-  enTemporada: boolean;
-  categoria: Category;
-  imagen_producto: string;
-}
+async function updateProduct(req: NextRequest) {
+  const session = await getServerSession(authOptions);
 
-async function updateProduct(req: NextRequest, res: NextResponse) {
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   try {
-    const body = await req.json()
+    const body = await req.json();
     const { id, nombre_producto, file, descripcion, enTemporada, categoria } =
       validateUpdateProduct(body);
 
@@ -62,7 +71,7 @@ async function updateProduct(req: NextRequest, res: NextResponse) {
       data: {
         nombre_producto,
         imagen_producto: file,
-        descripcion: descripcion || "",
+        descripcion: descripcion || '',
         enTemporada,
         categoria: categoria?.toUpperCase() as Category,
       },
@@ -72,20 +81,31 @@ async function updateProduct(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
-    console.log(error, "error al validar los datos");
+    console.log(error, 'error al validar los datos');
     return NextResponse.json(
-      { message: "Error al validar los datos" },
+      { message: 'Error al validar los datos' },
       { status: 500 }
     );
   }
 }
 
-async function deleteProduct(req: NextRequest, res: NextResponse) {
+async function deleteProduct(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const { id } = (await req.json()) as { id: string };
 
   if (!id) {
     return NextResponse.json(
-      { message: "Falta Id del producto" },
+      { message: 'Falta Id del producto' },
       { status: 400 }
     );
   }
@@ -99,20 +119,29 @@ async function deleteProduct(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
-    console.log(error, "error al eliminar el producto");
+    console.log(error, 'error al eliminar el producto');
     return NextResponse.json(
-      { message: "Error al eliminar el producto" },
+      { message: 'Error al eliminar el producto' },
       { status: 500 }
     );
   }
 }
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const products = await prisma.m_producto.findMany();
-  // const session = await getSession();
-  // console.log(session, "session");
 
   return NextResponse.json(products, { status: 200 });
 }

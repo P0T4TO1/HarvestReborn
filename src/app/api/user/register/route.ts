@@ -1,13 +1,13 @@
-import { NextResponse, NextRequest } from "next/server";
-import { hash } from "bcrypt";
-import crypto from "crypto";
-import { render } from "@react-email/render";
+import { NextResponse, NextRequest } from 'next/server';
+import { hash } from 'bcrypt';
+import crypto from 'crypto';
+import { render } from '@react-email/render';
 
-import { sendEmail } from "@/utils/sendEmail";
+import { sendEmail } from '@/utils/sendEmail';
 
-import { signToken } from "@/lib/jwt";
-import prisma from "@/lib/prisma";
-import { VerifyEmail } from "@/components";
+import { signToken } from '@/lib/jwt';
+import prisma from '@/lib/prisma';
+import { VerifyEmail } from '@/components';
 
 interface Data {
   email: string;
@@ -24,32 +24,44 @@ interface Data {
   cp: string;
 }
 
-async function registerUser(req: NextRequest, res: NextResponse) {
+async function registerUser(req: NextRequest) {
+  const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'You are not authorized to access this route. Please provide a valid API key.',
+      },
+      { status: 401 }
+    );
+  }
   const {
-    email = "",
-    password = "",
-    tipo = "",
-    nombre = "",
-    apellidos = "",
-    fecha_nacimiento = "",
-    nombreNegocio = "",
-    telefono = "",
-    calle = "",
-    colonia = "",
-    alcaldia = "",
-    cp = "",
+    email = '',
+    password = '',
+    tipo = '',
+    nombre = '',
+    apellidos = '',
+    fecha_nacimiento = '',
+    nombreNegocio = '',
+    telefono = '',
+    calle = '',
+    colonia = '',
+    alcaldia = '',
+    cp = '',
   } = (await req.json()) as Data;
   try {
     const ceo: number =
-      email === "jaretgarciagomez@gmail.com" ||
-      email === "elbonixd5@gmail.com" ||
-      email === "saulchanona@yahoo.com"
+      email === 'jaretgarciagomez@gmail.com' ||
+      email === 'elbonixd5@gmail.com' ||
+      email === 'saulchanona@yahoo.com'
         ? 1
         : 2 || 3;
 
-    const emailVerificationToken = crypto.randomBytes(32).toString("base64url");
+    const emailVerificationToken = crypto.randomBytes(32).toString('base64url');
 
-    if (tipo === "cliente") {
+    if (tipo === 'cliente') {
       const newUser = await prisma.m_user.upsert({
         where: { email },
         create: {
@@ -63,9 +75,9 @@ async function registerUser(req: NextRequest, res: NextResponse) {
               apellidos_cliente: apellidos,
               telefono_cliente: telefono,
               fecha_nacimiento: new Date(fecha_nacimiento),
-              nombre_negocio: nombreNegocio || "",
+              nombre_negocio: nombreNegocio || '',
               direccion_negocio:
-                calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
               historial: {
                 create: {},
               },
@@ -83,9 +95,9 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                 apellidos_cliente: apellidos,
                 telefono_cliente: telefono,
                 fecha_nacimiento: new Date(fecha_nacimiento),
-                nombre_negocio: nombreNegocio || "",
+                nombre_negocio: nombreNegocio || '',
                 direccion_negocio:
-                  calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                  calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
                 historial: {
                   create: {},
                 },
@@ -95,9 +107,9 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                 apellidos_cliente: apellidos,
                 telefono_cliente: telefono,
                 fecha_nacimiento: new Date(fecha_nacimiento),
-                nombre_negocio: nombreNegocio || "",
+                nombre_negocio: nombreNegocio || '',
                 direccion_negocio:
-                  calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                  calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
               },
             },
           },
@@ -105,8 +117,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
       });
 
       if (!newUser.emailVerified) {
-        let link = "";
-        if (process.env.NODE_ENV === "development") {
+        let link = '';
+        if (process.env.NODE_ENV === 'development') {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
           link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
@@ -120,12 +132,12 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         );
 
         try {
-          await sendEmail(email, "Verifica tu correo electrónico", emailHtml);
+          await sendEmail(email, 'Verifica tu correo electrónico', emailHtml);
         } catch (error) {
           console.error(error);
           return NextResponse.json(
             {
-              message: "Error al enviar el correo",
+              message: 'Error al enviar el correo',
             },
             { status: 500 }
           );
@@ -141,13 +153,13 @@ async function registerUser(req: NextRequest, res: NextResponse) {
           user: {
             email,
           },
-          message: "Usuario creado correctamente y correo enviado",
+          message: 'Usuario creado correctamente y correo enviado',
         },
         { status: 201 }
       );
     }
 
-    if (tipo === "negocio") {
+    if (tipo === 'negocio') {
       const newUser = await prisma.m_user.upsert({
         where: { email },
         create: {
@@ -165,7 +177,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                   nombre_negocio: nombreNegocio,
                   telefono_negocio: telefono,
                   direccion_negocio:
-                    calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) || "",
+                    calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) || '',
                   inventario: {
                     create: {},
                   },
@@ -192,8 +204,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                     nombre_negocio: nombreNegocio,
                     telefono_negocio: telefono,
                     direccion_negocio:
-                      calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) ||
-                      "",
+                      calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) ||
+                      '',
                     inventario: {
                       create: {},
                     },
@@ -213,8 +225,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                       nombre_negocio: nombreNegocio,
                       telefono_negocio: telefono,
                       direccion_negocio:
-                        calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) ||
-                        "",
+                        calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) ||
+                        '',
                       inventario: {
                         create: {},
                       },
@@ -226,8 +238,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
                       nombre_negocio: nombreNegocio,
                       telefono_negocio: telefono,
                       direccion_negocio:
-                        calle.concat(", ", colonia, ", ", alcaldia, ", ", cp) ||
-                        "",
+                        calle.concat(', ', colonia, ', ', alcaldia, ', ', cp) ||
+                        '',
                       updatedAt: new Date(),
                     },
                   },
@@ -239,8 +251,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
       });
 
       if (!newUser.emailVerified) {
-        let link = "";
-        if (process.env.NODE_ENV === "development") {
+        let link = '';
+        if (process.env.NODE_ENV === 'development') {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
           link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
@@ -254,12 +266,12 @@ async function registerUser(req: NextRequest, res: NextResponse) {
         );
 
         try {
-          await sendEmail(email, "Verifica tu correo electrónico", emailHtml);
+          await sendEmail(email, 'Verifica tu correo electrónico', emailHtml);
         } catch (error) {
           console.error(error);
           return NextResponse.json(
             {
-              message: "Error al enviar el correo",
+              message: 'Error al enviar el correo',
             },
             { status: 500 }
           );
@@ -275,7 +287,7 @@ async function registerUser(req: NextRequest, res: NextResponse) {
           user: {
             email,
           },
-          message: "Usuario creado correctamente y correo enviado",
+          message: 'Usuario creado correctamente y correo enviado',
         },
         { status: 201 }
       );
@@ -285,8 +297,8 @@ async function registerUser(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(
       {
-        error: "Internal Server Error",
-        message: "Error al crear el usuario",
+        error: 'Internal Server Error',
+        message: 'Error al crear el usuario',
       },
       { status: 500 }
     );

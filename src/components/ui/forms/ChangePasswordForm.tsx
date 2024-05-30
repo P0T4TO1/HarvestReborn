@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { hrApi } from "@/api";
-import { Input, Button, Card, CardBody, CardHeader } from "@nextui-org/react";
-import { toast } from "sonner";
-import { SUCCESS_TOAST } from "@/components";
-import { useRouter } from "next/navigation";
-import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
+import React, { useState } from 'react';
+import { changePassword } from '@/actions';
+import { hrApi } from '@/api';
+import { Input, Button, Card, CardBody, CardHeader } from '@nextui-org/react';
+import { toast } from 'sonner';
+import { SUCCESS_TOAST } from '@/components';
+import { useRouter } from 'next/navigation';
+import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 
 interface ChangePasswordFormProps {
   resetPasswordToken: string;
@@ -17,10 +18,10 @@ export const ChangePasswordForm = ({
 }: ChangePasswordFormProps) => {
   const router = useRouter();
 
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleConfirm, setVisibleConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,22 +29,19 @@ export const ChangePasswordForm = ({
   const handleSubmit = async () => {
     setLoading(true);
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError('Las contraseñas no coinciden');
       setLoading(false);
       return;
     }
-    const response = await hrApi.post("user/change-password", {
-      resetToken: resetPasswordToken,
-      password,
-    });
-    if (response.status !== 200) {
-      setMessage("Error al cambiar la contraseña");
+    const response = await changePassword(resetPasswordToken, password);
+    if (response.message === 'Error al cambiar la contraseña') {
+      setMessage('Error al cambiar la contraseña');
       setLoading(false);
       return;
     } else {
-      setMessage(response.data.message);
-      toast("Contraseña cambiada correctamente", SUCCESS_TOAST);
-      router.push("/auth/login");
+      setMessage(response.message);
+      toast('Contraseña cambiada correctamente', SUCCESS_TOAST);
+      router.push('/auth/login');
     }
   };
 
@@ -53,14 +51,14 @@ export const ChangePasswordForm = ({
         <Card className="p-6 mx-auto w-[386px]">
           <CardHeader>
             <h3 className="font-semibold text-2xl dark:text-gray-200 text-gray-800">
-              Cambiar contraseña{" "}
+              Cambiar contraseña{' '}
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-6">
               <div className="relative">
                 <Input
-                  type={visible ? "text" : "password"}
+                  type={visible ? 'text' : 'password'}
                   label="Contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -81,7 +79,7 @@ export const ChangePasswordForm = ({
               </div>
               <div className="relative">
                 <Input
-                  type={visibleConfirm ? "text" : "password"}
+                  type={visibleConfirm ? 'text' : 'password'}
                   label="Confirmar contraseña"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

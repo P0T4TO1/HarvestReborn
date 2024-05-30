@@ -1,22 +1,33 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { Estado } from "@/interfaces";
-import { render } from "@react-email/render";
-import { NegocioActivationEmail } from "@/components";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { Estado } from '@/interfaces';
+import { render } from '@react-email/render';
+import { NegocioActivationEmail } from '@/components';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
-import { sendEmail } from "@/utils/sendEmail";
+import { sendEmail } from '@/utils/sendEmail';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 async function getNegocioByIDAdmin(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id del negocio" },
+      { message: 'Falta id del negocio' },
       { status: 400 }
     );
 
@@ -60,9 +71,18 @@ interface Data {
 async function updateNegocioData(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const {
     nombre_negocio,
     calle,
@@ -74,7 +94,7 @@ async function updateNegocioData(
     descripcion_negocio,
     estado_negocio,
   } = (await request.json()) as Data;
-  const dir_negocio = calle.concat(", ", colonia, ", ", alcaldia, ", ", cp);
+  const dir_negocio = calle.concat(', ', colonia, ', ', alcaldia, ', ', cp);
 
   const updatedNegocio = await prisma.m_negocio.update({
     where: {
@@ -109,7 +129,7 @@ async function updateNegocioData(
 
   await sendEmail(
     user?.email as string,
-    "Estado de tu negocio en Harvest Reborn",
+    'Estado de tu negocio en Harvest Reborn',
     emailHtml
   );
 

@@ -1,18 +1,27 @@
-import { hrApi } from "@/api";
-import prisma from "@/lib/prisma";
+'use server';
+
+import axios from 'axios';
+import prisma from '@/lib/prisma';
 
 export const searchUserByEmail = async (email: string) => {
-  const res = await hrApi.get(`/user/search/${email}`);
+  const res = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/user/search/${email}?api_key=${process.env.API_KEY}`
+  );
   return res.data;
 };
 
 export const verifyOldPassword = async (id: string, password: string) => {
-  const res = await hrApi.post(`/user/search/password/${id}`, { password });
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_URL}/user/search/password/${id}?api_key=${process.env.API_KEY}`,
+    { password }
+  );
   return res.data;
 };
 
 export const isEmailVerified = async (email: string) => {
-  const res = await hrApi.get(`/user/search/verify/${email}`);
+  const res = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/user/search/verify/${email}?api_key=${process.env.API_KEY}`
+  );
   return res.data;
 };
 

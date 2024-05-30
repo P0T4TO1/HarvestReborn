@@ -1,8 +1,11 @@
-"use client";
+'use client';
 
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Estado, INegocio } from "@/interfaces";
-import { hrApi } from "@/api";
+import React, { ChangeEvent, useState } from 'react';
+
+import { INegocio } from '@/interfaces';
+import { hrApi } from '@/api';
+import { getNegocioById } from '@/actions';
+
 import {
   CardBody,
   Link,
@@ -13,64 +16,45 @@ import {
   CardHeader,
   Image,
   Input,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 import {
   MdLabelImportantOutline,
   MdOutlineInventory,
   MdOutlinePermPhoneMsg,
-} from "react-icons/md";
-import { FaSearch, FaRegStar } from "react-icons/fa";
-import { MdOutlineStorefront, MdHelpOutline } from "react-icons/md";
-import { FaLocationDot } from "react-icons/fa6";
+} from 'react-icons/md';
+import { FaSearch } from 'react-icons/fa';
+import { FaLocationDot } from 'react-icons/fa6';
+import { MdOutlineStorefront, MdHelpOutline } from 'react-icons/md';
 
-export const NegociosList = () => {
-  const [negocios, setNegocios] = useState<INegocio[]>([]);
+interface NegociosListProps {
+  stores: INegocio[];
+}
+
+export const NegociosList = ({ stores }: NegociosListProps) => {
   const [negocio, setNegocio] = useState<INegocio>();
-  const [loading, setLoading] = useState(true);
   const [loadingNegocio, setLoadingNegocio] = useState(false);
   const [error, setError] = useState(false);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 
   const results = !search
-    ? negocios
-    : negocios.filter((dato) =>
+    ? stores
+    : stores.filter((dato) =>
         dato.nombre_negocio.toLowerCase().includes(search.toLowerCase())
       );
 
-  useEffect(() => {
-    hrApi
-      .get("/store")
-      .then((res) => {
-        if (res.status === 200) {
-          setNegocios(res.data);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
-  }, []);
-
-  const getNegocio = async (id: number | undefined) => {
+  const getNegocio = async (id?: number) => {
+    if (!id) return;
     setLoadingNegocio(true);
-    await hrApi
-      .get(`/store/${id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setNegocio(res.data);
-        }
-        setLoadingNegocio(false);
-      })
-      .catch(() => {
-        setError(true);
-        setLoadingNegocio(false);
-      });
+    const negocio = await getNegocioById(id);
+    console.log(negocio);
+    if (!negocio) setError(true);
+    setNegocio(negocio);
+    setLoadingNegocio(false);
   };
 
   return (
@@ -103,63 +87,35 @@ export const NegociosList = () => {
             />
           </div>
         </div>
-        {/* <div className="absolute inset-y-0 right-0 flex items-end pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 flex-col">
-          <Select
-            placeholder="Filtrar por"
-            className="w-60"
-            onChange={(e) => console.log(e)}
-          >
-            <SelectItem value="0" key="0">
-              -- --
-            </SelectItem>
-            <SelectItem value="1" key="1">
-              Nombre
-            </SelectItem>
-          </Select>
-        </div> */}
       </div>
       <div className="grid grid-cols-5 mt-10 gap-8">
         <div className="col-span-2">
-          {loading ? (
-            <CircularProgress size="lg" />
-          ) : error ? (
-            <p>Error al cargar los negocios</p>
-          ) : (
-            results.map(
-              (negocio) =>
-                negocio.estado_negocio === Estado.Activo && (
-                  <Card
-                    aria-label="Negocio"
-                    isPressable
-                    isHoverable
-                    shadow="lg"
-                    key={negocio.id_negocio}
-                    className="mb-6 w-full"
-                    classNames={{
-                      base: "hover:border-green-700 border-2 border-gray-300",
-                    }}
-                    onPress={() => getNegocio(negocio.id_negocio)}
-                  >
-                    <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
-                      <div className="flex gap-2 justify-center items-center">
-                        <MdOutlineStorefront size={25} />
-                        <h2 className="text-2xl font-bold">
-                          {negocio.nombre_negocio}
-                        </h2>
-                      </div>
-                      {/* <div>
-                        <Button color="success" variant="light" isIconOnly>
-                          <FaRegStar size={25} />
-                        </Button>
-                      </div> */}
-                    </CardHeader>
-                    <CardBody className="overflow-visible px-5 pb-2">
-                      <p className="mb-4">{negocio.direccion_negocio}</p>
-                    </CardBody>
-                  </Card>
-                )
-            )
-          )}
+          {results.map((negocio) => (
+            <Card
+              aria-label="Negocio"
+              isPressable
+              isHoverable
+              shadow="lg"
+              key={negocio.id_negocio}
+              className="mb-6 w-full"
+              classNames={{
+                base: 'hover:border-green-700 border-2 border-gray-300',
+              }}
+              onPress={() => getNegocio(negocio.id_negocio)}
+            >
+              <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
+                <div className="flex gap-2 justify-center items-center">
+                  <MdOutlineStorefront size={25} />
+                  <h2 className="text-2xl font-bold">
+                    {negocio.nombre_negocio}
+                  </h2>
+                </div>
+              </CardHeader>
+              <CardBody className="overflow-visible px-5 pb-2">
+                <p className="mb-4">{negocio.direccion_negocio}</p>
+              </CardBody>
+            </Card>
+          ))}
         </div>
 
         <div className="col-span-3">
@@ -171,15 +127,15 @@ export const NegociosList = () => {
             <Card
               className="mb-6 w-full max-h-[50rem]"
               classNames={{
-                base: "border-2 border-gray-300",
+                base: 'border-2 border-gray-300',
               }}
             >
               <Image
-                src={negocio?.images_negocio[0] || "/images/no-image.jpg"}
+                src={negocio?.images_negocio[0] || '/images/no-image.jpg'}
                 alt={negocio?.nombre_negocio}
                 className="min-w-full h-40 object-cover rounded-t-lg"
                 classNames={{
-                  wrapper: "min-w-full",
+                  wrapper: 'min-w-full',
                 }}
               />
               <CardHeader className="px-4 flex flex-col items-start">
@@ -249,7 +205,7 @@ export const NegociosList = () => {
                   </div>
                   <p className="mb-2 mt-2">{negocio?.direccion_negocio}</p>
                   <iframe
-                    style={{ border: "0" }}
+                    style={{ border: '0' }}
                     width="100%"
                     height="450"
                     loading="lazy"
@@ -263,7 +219,7 @@ export const NegociosList = () => {
           ) : (
             <Card
               classNames={{
-                base: "border-2 border-gray-300",
+                base: 'border-2 border-gray-300',
               }}
             >
               <CardHeader>

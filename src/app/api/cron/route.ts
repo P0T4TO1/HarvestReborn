@@ -6,7 +6,6 @@ import { VencimientoNotificationEmail } from "@/components";
 import { ILote } from "@/interfaces";
 
 import mailgun from "mailgun-js";
-import { m } from "framer-motion";
 
 const mg = mailgun({
   apiKey: process.env.MAILGUN_API_KEY || "",

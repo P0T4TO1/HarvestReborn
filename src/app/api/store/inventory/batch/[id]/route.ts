@@ -1,15 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { TipoAlmacenaje } from "@/interfaces";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { TipoAlmacenaje } from '@/interfaces';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function getLoteById(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id) {
-    return NextResponse.json({ message: "Falta Id del lote" }, { status: 400 });
+    return NextResponse.json({ message: 'Falta Id del lote' }, { status: 400 });
   }
 
   const lote = await prisma.m_lote.findUnique({
@@ -36,9 +47,18 @@ type Data = {
 async function updateLote(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const body = await request.json();
   const {
     cantidad_producto,
@@ -52,7 +72,7 @@ async function updateLote(
   try {
     if (!params.id) {
       return NextResponse.json(
-        { message: "Falta Id del lote" },
+        { message: 'Falta Id del lote' },
         { status: 400 }
       );
     }
@@ -76,7 +96,7 @@ async function updateLote(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: "Error al actualizar lote" },
+      { message: 'Error al actualizar lote' },
       { status: 500 }
     );
   }

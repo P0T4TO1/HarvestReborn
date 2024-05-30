@@ -1,19 +1,30 @@
-import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { IOrden, IProductoOrden } from "@/interfaces";
-import { EstadoOrden } from "@prisma/client";
+import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { IOrden, IProductoOrden } from '@/interfaces';
+import { EstadoOrden } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 async function getStoreOrders(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   const { id: id_negocio } = params;
 
   if (!id_negocio)
     return NextResponse.json(
-      { message: "Falta id de cliente" },
+      { message: 'Falta id de cliente' },
       { status: 400 }
     );
 
@@ -57,7 +68,7 @@ async function getStoreOrders(
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { error: true, message: "Error al obtener las ordenes" },
+      { error: true, message: 'Error al obtener las ordenes' },
       { status: 500 }
     );
   }
@@ -77,12 +88,21 @@ interface Data {
 async function editOrder(
   request: Request,
   { params }: { params: { id: string } },
-  req: NextRequest,
-  res: NextResponse
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        error: 'Unauthorized',
+        message: 'You need to be signed in to view the protected content.',
+      },
+      { status: 401 }
+    );
+  }
   if (!params.id)
     return NextResponse.json(
-      { message: "Falta id de la orden" },
+      { message: 'Falta id de la orden' },
       { status: 400 }
     );
   const { id } = params;
@@ -105,7 +125,7 @@ async function editOrder(
           createMany: {
             data: body.productos.map((product) => {
               if (!product.lote) {
-                throw new Error("No se ha seleccionado un lote");
+                throw new Error('No se ha seleccionado un lote');
               }
               return {
                 id_producto: product.id_producto,
@@ -122,10 +142,10 @@ async function editOrder(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "Error al editar la orden" },
+      { message: 'Error al editar la orden' },
       { status: 500 }
     );
   }
 }
 
-export { getStoreOrders as GET };
+export { getStoreOrders as GET, editOrder as PUT };
