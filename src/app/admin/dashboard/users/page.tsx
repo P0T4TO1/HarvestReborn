@@ -1,7 +1,31 @@
 import { UsersAdmin } from '@/components';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
-import { getUsersForAdmin, getUsersForSuperAdmin } from '@/actions';
+import { IUser } from '@/interfaces';
+
+const getUsersForSuperAdmin = async () => {
+  try {
+    const data = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`
+    );
+    return data.json() as unknown as IUser[];
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
+const getUsersForAdmin = async () => {
+  try {
+    const data = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/users`
+    );
+    return data.json() as unknown as IUser[];
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
 
 const UsersPage = async () => {
   const session = await getServerSession(authOptions);
