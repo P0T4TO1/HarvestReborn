@@ -2,7 +2,7 @@ import { AccountForm } from "@/components";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
-import { getAccount } from "@/actions";
+import { getAccount } from "@/helpers";
 
 const Account = async () => {
   const session = await getServerSession(authOptions);
