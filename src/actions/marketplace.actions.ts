@@ -61,7 +61,7 @@ export const getActivePublicactionsByStore = async (
       `${process.env.NEXT_PUBLIC_API_URL}/store/publication/active/${id_negocio}`,
       {
         method: 'GET',
-        headers: headers,
+        headers: new Headers(headers),
       }
     );
     const data = (await res.json()) as unknown as IPublicacion[];

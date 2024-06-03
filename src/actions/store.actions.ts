@@ -30,7 +30,7 @@ export const getPublicactionById = async (
       `${process.env.NEXT_PUBLIC_API_URL}/store/publication/${id_publicacion}`,
       {
         method: 'GET',
-        headers: headers,
+        headers: new Headers(headers),
       }
     );
     const data = await res.json();
@@ -76,7 +76,7 @@ export const getLotesForPosts = async (
       `${process.env.NEXT_PUBLIC_API_URL}/store/inventory/batch/all/${id_negocio}`,
       {
         method: 'GET',
-        headers: headers,
+        headers: new Headers(headers),
       }
     );
 

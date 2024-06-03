@@ -16,7 +16,7 @@ const getAllBatchs = async (id_negocio: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/store/inventory/batch/all/${id_negocio}?api_key=${process.env.API_KEY}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();

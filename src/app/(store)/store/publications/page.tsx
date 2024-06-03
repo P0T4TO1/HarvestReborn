@@ -17,7 +17,7 @@ const getPublications = async (id_negocio: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/store/publication?id_negocio=${id_negocio}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();

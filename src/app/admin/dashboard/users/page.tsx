@@ -10,7 +10,7 @@ const getUsersForSuperAdmin = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();
@@ -25,7 +25,7 @@ const getUsersForAdmin = async () => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
       method: 'GET',
-      headers: headers(),
+      headers: new Headers(headers()),
     });
     const data = await res.json();
     return data as unknown as IUser[];

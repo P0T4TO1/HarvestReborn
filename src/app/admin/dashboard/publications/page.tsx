@@ -8,7 +8,7 @@ const getAllPublications = async () => {
       `${process.env.NEXT_PUBLIC_API_URL}/publications?api_key=${process.env.API_KEY}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();

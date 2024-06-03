@@ -18,7 +18,7 @@ const getOrders = async (id_negocio: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/store/orders/${id_negocio}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();
@@ -37,7 +37,7 @@ const getLotes = async (id_negocio: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/store/inventory/batch/order/${id_negocio}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const lotes = (await res.json()) as unknown as ILote[];

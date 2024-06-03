@@ -23,7 +23,7 @@ const getOrdersCliente = async (id_cliente: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/customer/order/all/${id_cliente}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const orders = (await res.json()) as unknown as IOrden[];
@@ -59,7 +59,7 @@ const getOrdersNegocio = async (id_negocio: number) => {
       `${process.env.NEXT_PUBLIC_API_URL}/store/orders/${id_negocio}`,
       {
         method: 'GET',
-        headers: headers(),
+        headers: new Headers(headers()),
       }
     );
     const data = await res.json();

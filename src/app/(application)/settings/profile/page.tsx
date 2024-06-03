@@ -7,10 +7,13 @@ import { IUser } from '@/interfaces';
 
 const getProfile = async (id_user: string) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile/${id_user}`, {
-      method: 'GET',
-      headers: headers(),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user/profile/${id_user}`,
+      {
+        method: 'GET',
+        headers: new Headers(headers()),
+      }
+    );
     const data = await res.json();
     return data as unknown as IUser;
   } catch (error) {
