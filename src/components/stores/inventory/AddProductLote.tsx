@@ -1,12 +1,14 @@
 "use client";
 
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { IProduct } from "@/interfaces";
+
 import { hrApi } from "@/api";
-import { AddLoteToInventory, ProductCard } from "@/components";
-import { Input, useDisclosure, CircularProgress } from "@nextui-org/react";
+import { IProduct } from "@/interfaces";
+
 import { FaSearch } from "react-icons/fa";
 import { MdAddCircleOutline } from "react-icons/md";
+import { AddLoteToInventory, ProductCard } from "@/components";
+import { Input, useDisclosure, CircularProgress } from "@nextui-org/react";
 
 export const AddProductLote = () => {
   const [products, setProducts] = useState<IProduct[]>([]);

@@ -8,7 +8,7 @@ import {
 } from "@/interfaces";
 
 export interface INegocio {
-  id_negocio?: number;
+  id_negocio: number;
   nombre_negocio: string;
   direccion_negocio: string;
   telefono_negocio: string;
@@ -26,7 +26,7 @@ export interface INegocio {
   ordenes?: IOrden[];
   publicaciones?: IPublicacion[];
 
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
 }

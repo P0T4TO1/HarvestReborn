@@ -83,7 +83,6 @@ async function sendMessage(req: NextRequest) {
 
     const message = messageValidator.parse(messageData);
 
-    // notify all connected chat room clients
     await pusherServer.trigger(
       toPusherKey(`chat:${chatId}`),
       'incoming-message',
@@ -133,7 +132,7 @@ async function sendMessage(req: NextRequest) {
       data: message,
     });
 
-    return NextResponse.json({ message }, { status: 201 });
+    return NextResponse.json(message, { status: 201 });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {

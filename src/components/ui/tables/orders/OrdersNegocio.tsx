@@ -158,7 +158,7 @@ export const OrdersTable = ({ orders }: Props) => {
 
       switch (columnKey) {
         case "id_orden":
-          return <>{order.id_orden}</>;
+          return <>#{order.id_orden}</>;
         case "cliente.nombre_cliente":
           return (
             <>

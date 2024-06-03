@@ -1,9 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { redirect, notFound } from "next/navigation";
-import { getPublicactionById, getLotesForPosts } from "@/actions";
-import { PublicacionEdit } from "@/components";
-import prisma from "@/lib/prisma";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
+
+import { headers } from 'next/headers';
+import { redirect, notFound } from 'next/navigation';
+
+import { PublicacionEdit } from '@/components';
+import { getIdNegocioByUserId } from '@/helpers';
+import { getPublicactionById, getLotesForPosts } from '@/actions';
 
 interface PageProps {
   params: {
@@ -13,23 +16,32 @@ interface PageProps {
 
 const Page = async ({ params }: PageProps) => {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/auth/login");
-  if (session.user.id_rol !== 2) redirect("/home");
+  if (!session) redirect('/auth/login');
+  if (session.user.id_rol !== 2) redirect('/home');
 
-  const user = await prisma.d_duenonegocio.findUnique({
-    where: { id_user: session.user.id },
-    include: { negocio: true },
-  });
+  const res = await getIdNegocioByUserId(session.user.id);
 
-  if (!user?.negocio?.id_negocio) notFound();
+  if (!res) {
+    return (
+      <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
+        <h1>
+          Hubo un error al cargar la página. Por favor, cierre sesión y vuelva a
+          intentarlo.
+        </h1>
+      </section>
+    );
+  }
+
+  const { id_negocio } = res;
 
   const { id } = params;
-  const lotes = await getLotesForPosts(user?.negocio?.id_negocio);
-  const publicacion = await getPublicactionById(Number(id));
+  const lotes = await getLotesForPosts(id_negocio, headers());
+  const publicacion = await getPublicactionById(Number(id), headers());
 
   if (!publicacion || !lotes) return notFound();
 
-  if (publicacion.negocio.dueneg.user?.id !== session.user.id) return notFound();
+  if (publicacion.negocio.dueneg.user?.id !== session.user.id)
+    return notFound();
 
   return (
     <section className="w-full flex flex-col md:flex-row text-[#161931] min-h-screen">

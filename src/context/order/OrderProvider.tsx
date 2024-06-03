@@ -1,13 +1,19 @@
-"use client";
+'use client';
 
-import { useEffect, useReducer, ReactNode } from "react";
-import Cookie from "js-cookie";
-import { today, getLocalTimeZone } from "@internationalized/date";
-import { BagContext } from "./OrderContext";
-import { bagReducer } from "./orderReducer";
-import { IOrden, IProductoOrden, EstadoOrden, BagType } from "@/interfaces";
-import { hrApi } from "@/api";
-import { chatHrefConstructor } from "@/utils/cn";
+import { useEffect, useReducer, ReactNode } from 'react';
+
+import Cookie from 'js-cookie';
+
+import { BagContext } from './OrderContext';
+import { bagReducer } from './orderReducer';
+
+import { hrApi } from '@/api';
+import { chatHrefConstructor } from '@/utils/cn';
+import { IOrden, IProductoOrden, BagType } from '@/interfaces';
+import { today, getLocalTimeZone } from '@internationalized/date';
+
+import { toast } from 'sonner';
+import { WARNING_TOAST } from '@/components';
 
 export interface BagState {
   isLoaded: boolean;
@@ -28,23 +34,23 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     try {
-      const localBag = localStorage.getItem("bag")
-        ? JSON.parse(localStorage.getItem("bag")!)
+      const localBag = localStorage.getItem('bag')
+        ? JSON.parse(localStorage.getItem('bag')!)
         : [];
-      const cookieBag = Cookie.get("bag") ? JSON.parse(Cookie.get("bag")!) : [];
-      dispatch({ type: "LOAD_BAG", payload: localBag ?? cookieBag });
+      const cookieBag = Cookie.get('bag') ? JSON.parse(Cookie.get('bag')!) : [];
+      dispatch({ type: 'LOAD_BAG', payload: localBag ?? cookieBag });
     } catch (error) {
       console.log(error);
       dispatch({
-        type: "LOAD_BAG",
+        type: 'LOAD_BAG',
         payload: [],
       });
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("bag", JSON.stringify(state.bag));
-    Cookie.set("bag", JSON.stringify(state.bag));
+    localStorage.setItem('bag', JSON.stringify(state.bag));
+    Cookie.set('bag', JSON.stringify(state.bag));
   }, [state.bag]);
 
   useEffect(() => {
@@ -66,7 +72,7 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
       numberOfProducts,
       total,
     };
-    dispatch({ type: "UPDATE_ORDER_SUMMARY", payload: orderSummary });
+    dispatch({ type: 'UPDATE_ORDER_SUMMARY', payload: orderSummary });
   }, [state.bag]);
 
   const addProductToBag = async (product: IProductoOrden) => {
@@ -78,13 +84,41 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
         : false
     );
 
+    if (!product.lote) {
+      toast('No se puede agregar un producto sin lote', WARNING_TOAST);
+      return;
+    }
+
+    const availableQuantity = state.bag.reduce((acc, item) => {
+      if (item.id_negocio === product.lote?.inventario.id_negocio) {
+        return item.productos.reduce((acc, item) => {
+          if (item.id_producto === product.id_producto) {
+            return acc + item.cantidad_orden;
+          }
+          return acc;
+        }, 0);
+      }
+      return acc;
+    }, 0);
+
+    if (
+      product.cantidad_orden >
+      product.lote.cantidad_producto - availableQuantity
+    ) {
+      toast(
+        `No hay suficiente cantidad de ${product.producto?.nombre_producto} en el inventario`,
+        WARNING_TOAST
+      );
+      return;
+    }
+
     const productInNegocio = state.bag.some(
       (item) => item.id_negocio === product.lote?.inventario.id_negocio
     );
 
     if (!productInBag && !productInNegocio) {
       return dispatch({
-        type: "UPDATE_PRODUCTS_IN_BAG",
+        type: 'UPDATE_PRODUCTS_IN_BAG',
         payload: [
           ...state.bag,
           {
@@ -117,11 +151,23 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
       }
       return item;
     }) as BagType;
-    dispatch({ type: "UPDATE_PRODUCTS_IN_BAG", payload: updatedBag });
+    dispatch({ type: 'UPDATE_PRODUCTS_IN_BAG', payload: updatedBag });
   };
 
   const updateBagQuantity = (product: IProductoOrden) => {
-    dispatch({ type: "CHANGE_BAG_QUANTITY", payload: product });
+    if (!product.lote) {
+      toast('No se puede agregar un producto sin lote', WARNING_TOAST);
+      return;
+    }
+
+    if (product.cantidad_orden > product.lote.cantidad_producto) {
+      toast(
+        `No hay suficiente cantidad de ${product.producto?.nombre_producto} en el inventario`,
+        WARNING_TOAST
+      );
+      return;
+    }
+    dispatch({ type: 'CHANGE_BAG_QUANTITY', payload: product });
   };
 
   const removeBagProduct = async (product: IProductoOrden) => {
@@ -130,14 +176,14 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
         .map((item) => item.productos.length)
         .reduce((a, b) => a + b, 0) === 1
     ) {
-      dispatch({ type: "CLEAR_BAG", payload: [] });
+      dispatch({ type: 'CLEAR_BAG', payload: [] });
     }
-    dispatch({ type: "REMOVE_PRODUCT", payload: product });
+    dispatch({ type: 'REMOVE_PRODUCT', payload: product });
   };
 
   const clearBag = () => {
     dispatch({
-      type: "CLEAR_BAG",
+      type: 'CLEAR_BAG',
       payload: [],
     });
   };
@@ -157,17 +203,20 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
     };
 
     try {
-      const { data } = await hrApi.post("/customer/order", body);
+      const { data } = await hrApi.post('/customer/order', body);
       const orders = data.orders as IOrden[];
-      orders.map(async(order) => {
-        if(!order.negocio?.dueneg.id_user || !order.cliente?.id_user){
+      orders.map(async (order) => {
+        if (!order.negocio?.dueneg.id_user || !order.cliente?.id_user) {
           return;
         }
         await hrApi.post(`/chat`, {
           userId: order.cliente.id_user,
           userId2: order.negocio.dueneg.id_user,
           chatName: `Chat entre ${order.cliente.nombre_cliente} y ${order.negocio.nombre_negocio}`,
-          chatId: chatHrefConstructor(order.cliente.id_user, order.negocio.dueneg.id_user),
+          chatId: chatHrefConstructor(
+            order.cliente.id_user,
+            order.negocio.dueneg.id_user
+          ),
         });
       });
 
@@ -178,17 +227,17 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
           data: [],
         };
       }
-      dispatch({ type: "ORDER_COMPLETED" });
+      dispatch({ type: 'ORDER_COMPLETED' });
       return {
         hasError: false,
-        message: "Orden creada con éxito",
+        message: 'Orden creada con éxito',
         data: orders,
       };
     } catch (error) {
       console.log(error);
       return {
         hasError: true,
-        message: "Error no controlado, hable con el administrador",
+        message: 'Error no controlado, hable con el administrador',
         data: [],
       };
     }

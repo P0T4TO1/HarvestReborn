@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   ChangeEvent,
@@ -7,13 +7,13 @@ import React, {
   useState,
   useMemo,
   useCallback,
-} from "react";
-import { ILote, IProductoOrden } from "@/interfaces";
-import { Input, Button, Checkbox } from "@nextui-org/react";
-import { ProductCard, DANGER_TOAST } from "@/components";
-import { BagContext } from "@/context/order";
-import { FaSearch } from "react-icons/fa";
-import { toast } from "sonner";
+} from 'react';
+import { ILote, IProductoOrden } from '@/interfaces';
+import { Input, Button, Checkbox } from '@nextui-org/react';
+import { ProductCard, DANGER_TOAST } from '@/components';
+import { BagContext } from '@/context/order';
+import { FaSearch } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 interface NegocioProductsProps {
   lotes: ILote[];
@@ -27,7 +27,7 @@ export const NegocioProducts = ({
   const { addProductToBag } = useContext(BagContext);
   const [isSeletedFrutas, setIsSelectedFrutas] = useState(false);
   const [isSeletedVerduras, setIsSelectedVerduras] = useState(false);
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const hasSearchFilter = Boolean(filterValue);
 
   const filteredItems = useMemo(() => {
@@ -44,11 +44,11 @@ export const NegocioProducts = ({
       return filteredLotes;
     } else if (isSeletedFrutas) {
       return filteredLotes.filter(
-        (lote) => lote.producto.categoria === "FRUTA"
+        (lote) => lote.producto.categoria === 'FRUTA'
       );
     } else if (isSeletedVerduras) {
       return filteredLotes.filter(
-        (lote) => lote.producto.categoria === "VERDURA"
+        (lote) => lote.producto.categoria === 'VERDURA'
       );
     } else {
       return filteredLotes;
@@ -63,12 +63,12 @@ export const NegocioProducts = ({
     if (value) {
       setFilterValue(value);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
   }, []);
 
   const onAddProduct = (product: IProductoOrden) => {
@@ -78,7 +78,7 @@ export const NegocioProducts = ({
   return (
     <div className="pt-16 container mx-auto">
       <h1 className="font-bebas-neue uppercase text-4xl font-black flex flex-col leading-none dark:text-green-600 text-green-900">
-        {nombre_negocio.replace("%20", " ")}
+        {nombre_negocio.replace('%20', ' ')}
         <span className="text-xl dark:text-gray-300 text-gray-900 font-semibold">
           Aquí puedes ver los productos disponibles en este negocio
         </span>
@@ -118,7 +118,7 @@ export const NegocioProducts = ({
           <ul className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
             {itemsToDisplay.map((lote) => (
               <li key={lote.id_producto} className="p-2 flex">
-                <ProductCard lote={lote} route={"negocio-prods-cliente"}>
+                <ProductCard lote={lote} route={'negocio-prods-cliente'}>
                   <Button
                     className="w-full dark:text-gray-200 text-white bg-[#00994F]"
                     size="md"

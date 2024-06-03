@@ -148,7 +148,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
     if (!watch('cp')) {
       return;
     }
-    if (watch('cp')?.length === 5) {
+    if (watch('cp').length === 5) {
       axios.get('/CP_CDMX.json').then((direction) => {
         if (direction) {
           if (
@@ -162,7 +162,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
             return;
           }
           direction.data.map((item: IResponse) => {
-            if (item.d_codigo !== watch('cp')!) {
+            if (item.d_codigo !== watch('cp')) {
               return;
             } else {
               setValue('colonia', item.d_asenta);
@@ -175,7 +175,7 @@ export const EditUserForm = ({ user, isEditing }: Props) => {
         }
       });
     }
-  }, [getValues, setError, setValue, watch('cp')]);
+  }, [getValues, setError, setValue, watch]);
 
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
     setIsLoading(true);

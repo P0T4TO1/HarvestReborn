@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Tab, Tabs, Button } from "@nextui-org/react";
 import {
@@ -19,6 +19,7 @@ import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
 
 import { hrApi } from "@/api";
 import { INegocio } from "@/interfaces";
+import { get } from "http";
 
 interface Props {
   negocio: INegocio;
@@ -39,7 +40,7 @@ export interface IFormDataStoreSettings {
   isEditing: boolean;
 }
 
-export const MiNegocioSection = ({ negocio }: Props) => {
+export const StoreSettings = ({ negocio }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,6 +73,7 @@ export const MiNegocioSection = ({ negocio }: Props) => {
     setIsLoading(true);
     setIsEditing(false);
     const imagesURLs: string[] = [];
+    
     try {
       if (data.images_files) {
         const formData = new FormData();
@@ -85,7 +87,6 @@ export const MiNegocioSection = ({ negocio }: Props) => {
             console.log("File uploaded successfully");
             imagesURLs.push(...response.data.secure_urls);
             data.images_urls = imagesURLs;
-            console.log(imagesURLs);
           })
           .catch((error) => {
             console.error(error, "Error al subir las imágenes a la API");

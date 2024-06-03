@@ -1,7 +1,10 @@
-"use client";
+'use client';
 
-import React, { FC, useState, useMemo, useCallback } from "react";
-import { getPublicactionById } from "@/actions";
+import React, { FC, useState, useMemo, useCallback } from 'react';
+import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
+
+import { IPublicacion } from '@/interfaces';
+import { getPublicactionById } from '@/actions';
 
 import {
   Card,
@@ -9,22 +12,26 @@ import {
   Input,
   Image,
   useDisclosure,
-} from "@nextui-org/react";
-import { FaSearch } from "react-icons/fa";
-import { DANGER_TOAST, PublicacionModal } from "@/components";
+  Link,
+  Button,
+} from '@nextui-org/react';
+import { FaSearch } from 'react-icons/fa';
+import { Disponibilidad } from '@prisma/client';
+import { MdOutlinePostAdd } from 'react-icons/md';
+import { DANGER_TOAST, PublicacionModal } from '@/components';
 
-import { IPublicacion } from "@/interfaces";
-import { Disponibilidad } from "@prisma/client";
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
-interface MisPublicacionesProps {
+interface Props {
   publicaciones: IPublicacion[];
+  headers: ReadonlyHeaders;
 }
 
-export const MisPublicaciones: FC<MisPublicacionesProps> = ({
+export const MisPublicaciones: FC<Props> = ({
   publicaciones,
+  headers,
 }) => {
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const hasSearchFilter = Boolean(filterValue);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -52,24 +59,24 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
     if (value) {
       setFilterValue(value);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
   }, []);
 
   const getPublicacion = (id_publicacion: number) => {
-    getPublicactionById(id_publicacion)
+    getPublicactionById(id_publicacion, headers)
       .then((data) => {
-        if (!data) return toast("No se encontró la publicación", DANGER_TOAST);
+        if (!data) return toast('No se encontró la publicación', DANGER_TOAST);
         setPublicacion(data);
         setLoading(false);
       })
       .catch((error) => {
         console.error(error);
-        toast("Error al obtener la publicación", DANGER_TOAST);
+        toast('Error al obtener la publicación', DANGER_TOAST);
         setLoading(false);
       });
   };
@@ -81,6 +88,7 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
           useDisclosure={{ isOpen, onClose }}
           publicacion={publicacion}
           loading={loading}
+          headers={headers}
         />
       )}
       <Card shadow="none">
@@ -102,6 +110,18 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
           </div>
         </CardHeader>
       </Card>
+      <div className="flex justify-end mt-4">
+        <Button
+          as={Link}
+          href={'/market/item/create'}
+          color="primary"
+          variant="faded"
+          className="w-1/2 md:w-1/3"
+          startContent={<MdOutlinePostAdd size={25} />}
+        >
+          <span className="ml-2">Crear publicación de productos</span>
+        </Button>
+      </div>
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
         {itemsToDisplay.map((publicacion) => (
           <div
@@ -131,8 +151,8 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
               <div className="flex">
                 <p className="text-sm">
                   {publicacion.disponibilidad === Disponibilidad.DONACION
-                    ? "Donacion"
-                    : ""}
+                    ? 'Donacion'
+                    : ''}
                 </p>
               </div>
             )}
@@ -142,11 +162,11 @@ export const MisPublicaciones: FC<MisPublicacionesProps> = ({
                   publicacion.estado_publicacion.slice(1).toLowerCase()}
               </p>
               <p className="text-xs text-default-600">
-                Publicado el:{" "}
-                {new Date(publicacion.createdAt!).toLocaleDateString("es-MX", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                Publicado el:{' '}
+                {new Date(publicacion.createdAt!).toLocaleDateString('es-MX', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
             </div>

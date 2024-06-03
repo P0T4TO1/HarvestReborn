@@ -3,38 +3,6 @@
 import { IUser } from '@/interfaces';
 import axios, { AxiosError } from 'axios';
 
-export const getUsersForAdmin = async () => {
-  try {
-    const { data } = await axios.get<IUser[]>(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/users`
-    );
-    return data as unknown as IUser[];
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      console.error(error.response?.data);
-      return;
-    }
-    console.error(error);
-    return;
-  }
-};
-
-export const getUsersForSuperAdmin = async () => {
-  try {
-    const { data } = await axios.get<IUser[]>(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`
-    );
-    return data as unknown as IUser[];
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      console.error(error.response?.data);
-      return;
-    }
-    console.error(error);
-    return;
-  }
-};
-
 export const loginAction = async (email: string, password: string) => {
   try {
     const { data } = await axios.post(

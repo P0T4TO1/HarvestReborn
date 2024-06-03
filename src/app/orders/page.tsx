@@ -1,6 +1,9 @@
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
-import { redirect, notFound } from 'next/navigation';
+
 import {
   OrdersCliente,
   OrdersTable,
@@ -9,9 +12,63 @@ import {
   NavbarComponent,
   Footer,
 } from '@/components';
-import { getOrders as getOrdersNegocio } from '@/actions';
-import { getOrdersById as getOrdersCliente } from '@/actions';
-import prisma from '@/lib/prisma';
+import { IOrden, EstadoOrden } from '@/interfaces';
+import { getIdNegocioByUserId, getIdClienteByUserId } from '@/helpers';
+
+const getOrdersCliente = async (id_cliente: number) => {
+  if (!id_cliente) return;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer/order/all/${id_cliente}`,
+      {
+        method: 'GET',
+        headers: headers(),
+      }
+    );
+    const orders = (await res.json()) as unknown as IOrden[];
+    return {
+      todos: orders,
+      pendientes: orders.filter(
+        (order) => order.estado_orden === EstadoOrden.PENDIENTE
+      ),
+      en_proceso: orders.filter(
+        (order) => order.estado_orden === EstadoOrden.EN_PROCESO
+      ),
+      finalizados: orders.filter(
+        (order) => order.estado_orden === EstadoOrden.FINALIZADO
+      ),
+      cancelados: orders.filter(
+        (order) => order.estado_orden === EstadoOrden.CANCELADO
+      ),
+      rechazados: orders.filter(
+        (order) => order.estado_orden === EstadoOrden.RECHAZADO
+      ),
+    };
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
+
+const getOrdersNegocio = async (id_negocio: number) => {
+  if (!id_negocio) return;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/orders/${id_negocio}`,
+      {
+        method: 'GET',
+        headers: headers(),
+      }
+    );
+    const data = await res.json();
+    return data as unknown as IOrden[];
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
 
 const OrdersPage = async () => {
   const session = await getServerSession(authOptions);
@@ -21,19 +78,25 @@ const OrdersPage = async () => {
     redirect('/admin/dashboard');
 
   if (session.user.id_rol === 2) {
-    const user = await prisma.d_duenonegocio.findUnique({
-      where: { id_user: session?.user.id },
-      include: { negocio: true },
-    });
+    const res = await getIdNegocioByUserId(session.user.id);
+    if (!res) {
+      return (
+        <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
+          <h1>
+            Hubo un error al cargar la página. Por favor, cierre sesión y vuelva
+            a intentarlo.
+          </h1>
+        </section>
+      );
+    }
+    const { id_negocio } = res;
 
-    if (!user?.negocio?.id_negocio) return notFound();
-
-    const orders = await getOrdersNegocio(user?.negocio?.id_negocio);
+    const orders = await getOrdersNegocio(id_negocio);
 
     if (!orders)
       return (
         <section className="flex flex-col relative overflow-hidden min-h-screen">
-          <h1>No hay datos</h1>
+          <h1>No hay ordenes</h1>
         </section>
       );
 
@@ -56,18 +119,27 @@ const OrdersPage = async () => {
     );
   }
 
-  const user = await prisma.d_cliente.findUnique({
-    where: { id_user: session.user.id },
-  });
+  const res = await getIdClienteByUserId(session.user.id);
 
-  if (!user?.id_cliente) return notFound();
+  if (!res) {
+    return (
+      <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
+        <h1>
+          Hubo un error al cargar la página. Por favor, cierre sesión y vuelva a
+          intentarlo.
+        </h1>
+      </section>
+    );
+  }
 
-  const orders = await getOrdersCliente(user.id_cliente);
+  const { id_cliente } = res;
+
+  const orders = await getOrdersCliente(id_cliente);
 
   if (!orders)
     return (
       <section className="flex flex-col relative overflow-hidden min-h-screen">
-        <h1>No hay datos</h1>
+        <h1>No hay ordenes</h1>
       </section>
     );
 

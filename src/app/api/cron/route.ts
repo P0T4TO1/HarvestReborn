@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { render } from "@react-email/render";
-import { today, getLocalTimeZone } from "@internationalized/date";
-import { VencimientoNotificationEmail } from "@/components";
-import { ILote } from "@/interfaces";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { render } from '@react-email/render';
+import { today, getLocalTimeZone } from '@internationalized/date';
+import { VencimientoNotificationEmail } from '@/components';
+import { ILote } from '@/interfaces';
 
-import mailgun from "mailgun-js";
+import mailgun from 'mailgun-js';
 
 const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY || "",
-  domain: process.env.MAILGUN_DOMAIN || "",
+  apiKey: process.env.MAILGUN_API_KEY || '',
+  domain: process.env.MAILGUN_DOMAIN || '',
 });
 
 export async function GET(req: NextRequest) {
@@ -44,6 +44,33 @@ export async function GET(req: NextRequest) {
       );
     });
 
+    const publicationsWithLotesVencidos = await prisma.m_publicaciones.findMany(
+      {
+        where: {
+          lotes: {
+            some: {
+              id_lote: {
+                in: lotesVencidos.map((lote) => lote.id_lote),
+              },
+            },
+          },
+        },
+      }
+    );
+
+    await prisma.m_publicaciones.updateMany({
+      where: {
+        id_publicacion: {
+          in: publicationsWithLotesVencidos.map(
+            (publication) => publication.id_publicacion
+          ),
+        },
+      },
+      data: {
+        estado_general: 'INACTIVO',
+      },
+    });
+
     await prisma.m_lote.updateMany({
       where: {
         id_lote: {
@@ -51,7 +78,7 @@ export async function GET(req: NextRequest) {
         },
       },
       data: {
-        estado_lote: "VENCIDO",
+        estado_lote: 'VENCIDO',
       },
     });
 
@@ -76,8 +103,8 @@ export async function GET(req: NextRequest) {
     const msgs = lotesParaAvisar.map((lote, index) => {
       return {
         to: lote.inventario.negocio.dueneg.user.email,
-        from: "Harvest Reborn<harvestreborn@gmail.com>",
-        subject: "Aviso de vencimiento de lote",
+        from: 'Harvest Reborn<harvestreborn@gmail.com>',
+        subject: 'Aviso de vencimiento de lote',
         html: emailsHTML[index],
       };
     });
@@ -96,7 +123,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         error: true,
-        message: "Error general del metodo GET",
+        message: 'Error general del metodo GET',
       },
       { status: 500 }
     );

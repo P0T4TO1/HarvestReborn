@@ -1,8 +1,10 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import axios, { AxiosError } from "axios";
-import { IPublicacion } from "@/interfaces";
+import { revalidatePath } from 'next/cache';
+import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
+
+import axios, { AxiosError } from 'axios';
+import { IPublicacion } from '@/interfaces';
 
 export const getActivePublications = async (
   offset: number,
@@ -20,8 +22,8 @@ export const getActivePublications = async (
     const { data } = await axios.get<IPublicacion[]>(
       `${process.env.NEXT_PUBLIC_API_URL}/publications/active?q=${search}&offset=${offset}&limit=${limit}&api_key=${process.env.API_KEY}`
     );
-    
-    revalidatePath("/(application)/market");
+
+    revalidatePath('/(application)/market');
     return data as unknown as IPublicacion[];
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -38,13 +40,33 @@ export const getPublicationById = async (id: string) => {
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/publications/${id}?api_key=${process.env.API_KEY}`
     );
-    revalidatePath("/(application)/market/item/[id]", "page");
+    revalidatePath('/(application)/market/item/[id]', 'page');
     return data as unknown as IPublicacion;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error(error.response?.data);
       return;
     }
+    console.error(error);
+    return;
+  }
+};
+
+export const getActivePublicactionsByStore = async (
+  id_negocio: number,
+  headers: ReadonlyHeaders
+) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/store/publication/active/${id_negocio}`,
+      {
+        method: 'GET',
+        headers: headers,
+      }
+    );
+    const data = (await res.json()) as unknown as IPublicacion[];
+    return data;
+  } catch (error) {
     console.error(error);
     return;
   }

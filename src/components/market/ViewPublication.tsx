@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import React, { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 import {
   Image,
@@ -12,16 +12,18 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/react";
-import { toast } from "sonner";
-import { IoMdMore } from "react-icons/io";
-import Carousel from "react-material-ui-carousel";
-import { DANGER_TOAST } from "../ui";
-import { IoChatbubbleEllipsesOutline, IoBookmark } from "react-icons/io5";
+  Accordion,
+  AccordionItem,
+} from '@nextui-org/react';
+import { toast } from 'sonner';
+import { IoMdMore } from 'react-icons/io';
+import Carousel from 'react-material-ui-carousel';
+import { DANGER_TOAST } from '../ui';
+import { IoChatbubbleEllipsesOutline, IoBookmark } from 'react-icons/io5';
 
-import { hrApi } from "@/api";
-import { chatHrefConstructor } from "@/utils/cn";
-import { DisponibilidadPublicacion, IPublicacion } from "@/interfaces";
+import { hrApi } from '@/api';
+import { chatHrefConstructor } from '@/utils/cn';
+import { DisponibilidadPublicacion, IPublicacion } from '@/interfaces';
 
 interface Props {
   publication: IPublicacion;
@@ -37,7 +39,6 @@ export const ViewPublication = ({ publication }: Props) => {
     setIsLoading(true);
     if (!session) {
       router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`);
-      setIsLoading(false);
       return;
     }
     await hrApi
@@ -52,7 +53,7 @@ export const ViewPublication = ({ publication }: Props) => {
       })
       .catch(() => {
         return toast(
-          "Ocurrió un error al intentar enviar el mensaje",
+          'Ocurrió un error al intentar enviar el mensaje',
           DANGER_TOAST
         );
       });
@@ -130,10 +131,29 @@ export const ViewPublication = ({ publication }: Props) => {
               <p className="mt-2">
                 {publication.disponibilidad ===
                 DisponibilidadPublicacion.En_venta
-                  ? "Venta"
-                  : "Donación"}
+                  ? 'Venta'
+                  : 'Donación'}
               </p>
             </div>
+            <Accordion>
+              <AccordionItem title="Productos">
+                {publication.lotes?.map((lote) => (
+                  <div key={lote.id_lote} className="flex justify-between mt-2">
+                    <p>{lote.producto.nombre_producto}</p>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">
+                          {lote.last_cantidad !== 0
+                            ? lote.last_cantidad
+                            : lote.cantidad_producto}{' '}
+                          kg
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
         <Divider />
@@ -144,7 +164,7 @@ export const ViewPublication = ({ publication }: Props) => {
           <p className="mt-2">{publication.negocio.direccion_negocio}</p>
           <div className="mt-4">
             <iframe
-              style={{ border: "0" }}
+              style={{ border: '0' }}
               width="100%"
               height="320"
               loading="lazy"

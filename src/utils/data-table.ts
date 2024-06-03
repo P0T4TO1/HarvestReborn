@@ -12,7 +12,7 @@ export const statusColorMapOrders = {
 };
 
 export const columnsOrders = [
-  { name: 'ID', uid: 'id_orden', sortable: true },
+  { name: 'NO. DE ORDEN', uid: 'id_orden', sortable: true },
   { name: 'CLIENTE', uid: 'cliente.nombre_cliente', sortable: true },
   { name: 'FECHA', uid: 'fecha_orden', sortable: true },
   { name: 'TOTAL', uid: 'monto_total', sortable: true },
@@ -64,7 +64,7 @@ export const columnsNegocios = [
   { name: 'ID', uid: 'id_negocio', sortable: true },
   { name: 'NOMBRE', uid: 'nombre_negocio', sortable: true },
   { name: 'DIRECCIÓN', uid: 'direccion_negocio', sortable: true },
-  { name: 'FECHA DE CREACIÓN', uid: 'created_at', sortable: true },
+  { name: 'FECHA DE CREACIÓN', uid: 'createdAt', sortable: true },
   { name: 'ID DUEÑO', uid: 'id_dueneg', sortable: true },
   { name: 'ESTADO', uid: 'estado_negocio', sortable: true },
   { name: 'ACCIONES', uid: 'acciones' },

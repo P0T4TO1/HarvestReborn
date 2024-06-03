@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useState } from "react";
+
 import {
   Button,
   Input,
@@ -13,21 +14,22 @@ import {
   ModalHeader,
   DatePicker,
 } from "@nextui-org/react";
+
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { useDateFormatter, I18nProvider } from "@react-aria/i18n";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { productSchema } from "@/validations/products.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { hrApi } from "@/api";
-
-import { toast } from "sonner";
-import { SUCCESS_TOAST, DANGER_TOAST } from "@/components";
-import { IoMdHelp } from "react-icons/io";
-
 import { AuthContext } from "@/context/auth";
 import { IProduct, TipoAlmacenaje } from "@/interfaces";
+
+import { toast } from "sonner";
+import { IoMdHelp } from "react-icons/io";
+import { SUCCESS_TOAST, DANGER_TOAST } from "@/components";
+
 
 interface IFormData {
   cantidad_producto: number | null;
@@ -95,7 +97,7 @@ export const AddLoteToInventory = ({
       const res = await hrApi
         .post(`/store/inventory/${id}`, {
           id: id,
-          inventory_id: user?.duenonegocio?.negocio.inventario?.id_inventario,
+          inventory_id: user.duenonegocio.negocio.inventario.id_inventario,
           ...data,
         })
         .then(() => {
@@ -123,7 +125,7 @@ export const AddLoteToInventory = ({
   return (
     <Modal backdrop="blur" isOpen={isOpen} onClose={handleClose}>
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <form onSubmit={handleSubmit(addProduct)}>
             <ModalHeader className="flex gap-1 mt-4 justify-between items-center">
               <p>Añadir {product?.nombre_producto} a tu inventario</p>

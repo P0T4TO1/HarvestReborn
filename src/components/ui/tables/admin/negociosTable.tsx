@@ -39,7 +39,7 @@ interface Props {
 const INITIAL_VISIBLE_COLUMNS = [
   "nombre_negocio",
   "direccion_negocio",
-  "created_at",
+  "createdAt",
   "id_dueneg",
   "estado_negocio",
   "acciones",
@@ -132,9 +132,9 @@ export const TableNegocios = ({ negocios }: Props) => {
         return <>{cellValue}</>;
       case "direccion_negocio":
         return <>{cellValue}</>;
-      case "created_at":
+      case "createdAt":
         return (
-          <>{negocio.created_at?.toString().split("-")[2].split("T")[0]}</>
+          <>{negocio.createdAt?.toString().split("-")[2].split("T")[0]}</>
         );
       case "id_dueneg":
         return <>{cellValue}</>;

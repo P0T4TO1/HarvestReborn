@@ -80,7 +80,7 @@ export const BagList = ({ editable = false, products }: BagListProps) => {
         console.log(res);
         toast(res.message, SUCCESS_TOAST);
         setIsLoading(false);
-        return router.push(`/orders`);
+        return router.replace(`/orders`);
       })
       .catch(() => {
         toast("Hubo un error al realizar el pedido", DANGER_TOAST);

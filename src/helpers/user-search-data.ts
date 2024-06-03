@@ -38,3 +38,27 @@ export const getIdNegocioByUserId = async (id: string) => {
   });
   return id_negocio;
 };
+
+export const getIdClienteByUserId = async (id: string) => {
+  const id_cliente = await prisma.d_cliente.findFirst({
+    where: {
+      id_user: id,
+    },
+    select: {
+      id_cliente: true,
+    },
+  });
+  return id_cliente;
+};
+
+export const getAdressByUserId = async (id: string) => {
+  const direccion_negocio = await prisma.d_cliente.findFirst({
+    where: {
+      id_user: id,
+    },
+    select: {
+      direccion_negocio: true,
+    },
+  });
+  return direccion_negocio;
+};

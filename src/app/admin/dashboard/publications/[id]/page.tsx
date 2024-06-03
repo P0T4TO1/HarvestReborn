@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { PublicacionEdit } from "@/components";
 import { getPublicactionById, getLotesForPosts } from "@/actions";
 
@@ -15,8 +16,8 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const { id } = params;
   if (!searchParams.in) return notFound();
 
-  const lotes = await getLotesForPosts(Number(searchParams.in));
-  const publicacion = await getPublicactionById(Number(id));
+  const lotes = await getLotesForPosts(Number(searchParams.in), headers());
+  const publicacion = await getPublicactionById(Number(id), headers());
 
   if (!publicacion || !lotes) return notFound();
 

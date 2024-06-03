@@ -2,7 +2,7 @@ import { ProductsListContainer } from '@/components';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { redirect } from 'next/navigation';
-import { getDistinctProducts } from '@/actions';
+import { getBatchsByStore } from '@/actions';
 
 interface NegocioInfoPageProps {
   params: {
@@ -10,12 +10,13 @@ interface NegocioInfoPageProps {
     name: string;
   };
 }
+
 const NegocioInfoPage = async ({ params }: NegocioInfoPageProps) => {
   const session = await getServerSession(authOptions);
   if (session?.user.id_rol === 4) redirect('/auth/register?oauth=true');
   const { id, name } = params;
 
-  const products = await getDistinctProducts(id);
+  const products = await getBatchsByStore(id);
 
   if (!products)
     return (

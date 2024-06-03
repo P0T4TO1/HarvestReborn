@@ -2,13 +2,19 @@ import { UsersAdmin } from '@/components';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { IUser } from '@/interfaces';
+import { headers } from 'next/headers';
 
 const getUsersForSuperAdmin = async () => {
   try {
-    const data = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/users/all`,
+      {
+        method: 'GET',
+        headers: headers(),
+      }
     );
-    return data.json() as unknown as IUser[];
+    const data = await res.json();
+    return data as unknown as IUser[];
   } catch (error) {
     console.error(error);
     return;
@@ -17,10 +23,12 @@ const getUsersForSuperAdmin = async () => {
 
 const getUsersForAdmin = async () => {
   try {
-    const data = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/users`
-    );
-    return data.json() as unknown as IUser[];
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
+      method: 'GET',
+      headers: headers(),
+    });
+    const data = await res.json();
+    return data as unknown as IUser[];
   } catch (error) {
     console.error(error);
     return;
@@ -30,7 +38,7 @@ const getUsersForAdmin = async () => {
 const UsersPage = async () => {
   const session = await getServerSession(authOptions);
 
-  if(session?.user.id_rol === 1) {
+  if (session?.user.id_rol === 1) {
     const users = await getUsersForSuperAdmin();
     if (!users) {
       return (

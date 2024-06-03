@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 
-import { IPublicacion, EstadoPublicacion } from "@/interfaces";
-import { DisponibilidadPublicacion } from "@prisma/client";
-import { changePublicationStatus } from "@/actions";
+import { changePublicationStatus } from '@/actions';
+import { DisponibilidadPublicacion } from '@prisma/client';
+import { IPublicacion, EstadoPublicacion } from '@/interfaces';
 
 import {
   Modal,
@@ -17,30 +18,32 @@ import {
   Divider,
   CircularProgress,
   Link,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 import {
-  FaPlayCircle,
   FaCheck,
+  FaPlayCircle,
   FaPauseCircle,
   FaRegTrashAlt,
-} from "react-icons/fa";
-import { MdEdit } from "react-icons/md";
-import { CiViewList } from "react-icons/ci";
+} from 'react-icons/fa';
+import { MdEdit } from 'react-icons/md';
+import { CiViewList } from 'react-icons/ci';
 
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components';
 
 interface Props {
   useDisclosure: { isOpen: boolean; onClose: () => void };
   publicacion: IPublicacion;
   loading: boolean;
+  headers: ReadonlyHeaders;
 }
 
 export const PublicacionModal = ({
   useDisclosure: { isOpen, onClose },
   publicacion,
   loading,
+  headers,
 }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,20 +52,20 @@ export const PublicacionModal = ({
     setIsLoading(true);
     if (!id_publicacion) {
       toast.error(
-        "Error al actualizar el estado de la publicación",
+        'Error al actualizar el estado de la publicación',
         DANGER_TOAST
       );
       setIsLoading(false);
       return;
     }
-    await changePublicationStatus(id_publicacion, estado)
+    await changePublicationStatus(id_publicacion, estado, headers)
       .then(() => {
-        toast("Estado de la publicación actualizado", SUCCESS_TOAST);
+        toast('Estado de la publicación actualizado', SUCCESS_TOAST);
         onClose();
       })
       .catch(() => {
         toast.error(
-          "Error al actualizar el estado de la publicación",
+          'Error al actualizar el estado de la publicación',
           DANGER_TOAST
         );
       })
@@ -74,7 +77,7 @@ export const PublicacionModal = ({
   const handleDelete = async (id_publicacion: number) => {
     setIsLoading(true);
     if (!id_publicacion) {
-      toast("Error al eliminar la publicación", DANGER_TOAST);
+      toast('Error al eliminar la publicación', DANGER_TOAST);
       setIsLoading(false);
       return;
     }
@@ -82,12 +85,12 @@ export const PublicacionModal = ({
       .delete(`/store/publication/${id_publicacion}`)
       .then((res) => {
         if (res.status === 200) {
-          toast("Publicación eliminada", SUCCESS_TOAST);
-          router.push("/store/publications");
+          toast('Publicación eliminada', SUCCESS_TOAST);
+          router.push('/store/publications');
         }
       })
       .catch(() => {
-        toast("Error al eliminar la publicación", DANGER_TOAST);
+        toast('Error al eliminar la publicación', DANGER_TOAST);
       })
       .finally(() => {
         setIsLoading(false);
@@ -97,7 +100,7 @@ export const PublicacionModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl" className="max-w-3xl">
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <>
             {loading ? (
               <ModalBody>
@@ -145,7 +148,7 @@ export const PublicacionModal = ({
                             ? `MX$${publicacion.precio_publicacion}`
                             : publicacion.disponibilidad ===
                                 DisponibilidadPublicacion.DONACION
-                              ? "Donación"
+                              ? 'Donación'
                               : null}
                         </p>
                       </div>
@@ -179,11 +182,11 @@ export const PublicacionModal = ({
                       >
                         {publicacion.disponibilidad ===
                         DisponibilidadPublicacion.EN_VENTA
-                          ? "Marcar como vendido"
+                          ? 'Marcar como vendido'
                           : publicacion.disponibilidad ===
                               DisponibilidadPublicacion.DONACION
-                            ? "Marcar como donado"
-                            : "Marcar como disponible"}
+                            ? 'Marcar como donado'
+                            : 'Marcar como disponible'}
                       </Button>
                       <div className="mt-4 flex gap-4">
                         <div className="flex flex-col items-center">
@@ -211,8 +214,8 @@ export const PublicacionModal = ({
                           <p className="text-sm text-center">
                             {publicacion.estado_publicacion ===
                             EstadoPublicacion.Pendiente
-                              ? "Marcar como disponible"
-                              : "Marcar como pendiente"}
+                              ? 'Marcar como disponible'
+                              : 'Marcar como pendiente'}
                           </p>
                         </div>
                         <div className="flex flex-col items-center">

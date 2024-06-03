@@ -11,7 +11,7 @@ async function getAllNegocios(req: NextRequest) {
     return NextResponse.json(
       {
         message:
-          'No tienes autorización para acceder a esta ruta. Por favor proporciona una API key válida.',
+          'You are not authorized to access this route. Please provide a valid API key.',
       },
       { status: 401 }
     );

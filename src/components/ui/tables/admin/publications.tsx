@@ -41,7 +41,7 @@ import { capitalize } from "@/utils/capitalize";
 
 import { toast } from "sonner";
 import { HiDotsVertical } from "react-icons/hi";
-import { DANGER_TOAST, SUCCESS_TOAST, DeleteUserConfirm } from "@/components";
+import { DANGER_TOAST, SUCCESS_TOAST, DeletePublicationConfirm } from "@/components";
 import { FaCheck, FaChevronDown, FaSearch } from "react-icons/fa";
 import { MdBlock } from "react-icons/md";
 
@@ -504,7 +504,7 @@ export const TablePublications = ({ publications }: Props) => {
   return (
     <>
       {id && (
-        <DeleteUserConfirm
+        <DeletePublicationConfirm
           useDisclosure={{ isOpen, onOpenChange }}
           loading={false}
           id={id}

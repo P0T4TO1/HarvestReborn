@@ -59,7 +59,7 @@ async function createChat(req: NextRequest) {
     });
     return NextResponse.json(
       { ...chat, message: 'Chat creado con éxito' },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);

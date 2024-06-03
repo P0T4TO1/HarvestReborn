@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -12,15 +11,17 @@ import {
   Image,
   Button,
 } from "@nextui-org/react";
+
+import Slider from "react-slick";
 import { IOrden, ILote, IProductoOrden } from "@/interfaces";
+
 import {
   FaRegCheckCircle,
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
-import { MdOutlinePendingActions, MdDownloading } from "react-icons/md";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
-import Slider from "react-slick";
+import { MdOutlinePendingActions, MdDownloading } from "react-icons/md";
 
 interface ReportsSectionProps {
   orders: IOrden[];
@@ -30,6 +31,7 @@ interface ReportsSectionProps {
     lotesPorVencer: ILote[];
     lotesVigentes: ILote[];
   };
+  productsMoreRequested: IProductoOrden[];
 }
 
 const settings = {
@@ -50,24 +52,7 @@ const settings = {
   ),
 };
 
-export const ReportsSection = ({ orders, lotes }: ReportsSectionProps) => {
-  const products = orders.map((order) => order.productoOrden);
-
-  const productsMoreRequested = products.reduce((acc, product) => {
-    product.forEach((product) => {
-      const found = acc.find(
-        (item) => item.id_producto === product.id_producto
-      );
-      if (!found) {
-        acc.push(product);
-      } else {
-        found.cantidad_orden += product.cantidad_orden;
-      }
-      return acc;
-    });
-    return acc;
-  }, []);
-
+export const ReportsSection = ({ orders, lotes, productsMoreRequested }: ReportsSectionProps) => {
   return (
     <div className="pt-8 container mx-auto p-4">
       <div>

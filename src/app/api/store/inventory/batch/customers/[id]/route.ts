@@ -33,6 +33,7 @@ async function getLotesFromInventory(
         inventario: {
           id_negocio: parseInt(params.id, 10),
         },
+        estado_lote: 'ACTIVO',
       },
       include: {
         producto: true,
@@ -47,10 +48,27 @@ async function getLotesFromInventory(
           },
         },
       },
-      distinct: ['id_producto'],
     });
 
-    return NextResponse.json(lotes, { status: 200 });
+    const distinctProducts = lotes.reduce((acc: any, lote) => {
+      const existingProduct = acc.find(
+        (product: any) =>
+          product.producto.id_producto === lote.producto.id_producto
+      );
+
+      if (existingProduct) {
+        existingProduct.cantidad_producto += lote.cantidad_producto;
+      } else {
+        acc.push({
+          ...lote,
+          cantidad_producto: lote.cantidad_producto,
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return NextResponse.json(distinctProducts, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: 'Error al buscar el inventario' },
