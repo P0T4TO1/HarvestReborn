@@ -4,6 +4,7 @@ import { TipoAlmacenaje } from '@/interfaces';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
+import { now, getLocalTimeZone } from '@internationalized/date';
 
 type Data = {
   id: number;
@@ -37,6 +38,8 @@ async function addProductToInventory(
       inventory_id,
     } = body as Data;
 
+    const [day, month, year] = fecha_vencimiento.split('/');
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta Id del producto' },
@@ -62,8 +65,10 @@ async function addProductToInventory(
       const product = await prisma.m_lote.create({
         data: {
           cantidad_producto: parseInt(cantidad_producto, 10),
-          fecha_entrada: new Date(fecha_entrada).toISOString(),
-          fecha_vencimiento: new Date(fecha_vencimiento).toISOString(),
+          fecha_entrada:
+            new Date(fecha_entrada).toISOString() ||
+            now(getLocalTimeZone()).toDate().toISOString(),
+          fecha_vencimiento: new Date(`${year}-${month}-${day}`).toISOString(),
           dias_aviso: parseInt(dias_aviso, 10),
           precio_kg: parseFloat(precio_kg),
           monto_total: parseFloat(precio_kg) * parseInt(cantidad_producto, 10),
@@ -139,7 +144,9 @@ async function addProductToInventory(
     const product = await prisma.m_lote.create({
       data: {
         cantidad_producto: parseInt(cantidad_producto, 10),
-        fecha_entrada: new Date(fecha_entrada).toISOString(),
+        fecha_entrada:
+          new Date(fecha_entrada).toISOString() ||
+          now(getLocalTimeZone()).toDate().toISOString(),
         fecha_vencimiento: new Date(fecha_vencimiento).toISOString(),
         dias_aviso: parseInt(dias_aviso, 10),
         precio_kg: parseFloat(precio_kg),
