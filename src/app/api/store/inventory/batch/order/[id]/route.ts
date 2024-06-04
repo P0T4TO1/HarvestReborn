@@ -3,11 +3,42 @@ import prisma from '@/lib/prisma';
 import { ILote } from '@/interfaces';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
+import { headers } from 'next/headers';
 
 async function getLotes(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const headersList = headers();
+  const referer = headersList.get('authorization');
+  const mobileToken = referer?.split(' ')[1];
+
+  if (mobileToken && mobileToken !== 'undefined') {
+    if (!params.id) {
+      return NextResponse.json(
+        { message: 'Falta Id del lote' },
+        { status: 400 }
+      );
+    }
+
+    const lotes = (await prisma.m_lote.findMany({
+      where: {
+        inventario: {
+          id_negocio: Number(params.id),
+        },
+      },
+      include: {
+        productoOrden: {
+          orderBy: {
+            cantidad_orden: 'desc',
+          },
+        },
+      },
+    })) as unknown as ILote[];
+
+    return NextResponse.json(lotes, { status: 200 });
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {

@@ -14,7 +14,7 @@ async function getStoreOrders(
   const referer = headersList.get('authorization');
   const mobileToken = referer?.split(' ')[1];
 
-  if (mobileToken) {
+  if (mobileToken && mobileToken !== 'undefined') {
     const { id: id_negocio } = params;
 
     if (!id_negocio)

@@ -2,13 +2,56 @@ import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
-
-export const dynamic = 'force-dynamic';
+import { headers } from 'next/headers';
 
 async function getProfile(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
+  const headersList = headers();
+  const referer = headersList.get('authorization');
+  const mobileToken = referer?.split(' ')[1];
+
+  if (mobileToken && mobileToken !== 'undefined') {
+    if (!params.id)
+      return NextResponse.json(
+        { message: 'Falta Id del usuario' },
+        { status: 400 }
+      );
+
+    const profile = await prisma.m_user.findUnique({
+      where: {
+        id: params.id,
+      },
+    });
+    if (!profile)
+      return NextResponse.json(
+        { message: 'No existe usuario por ese id' },
+        { status: 400 }
+      );
+
+    if (profile?.id_rol === 2) {
+      const duenonegocio = await prisma.d_duenonegocio.findFirst({
+        where: {
+          id_user: profile.id,
+        },
+        include: {
+          negocio: true,
+        },
+      });
+      return NextResponse.json({ ...profile, duenonegocio }, { status: 200 });
+    } else if (profile?.id_rol === 3) {
+      const cliente = await prisma.d_cliente.findFirst({
+        where: {
+          id_user: profile.id,
+        },
+      });
+      return NextResponse.json({ ...profile, cliente }, { status: 200 });
+    }
+
+    return NextResponse.json({ ...profile }, { status: 200 });
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -102,8 +145,89 @@ interface ProfileData {
 
 async function updateProfile(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
+  const headersList = headers();
+  const referer = headersList.get('authorization');
+  const mobileToken = referer?.split(' ')[1];
+
+  if (mobileToken && mobileToken !== 'undefined') {
+    const data: ProfileData = await request.json();
+
+    if (!params.id)
+      return NextResponse.json(
+        { message: 'Falta Id del usuario' },
+        { status: 400 }
+      );
+
+    try {
+      if (data.dueneg) {
+        await prisma.m_user.update({
+          where: {
+            id: params.id,
+          },
+          data: {
+            duenonegocio: {
+              update: {
+                where: {
+                  id_dueneg: data.id_dueneg,
+                },
+                data: {
+                  nombre_dueneg: data.dueneg.nombre_dueneg,
+                  apellidos_dueneg: data.dueneg.apellidos_dueneg,
+                  fecha_nacimiento: new Date(data.fecha_nacimiento_d),
+                  negocio: {
+                    update: {
+                      nombre_negocio: data.dueneg.negocio.nombre_negocio,
+                      telefono_negocio: data.dueneg.negocio.telefono_negocio,
+                      direccion_negocio: data.dueneg.negocio.direccion_negocio,
+                      email_negocio: data.dueneg.negocio.email_negocio || '',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+        return NextResponse.json(
+          { message: 'Usuario dueño de negocio actualizado correctamente' },
+          { status: 200 }
+        );
+      } else if (data.cliente) {
+        await prisma.m_user.update({
+          where: {
+            id: params.id,
+          },
+          data: {
+            cliente: {
+              update: {
+                where: {
+                  id_cliente: data.id_cliente,
+                },
+                data: {
+                  nombre_cliente: data.cliente.nombre_cliente,
+                  apellidos_cliente: data.cliente.apellidos_cliente,
+                  telefono_cliente: data.cliente.telefono_cliente,
+                  fecha_nacimiento: new Date(data.fecha_nacimiento_c),
+                },
+              },
+            },
+          },
+        });
+        return NextResponse.json(
+          { message: 'Usuario cliente actualizado correctamente' },
+          { status: 200 }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      return NextResponse.json(
+        { message: 'Error al actualizar usuario' },
+        { status: 400 }
+      );
+    }
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {

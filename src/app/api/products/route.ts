@@ -2,10 +2,18 @@ import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
-
-export const dynamic = 'force-dynamic';
+import { headers } from 'next/headers';
 
 async function getAllProducts(req: NextRequest) {
+  const headersList = headers();
+  const referer = headersList.get('authorization');
+  const mobileToken = referer?.split(' ')[1];
+
+  if (mobileToken && mobileToken !== 'undefined') {
+    const products = await prisma.m_producto.findMany();
+    return NextResponse.json(products, { status: 200 });
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {

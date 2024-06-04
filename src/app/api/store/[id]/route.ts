@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
+import { headers } from 'next/headers';
 
 async function getNegocioById(
   request: Request,
@@ -69,6 +70,59 @@ async function updateNegocioById(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const headersList = headers();
+  const referer = headersList.get('authorization');
+  const mobileToken = referer?.split(' ')[1];
+
+  if (mobileToken && mobileToken !== 'undefined') {
+    const { id: id_negocio } = params;
+    const {
+      nombre_negocio,
+      telefono_negocio,
+      email_negocio,
+      direccion_negocio,
+      calle,
+      colonia,
+      alcaldia,
+      cp,
+      descripcion_negocio,
+      images_urls,
+    } = (await request.json()) as Data;
+    const newDireccion = `${calle}, ${colonia}, ${alcaldia}, ${cp}`;
+
+    if (!id_negocio)
+      return NextResponse.json(
+        { message: 'Falta id de cliente' },
+        { status: 400 }
+      );
+
+    try {
+      const negocio = await prisma.m_negocio.update({
+        where: {
+          id_negocio: parseInt(params.id.toString()),
+        },
+        data: {
+          nombre_negocio: nombre_negocio,
+          telefono_negocio: telefono_negocio,
+          direccion_negocio:
+            newDireccion === 'undefined, undefined, undefined, undefined'
+              ? direccion_negocio
+              : newDireccion,
+          email_negocio: email_negocio,
+          descripcion_negocio: descripcion_negocio,
+          images_negocio: images_urls ?? [],
+        },
+      });
+      return NextResponse.json(negocio, { status: 200 });
+    } catch (error) {
+      console.log(error);
+      return NextResponse.json(
+        { message: 'Error al obtener las ordenes' },
+        { status: 500 }
+      );
+    }
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {

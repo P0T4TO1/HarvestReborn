@@ -5,6 +5,20 @@ async function getIdNegocioByUserId(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
+  const api_key = urlSearchParams.get('api_key');
+
+  if (api_key !== process.env.API_KEY) {
+    return NextResponse.json(
+      {
+        message:
+          'You are not authorized to access this route. Please provide a valid API key.',
+      },
+      { status: 401 }
+    );
+  }
+
   if (!params.id)
     return NextResponse.json(
       { message: 'Falta id del usuario' },
