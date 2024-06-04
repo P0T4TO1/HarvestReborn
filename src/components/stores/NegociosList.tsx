@@ -1,9 +1,8 @@
 'use client';
 
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, useMemo } from 'react';
 
 import { INegocio } from '@/interfaces';
-import { hrApi } from '@/api';
 import { getNegocioById } from '@/actions';
 
 import {
@@ -27,10 +26,19 @@ import { FaLocationDot } from 'react-icons/fa6';
 import { MdOutlineStorefront, MdHelpOutline } from 'react-icons/md';
 
 interface NegociosListProps {
-  stores: INegocio[];
+  stores?: {
+    distanceLessThan5km: INegocio[];
+    distanceMoreThan5km: INegocio[];
+  };
+  storesWithoutDistance?: INegocio[];
+  isSession?: boolean;
 }
 
-export const NegociosList = ({ stores }: NegociosListProps) => {
+export const NegociosList = ({
+  stores,
+  storesWithoutDistance,
+  isSession,
+}: NegociosListProps) => {
   const [negocio, setNegocio] = useState<INegocio>();
   const [loadingNegocio, setLoadingNegocio] = useState(false);
   const [error, setError] = useState(false);
@@ -41,11 +49,28 @@ export const NegociosList = ({ stores }: NegociosListProps) => {
     setSearch(event.target.value);
   };
 
-  const results = !search
-    ? stores
-    : stores.filter((dato) =>
-        dato.nombre_negocio.toLowerCase().includes(search.toLowerCase())
+  const results = useMemo(() => {
+    if (!search) return stores;
+    if (stores?.distanceLessThan5km) {
+      return (
+        stores.distanceLessThan5km.filter((store) =>
+          store.nombre_negocio.toLowerCase().includes(search.toLowerCase())
+        ) ||
+        stores.distanceMoreThan5km.filter((store) =>
+          store.nombre_negocio.toLowerCase().includes(search.toLowerCase())
+        )
       );
+    }
+  }, [search, stores]);
+
+  const resultsWithoutDistance = useMemo(() => {
+    if (!search) return storesWithoutDistance;
+    if (storesWithoutDistance) {
+      return storesWithoutDistance.filter((store) =>
+        store.nombre_negocio.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+  }, [search, storesWithoutDistance]);
 
   const getNegocio = async (id?: number) => {
     if (!id) return;
@@ -90,7 +115,7 @@ export const NegociosList = ({ stores }: NegociosListProps) => {
       </div>
       <div className="grid grid-cols-5 mt-10 gap-8">
         <div className="col-span-2">
-          {results.map((negocio) => (
+          {/* {results.map((negocio) => (
             <Card
               aria-label="Negocio"
               isPressable
@@ -115,7 +140,96 @@ export const NegociosList = ({ stores }: NegociosListProps) => {
                 <p className="mb-4">{negocio.direccion_negocio}</p>
               </CardBody>
             </Card>
-          ))}
+          ))} */}
+          {!isSession ? (
+            resultsWithoutDistance?.map((negocio) => (
+              <Card
+                aria-label="Negocio"
+                isPressable
+                isHoverable
+                shadow="lg"
+                key={negocio.id_negocio}
+                className="mb-6 w-full"
+                classNames={{
+                  base: 'hover:border-green-700 border-2 border-gray-300',
+                }}
+                onPress={() => getNegocio(negocio.id_negocio)}
+              >
+                <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
+                  <div className="flex gap-2 justify-center items-center">
+                    <MdOutlineStorefront size={25} />
+                    <h2 className="text-2xl font-bold">
+                      {negocio.nombre_negocio}
+                    </h2>
+                  </div>
+                </CardHeader>
+                <CardBody className="overflow-visible px-5 pb-2">
+                  <p className="mb-4">{negocio.direccion_negocio}</p>
+                </CardBody>
+              </Card>
+            ))
+          ) : (
+            <>
+              <div>
+                <h3 className="text-lg font-bold">A menos de 5 km</h3>
+                {stores?.distanceLessThan5km.map((store) => (
+                  <Card
+                    aria-label="Negocio"
+                    isPressable
+                    isHoverable
+                    shadow="lg"
+                    key={store.id_negocio}
+                    className="mb-6 w-full"
+                    classNames={{
+                      base: 'hover:border-green-700 border-2 border-gray-300',
+                    }}
+                    onPress={() => getNegocio(store.id_negocio)}
+                  >
+                    <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
+                      <div className="flex gap-2 justify-center items-center">
+                        <MdOutlineStorefront size={25} />
+                        <h2 className="text-2xl font-bold">
+                          {store.nombre_negocio}
+                        </h2>
+                      </div>
+                    </CardHeader>
+                    <CardBody className="overflow-visible px-5 pb-2">
+                      <p className="mb-4">{store.direccion_negocio}</p>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">A más de 5 km</h3>
+                {stores?.distanceMoreThan5km.map((store) => (
+                  <Card
+                    aria-label="Negocio"
+                    isPressable
+                    isHoverable
+                    shadow="lg"
+                    key={store.id_negocio}
+                    className="mb-6 w-full"
+                    classNames={{
+                      base: 'hover:border-green-700 border-2 border-gray-300',
+                    }}
+                    onPress={() => getNegocio(store.id_negocio)}
+                  >
+                    <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
+                      <div className="flex gap-2 justify-center items-center">
+                        <MdOutlineStorefront size={25} />
+                        <h2 className="text-2xl font-bold">
+                          {store.nombre_negocio}
+                        </h2>
+                      </div>
+                    </CardHeader>
+                    <CardBody className="overflow-visible px-5 pb-2">
+                      <p className="mb-4">{store.direccion_negocio}</p>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="col-span-3">

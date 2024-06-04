@@ -46,7 +46,7 @@ const NegociosPage = async () => {
     return (
       <>
         <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
-          <NegociosList stores={stores} />
+          <NegociosList stores={stores} isSession />
         </section>
       </>
     );
@@ -63,7 +63,10 @@ const NegociosPage = async () => {
   return (
     <>
       <section className="flex mt-16 flex-col relative overflow-hidden min-h-screen">
-        <NegociosList stores={stores} />
+        <NegociosList
+          storesWithoutDistance={stores}
+          isSession={false}
+        />
       </section>
     </>
   );

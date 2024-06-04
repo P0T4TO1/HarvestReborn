@@ -1,7 +1,7 @@
 'use client';
 
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 import React from 'react';
 
@@ -22,7 +22,10 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 interface Props {
   publications?: IPublicacion[];
-  stores?: INegocio[];
+  stores?: {
+    distanceLessThan5km: INegocio[];
+    distanceMoreThan5km: INegocio[];
+  };
 }
 
 const disponibilidadOptions = {
@@ -129,27 +132,74 @@ export const HomeCliente = ({ stores, publications }: Props) => {
         <h1 className="font-bebas-neue uppercase text-2xl font-black flex flex-col leading-none dark:text-green-600 text-green-900">
           Negocios
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {!stores ? (
+        <div>
+          {!stores ||
+          (stores.distanceLessThan5km.length === 0 &&
+            stores.distanceMoreThan5km.length === 0) ? (
             <div className="text-center">No hay negocios disponibles</div>
           ) : (
-            stores.map((store) => (
-              <Card key={store.id_negocio} className="shadow-md rounded-md p-4">
-                <CardHeader className="flex justify-between items-center">
-                  <h2 className="text-lg font-bold">{store.nombre_negocio}</h2>
-                </CardHeader>
-                <CardBody>
-                  <p className="text-sm text-gray-500">
-                    {store.direccion_negocio}
-                  </p>
-                </CardBody>
-                <CardFooter className="mt-2">
-                  <Link href={`/stores/${store.id_negocio}`} underline="always">
-                    Ver más
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))
+            <>
+              <div className="mt-8">
+                <h3 className="text-lg font-bold">A menos de 5 km</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                  {stores.distanceLessThan5km.map((store) => (
+                    <Card
+                      key={store.id_negocio}
+                      className="shadow-md rounded-md p-4"
+                    >
+                      <CardHeader className="flex justify-between items-center">
+                        <h2 className="text-lg font-bold">
+                          {store.nombre_negocio}
+                        </h2>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-sm text-gray-500">
+                          {store.direccion_negocio}
+                        </p>
+                      </CardBody>
+                      <CardFooter className="mt-2">
+                        <Link
+                          href={`/stores/${store.id_negocio}/${store.nombre_negocio}`}
+                          underline="always"
+                        >
+                          Ver más
+                        </Link>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-8">
+                <h3 className="text-lg font-bold">A más de 5 km</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                  {stores.distanceMoreThan5km.map((store) => (
+                    <Card
+                      key={store.id_negocio}
+                      className="shadow-md rounded-md p-4"
+                    >
+                      <CardHeader className="flex justify-between items-center">
+                        <h2 className="text-lg font-bold">
+                          {store.nombre_negocio}
+                        </h2>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-sm text-gray-500">
+                          {store.direccion_negocio}
+                        </p>
+                      </CardBody>
+                      <CardFooter className="mt-2">
+                        <Link
+                          href={`/stores/${store.id_negocio}/${store.nombre_negocio}`}
+                          underline="always"
+                        >
+                          Ver más
+                        </Link>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

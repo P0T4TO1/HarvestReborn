@@ -3,7 +3,7 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { TravelMode } from '@googlemaps/google-maps-services-js/dist/common';
 
-import { IPublicacion } from '@/interfaces';
+import { IPublicacion, INegocio } from '@/interfaces';
 import { getAllActiveStores, getActivePublicactionsByStore } from '@/actions';
 import type { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 
@@ -59,16 +59,30 @@ export const getStoresNearby = async (address: string) => {
     })
   );
 
-  const sortedStores = storesWithDistance
+  const storesWithDistanceLessThan5km = storesWithDistance
+    .filter((store) => parseFloat(store.distance.split(' ')[0]) <= 5)
     .sort((a, b) => {
       const distanceA = parseFloat(a.distance.split(' ')[0]);
       const distanceB = parseFloat(b.distance.split(' ')[0]);
 
       return distanceA - distanceB;
     })
-    .slice(0, 10);
+    .slice(0, 5) as unknown as INegocio[];
 
-  return sortedStores;
+  const storesWithDistanceMoreThan5km = storesWithDistance
+    .filter((store) => parseFloat(store.distance.split(' ')[0]) > 5)
+    .sort((a, b) => {
+      const distanceA = parseFloat(a.distance.split(' ')[0]);
+      const distanceB = parseFloat(b.distance.split(' ')[0]);
+
+      return distanceA - distanceB;
+    })
+    .slice(0, 5) as unknown as INegocio[];
+
+  return {
+    distanceLessThan5km: storesWithDistanceLessThan5km,
+    distanceMoreThan5km: storesWithDistanceMoreThan5km,
+  };
 };
 
 export const getPublicationsByStoresNearby = async (
@@ -80,7 +94,7 @@ export const getPublicationsByStoresNearby = async (
   if (!stores) return;
 
   const publications = await Promise.all(
-    stores.map(async (store) => {
+    stores.distanceLessThan5km.map(async (store) => {
       const storePublications = await getActivePublicactionsByStore(
         store.id_negocio,
         headers
