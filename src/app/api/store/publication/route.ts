@@ -4,6 +4,7 @@ import { DisponibilidadPublicacion } from '@/interfaces';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 interface Data {
   id_negocio: number;
@@ -22,6 +23,18 @@ async function createPost(req: NextRequest) {
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     const body = (await req.json()) as Data;
     const {
       id_negocio,
@@ -111,6 +124,18 @@ async function getAllPublicationsByStoreId(req: NextRequest) {
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
     const id_negocio = urlSearchParams.get('id_negocio');
 

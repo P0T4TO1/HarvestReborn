@@ -4,6 +4,7 @@ import { ILote } from '@/interfaces';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 async function getLotes(
   request: Request,
@@ -14,6 +15,18 @@ async function getLotes(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id) {
       return NextResponse.json(
         { message: 'Falta Id del lote' },

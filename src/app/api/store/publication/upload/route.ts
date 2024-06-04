@@ -3,6 +3,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,6 +17,18 @@ export async function POST(request: NextRequest) {
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     try {
       const data = await request.formData();
       const files: File[] = data.getAll('files') as unknown as File[];

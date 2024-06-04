@@ -4,6 +4,7 @@ import { DisponibilidadPublicacion } from '@/interfaces';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 async function deletePublicacion(
   request: Request,
@@ -14,6 +15,18 @@ async function deletePublicacion(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta id del negocio' },
@@ -91,6 +104,18 @@ async function updatePublicacion(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta id del negocio' },
@@ -199,6 +224,18 @@ async function getPublicactionById(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta id del negocio' },

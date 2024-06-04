@@ -9,6 +9,7 @@ import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
 
 import { sendEmail } from '@/utils/sendEmail';
+import { isValidToken } from '@/lib/jwt';
 
 interface Data {
   fecha_orden: string;
@@ -25,6 +26,18 @@ async function createOrder(req: NextRequest) {
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     const data = (await req.json()) as Data;
     const {
       fecha_orden,

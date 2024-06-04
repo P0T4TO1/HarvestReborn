@@ -8,6 +8,7 @@ import { nanoid } from 'nanoid';
 import { getServerSession } from 'next-auth';
 import { IMensaje, tipo_mensaje } from '@/interfaces';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 async function sendMessage(req: NextRequest) {
   const headersList = headers();
@@ -15,6 +16,18 @@ async function sendMessage(req: NextRequest) {
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     const { text, chatId }: { text: string; chatId: string } = await req.json();
     const [userId1, userId2] = chatId.split('--');
 

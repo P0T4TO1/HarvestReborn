@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/authOptions';
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 async function getOrderById(
   request: Request,
@@ -13,6 +14,18 @@ async function getOrderById(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id) {
       return NextResponse.json(
         { message: 'Falta id de la orden' },

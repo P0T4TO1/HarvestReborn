@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { headers } from 'next/headers';
 import { now, getLocalTimeZone } from '@internationalized/date';
+import { isValidToken } from '@/lib/jwt';
 
 type Data = {
   id: number;
@@ -26,6 +27,18 @@ async function addProductToInventory(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const {
       id,
@@ -184,6 +197,18 @@ async function deleteProductFromInventory(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta Id del producto' },

@@ -7,6 +7,7 @@ import { authOptions } from '@/lib/authOptions';
 import { render } from '@react-email/render';
 import { OrderStatusEmail } from '@/components';
 import { headers } from 'next/headers';
+import { isValidToken } from '@/lib/jwt';
 
 import { sendEmail } from '@/utils/sendEmail';
 
@@ -19,6 +20,18 @@ async function changeEstadoOrder(
   const mobileToken = referer?.split(' ')[1];
 
   if (mobileToken && mobileToken !== 'undefined') {
+    const session = await isValidToken(mobileToken);
+
+    if (session === 'JWT no es válido' || !session) {
+      return NextResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Invalid session token',
+        },
+        { status: 401 }
+      );
+    }
+
     if (!params.id)
       return NextResponse.json(
         { message: 'Falta id de la orden' },
