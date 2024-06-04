@@ -1,23 +1,24 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { ILote, INegocio } from "@/interfaces";
-import { hrApi } from "@/api";
+import React, { useEffect, useState } from 'react';
+import { ILote, INegocio } from '@/interfaces';
+import { hrApi } from '@/api';
 import {
   CircularProgress,
   Image,
   Button,
   BreadcrumbItem,
   Breadcrumbs,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 import {
   ProductsCollapsibleTable,
   EditNegocioAdmin,
   DANGER_TOAST,
-} from "@/components";
-import { FaHome, FaEdit } from "react-icons/fa";
-import { MdOutlineStorefront } from "react-icons/md";
-import { toast } from "sonner";
+} from '@/components';
+import { FaHome, FaEdit } from 'react-icons/fa';
+import { MdOutlineStorefront } from 'react-icons/md';
+import { toast } from 'sonner';
+import { getDistinctProducts } from '@/actions';
 
 interface NegocioInfoAdminProps {
   id_negocio: number;
@@ -43,20 +44,17 @@ export const NegocioInfoAdmin = ({ id_negocio }: NegocioInfoAdminProps) => {
       .catch((err) => {
         console.log(err);
         setError(true);
-        toast("Hubo un error", DANGER_TOAST);
+        toast('Hubo un error', DANGER_TOAST);
         setLoading(false);
       });
-    hrApi
-      .get(`/store/inventory/batch/all/distinct/${id_negocio}`)
+    getDistinctProducts(id_negocio)
       .then((res) => {
-        if (res.status === 200) {
-          setLotesSorted(res.data);
-        }
+        if (res) setLotesSorted(res);
       })
       .catch((err) => {
         console.log(err);
         setError(true);
-        toast("Error al obtener productos", DANGER_TOAST);
+        toast('Error al obtener productos #1', DANGER_TOAST);
       });
     hrApi
       .get(`/store/inventory/batch/all/${id_negocio}`)
@@ -68,7 +66,7 @@ export const NegocioInfoAdmin = ({ id_negocio }: NegocioInfoAdminProps) => {
       .catch((err) => {
         console.log(err);
         setError(true);
-        toast("Error al obtener productos", DANGER_TOAST);
+        toast('Error al obtener productos #2', DANGER_TOAST);
       });
   }, [id_negocio]);
 
@@ -76,13 +74,13 @@ export const NegocioInfoAdmin = ({ id_negocio }: NegocioInfoAdminProps) => {
     <div className="my-10 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
       <Breadcrumbs size="lg">
         <BreadcrumbItem
-          href={"/admin/dashboard"}
+          href={'/admin/dashboard'}
           startContent={<FaHome size={25} />}
         >
           Home
         </BreadcrumbItem>
         <BreadcrumbItem
-          href={"/admin/dashboard/stores"}
+          href={'/admin/dashboard/stores'}
           startContent={<MdOutlineStorefront size={25} />}
         >
           Negocios
@@ -109,7 +107,7 @@ export const NegocioInfoAdmin = ({ id_negocio }: NegocioInfoAdminProps) => {
                   onClick={() => setIsEditing(!isEditing)}
                   startContent={<FaEdit size={20} />}
                 >
-                  {isEditing ? "Cancelar" : "Editar"}
+                  {isEditing ? 'Cancelar' : 'Editar'}
                 </Button>
               </div>
               <EditNegocioAdmin
