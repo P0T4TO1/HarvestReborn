@@ -248,7 +248,11 @@ async function getPublicactionById(
           id_publicacion: parseInt(params.id),
         },
         include: {
-          lotes: true,
+          lotes: {
+            include: {
+              producto: true,
+            },
+          },
           negocio: {
             select: {
               dueneg: {

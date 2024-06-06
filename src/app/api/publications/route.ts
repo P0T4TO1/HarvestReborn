@@ -30,7 +30,24 @@ async function getAllPublications(req: NextRequest) {
 
   const publications = await prisma.m_publicaciones.findMany({
     include: {
-      lotes: true,
+      lotes: {
+        include: {
+          producto: true,
+        },
+      },
+      negocio: {
+        include: {
+          dueneg: {
+            select: {
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
   return NextResponse.json(publications, { status: 200 });

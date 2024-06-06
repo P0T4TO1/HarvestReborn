@@ -173,6 +173,7 @@ export const storageColorMapLotes = {
 
 export const columnsPublications = [
   { name: 'ID', uid: 'id_publicacion', sortable: true },
+  { name: 'USUARIO', uid: 'negocio.dueneg.user?.email', sortable: true },
   { name: 'TÍTULO', uid: 'titulo_publicacion', sortable: true },
   { name: 'DISPONIBILIDAD', uid: 'disponibilidad', sortable: true },
   { name: 'ESTADO', uid: 'estado_publicacion', sortable: true },

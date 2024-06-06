@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useCallback, Key } from "react";
+import React, { useState, useMemo, useCallback, Key } from 'react';
 
 import {
   Chip,
@@ -23,10 +23,10 @@ import {
   SortDescriptor,
   ChipProps,
   useDisclosure,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 
-import { hrApi } from "@/api";
-import { IPublicacion, Estado } from "@/interfaces";
+import { hrApi } from '@/api';
+import { IPublicacion, Estado } from '@/interfaces';
 
 import {
   columnsPublications as columns,
@@ -36,46 +36,51 @@ import {
   statusOptionsPublicationsGeneral as statusOptionsGeneral,
   availabilityOptionsPublications as availabilityOptions,
   availabilityColorMapPublications as availabilityColorMap,
-} from "@/utils/data-table";
-import { capitalize } from "@/utils/capitalize";
+} from '@/utils/data-table';
+import { capitalize } from '@/utils/capitalize';
 
-import { toast } from "sonner";
-import { HiDotsVertical } from "react-icons/hi";
-import { DANGER_TOAST, SUCCESS_TOAST, DeletePublicationConfirm } from "@/components";
-import { FaCheck, FaChevronDown, FaSearch } from "react-icons/fa";
-import { MdBlock } from "react-icons/md";
+import { toast } from 'sonner';
+import { HiDotsVertical } from 'react-icons/hi';
+import {
+  DANGER_TOAST,
+  SUCCESS_TOAST,
+  DeletePublicationConfirm,
+} from '@/components';
+import { FaCheck, FaChevronDown, FaSearch } from 'react-icons/fa';
+import { MdBlock } from 'react-icons/md';
 
 interface Props {
   publications: IPublicacion[];
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "titulo_publicacion",
-  "disponibilidad",
-  "estado_publicacion",
-  "estado_general",
-  "createdAt",
-  "acciones",
+  'negocio.dueneg.user?.email',
+  'titulo_publicacion',
+  'disponibilidad',
+  'estado_publicacion',
+  'estado_general',
+  'createdAt',
+  'acciones',
 ];
 
 export const TablePublications = ({ publications }: Props) => {
   const { isOpen, onOpenChange, onOpen } = useDisclosure();
-  const [id, setId] = useState("");
-  const [filterValue, setFilterValue] = useState("");
+  const [id, setId] = useState('');
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
   const [statusGeneralFilter, setStatusGeneralFilter] =
-    useState<Selection>("all");
+    useState<Selection>('all');
   const [availabilityFilter, setAvailabilityFilter] =
-    useState<Selection>("all");
+    useState<Selection>('all');
 
   const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "createdAt",
-    direction: "ascending",
+    column: 'createdAt',
+    direction: 'ascending',
   });
 
   const [page, setPage] = useState(1);
@@ -83,7 +88,7 @@ export const TablePublications = ({ publications }: Props) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -101,7 +106,7 @@ export const TablePublications = ({ publications }: Props) => {
       );
     }
     if (
-      statusFilter !== "all" &&
+      statusFilter !== 'all' &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredPublications = filteredPublications.filter((publication) =>
@@ -109,7 +114,7 @@ export const TablePublications = ({ publications }: Props) => {
       );
     }
     if (
-      statusGeneralFilter !== "all" &&
+      statusGeneralFilter !== 'all' &&
       Array.from(statusGeneralFilter).length !== statusOptionsGeneral.length
     ) {
       filteredPublications = filteredPublications.filter((publication) =>
@@ -117,7 +122,7 @@ export const TablePublications = ({ publications }: Props) => {
       );
     }
     if (
-      availabilityFilter !== "all" &&
+      availabilityFilter !== 'all' &&
       Array.from(availabilityFilter).length !== availabilityOptions.length
     ) {
       filteredPublications = filteredPublications.filter((publication) =>
@@ -149,16 +154,16 @@ export const TablePublications = ({ publications }: Props) => {
 
     return items.sort((a, b) => {
       if (
-        (a[column as keyof IPublicacion] ?? "") <
-        (b[column as keyof IPublicacion] ?? "")
+        (a[column as keyof IPublicacion] ?? '') <
+        (b[column as keyof IPublicacion] ?? '')
       ) {
-        return direction === "ascending" ? -1 : 1;
+        return direction === 'ascending' ? -1 : 1;
       }
       if (
-        (a[column as keyof IPublicacion] ?? "") >
-        (b[column as keyof IPublicacion] ?? "")
+        (a[column as keyof IPublicacion] ?? '') >
+        (b[column as keyof IPublicacion] ?? '')
       ) {
-        return direction === "ascending" ? 1 : -1;
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -169,12 +174,14 @@ export const TablePublications = ({ publications }: Props) => {
       const cellValue = publication[columnKey as keyof IPublicacion];
 
       switch (columnKey) {
-        case "id_publicacion":
+        case 'id_publicacion':
           return cellValue;
-        case "titulo_publicacion":
+        case 'negocio.dueneg.user?.email':
+          return <>{publication.negocio.dueneg.user?.email}</>;
+        case 'titulo_publicacion':
           return (
             <>
-              <Tooltip content={"Ver publicación"} placement="top-start">
+              <Tooltip content={'Ver publicación'} placement="top-start">
                 <Link
                   href={`/admin/dashboard/publications/${publication.id_publicacion}?in=${publication.id_negocio}`}
                   underline="always"
@@ -185,13 +192,13 @@ export const TablePublications = ({ publications }: Props) => {
               </Tooltip>
             </>
           );
-        case "disponibilidad":
+        case 'disponibilidad':
           return (
             <Chip
               color={
                 availabilityColorMap[
                   publication.disponibilidad
-                ] as ChipProps["color"]
+                ] as ChipProps['color']
               }
               size="sm"
               variant="flat"
@@ -199,13 +206,13 @@ export const TablePublications = ({ publications }: Props) => {
               {capitalize(publication.disponibilidad)}
             </Chip>
           );
-        case "estado_publicacion":
+        case 'estado_publicacion':
           return (
             <Chip
               color={
                 statusColorMap[
                   publication.estado_publicacion
-                ] as ChipProps["color"]
+                ] as ChipProps['color']
               }
               size="sm"
               variant="flat"
@@ -213,13 +220,13 @@ export const TablePublications = ({ publications }: Props) => {
               {capitalize(publication.estado_publicacion)}
             </Chip>
           );
-        case "estado_general":
+        case 'estado_general':
           return (
             <Chip
               color={
                 statusColorMapGeneral[
                   publication.estado_general
-                ] as ChipProps["color"]
+                ] as ChipProps['color']
               }
               size="sm"
               variant="flat"
@@ -227,23 +234,23 @@ export const TablePublications = ({ publications }: Props) => {
               {capitalize(publication.estado_general)}
             </Chip>
           );
-        case "createdAt":
+        case 'createdAt':
           return new Date(publication.createdAt.toString()).toLocaleString(
-            "es-MX",
+            'es-MX',
             {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
             }
           );
-        case "acciones":
+        case 'acciones':
           return (
             <div className="flex gap-2">
               <Tooltip
                 content={
                   publication.estado_general === Estado.Activo
-                    ? "Desactivar publicación"
-                    : "Activar publicación"
+                    ? 'Desactivar publicación'
+                    : 'Activar publicación'
                 }
                 placement="top"
               >
@@ -316,12 +323,12 @@ export const TablePublications = ({ publications }: Props) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -447,8 +454,8 @@ export const TablePublications = ({ publications }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los clientes seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los clientes seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} clientes seleccionados`}
         </span>
         <Pagination
@@ -492,12 +499,12 @@ export const TablePublications = ({ publications }: Props) => {
   const handleChangeStatus = async (id: number, status: string) => {
     try {
       await hrApi.put(`/publications/status/${id}`, { status }).then(() => {
-        toast("Se ha cambiado el estado exitosamente", SUCCESS_TOAST);
+        toast('Se ha cambiado el estado exitosamente', SUCCESS_TOAST);
         window.location.reload();
       });
     } catch (error) {
       console.log(error);
-      toast("Error al cambiar estado", DANGER_TOAST);
+      toast('Error al cambiar estado', DANGER_TOAST);
     }
   };
 
@@ -526,7 +533,7 @@ export const TablePublications = ({ publications }: Props) => {
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
+                align={column.uid === 'actions' ? 'center' : 'start'}
                 allowsSorting={column.sortable}
               >
                 {column.name}
@@ -534,7 +541,7 @@ export const TablePublications = ({ publications }: Props) => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={"No hay publicaciones 😭"}
+            emptyContent={'No hay publicaciones 😭'}
             items={sortedItems}
           >
             {(item) => (

@@ -32,7 +32,11 @@ async function getPublicationById(
       id_publicacion: parseInt(id),
     },
     include: {
-      lotes: true,
+      lotes: {
+        include: {
+          producto: true,
+        },
+      },
       negocio: {
         include: {
           dueneg: {
