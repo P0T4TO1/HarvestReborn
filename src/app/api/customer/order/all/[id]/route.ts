@@ -65,10 +65,14 @@ async function getCustomerOrders(
             },
           },
         },
-        orderBy: {
-          fecha_orden: 'desc',
-          hora_orden: 'desc',
-        },
+        orderBy: [
+          {
+            fecha_orden: 'desc',
+          },
+          {
+            hora_orden: 'desc',
+          },
+        ],
       })) as unknown as IOrden[];
 
       return NextResponse.json(orders, { status: 200 });
