@@ -35,19 +35,34 @@ async function getIdClienteByUserId(
       select: {
         cliente: {
           select: {
+            historial: {
+              select: {
+                id_historial: true,
+              },
+            },
             id_cliente: true,
           },
         },
       },
     });
 
-    if (!user?.cliente)
+    if (
+      !user?.cliente ||
+      !user?.cliente?.id_cliente ||
+      !user?.cliente?.historial?.id_historial
+    )
       return NextResponse.json(
         { message: 'El usuario no tiene un cliente asociado' },
         { status: 404 }
       );
 
-    return NextResponse.json(user.cliente.id_cliente, { status: 200 });
+    return NextResponse.json(
+      {
+        id_cliente: user.cliente.id_cliente,
+        id_historial: user.cliente.historial.id_historial,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
