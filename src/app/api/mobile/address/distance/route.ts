@@ -2,7 +2,7 @@ import { Client } from '@googlemaps/google-maps-services-js';
 import { TravelMode } from '@googlemaps/google-maps-services-js/dist/common';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function getDistance(req: NextRequest) {
+async function getDistance(req: NextRequest) {
   const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
   const api_key = urlSearchParams.get('api_key');
 

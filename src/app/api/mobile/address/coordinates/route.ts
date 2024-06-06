@@ -1,7 +1,7 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function getCoordinates(req: NextRequest) {
+async function getCoordinates(req: NextRequest) {
   const urlSearchParams = new URLSearchParams(req.nextUrl.searchParams);
   const api_key = urlSearchParams.get('api_key');
 
