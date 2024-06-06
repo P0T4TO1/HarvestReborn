@@ -59,15 +59,9 @@ async function getCustomerOrders(
             },
           },
           productoOrden: {
-            select: {
-              id_productoOrden: true,
-              cantidad_orden: true,
-              monto: true,
-              id_orden: true,
-              orden: true,
-            },
             include: {
               producto: true,
+              orden: true,
             },
           },
         },

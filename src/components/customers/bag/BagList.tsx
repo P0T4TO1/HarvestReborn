@@ -2,13 +2,10 @@
 
 import React, { useContext, useState } from "react";
 import { useSession } from "next-auth/react";
-import * as PusherPushNotifications from "@pusher/push-notifications-web";
 
 import { BagContext } from "@/context/order";
 import { AuthContext } from "@/context/auth";
 import { BagType, IProductoOrden } from "@/interfaces";
-import { chatHrefConstructor } from "@/utils/cn";
-import { hrApi } from "@/api";
 
 import {
   Divider,
