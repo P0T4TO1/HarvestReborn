@@ -49,7 +49,7 @@ export const StoreSettings = ({ negocio }: Props) => {
     defaultValues: {
       nombre_negocio: negocio.nombre_negocio,
       telefono_negocio: negocio.telefono_negocio,
-      email_negocio: negocio.email_negocio,
+      email_negocio: negocio.email_negocio ?? "",
       direccion_negocio: negocio.direccion_negocio,
       calle: negocio.direccion_negocio.split(",")[0],
       colonia: negocio.direccion_negocio.split(", ")[1],
