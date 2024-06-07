@@ -74,6 +74,7 @@ export const columnsNegocios = [
 export const categoryColorMap = {
   VERDURA: 'primary',
   FRUTA: 'secondary',
+  OTROS: 'default',
 };
 
 export const columnsProductos = [
@@ -89,6 +90,7 @@ export const columnsProductos = [
 export const categoryOptionsProductos = [
   { name: 'VERDURA', uid: 'VERDURA' },
   { name: 'FRUTA', uid: 'FRUTA' },
+  { name: 'OTROS', uid: 'OTROS' },
 ];
 
 // Usuarios

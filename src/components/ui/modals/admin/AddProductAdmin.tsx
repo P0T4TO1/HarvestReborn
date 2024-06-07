@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Button,
@@ -12,17 +12,22 @@ import {
   Select,
   SelectItem,
   useDisclosure,
-} from "@nextui-org/react";
-import React, { ChangeEvent, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { adminAddProductValidation } from "@/validations/admin.validation";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { useRouter } from "next/navigation";
-import { searchProductByName } from "@/helpers";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FaPlus } from "react-icons/fa";
+} from '@nextui-org/react';
+
+import { useRouter } from 'next/navigation';
+import React, { ChangeEvent, useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { adminAddProductValidation } from '@/validations/admin.validation';
+
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
+import { Category } from '@/interfaces';
+import { searchProductByName } from '@/helpers';
+
+import { FaPlus } from 'react-icons/fa';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components';
 
 interface IFormData {
   nombre_producto: string;
@@ -50,12 +55,12 @@ export const AddProductAdminModal = () => {
   } = useForm<IFormData>({
     resolver: zodResolver(adminAddProductValidation),
     defaultValues: {
-      nombre_producto: "",
+      nombre_producto: '',
       imagen_producto: undefined,
-      file: "",
-      descripcion: "",
+      file: '',
+      descripcion: '',
       enTemporada: false,
-      categoria: "",
+      categoria: '',
     },
   });
 
@@ -68,52 +73,52 @@ export const AddProductAdminModal = () => {
     setIsLoading(true);
     try {
       const productExists = await searchProductByName(data.nombre_producto);
-      if (productExists.message === "Este producto ya esta registrado") {
-        setError("nombre_producto", {
-          message: "Este producto ya esta registrado",
+      if (productExists.message === 'Este producto ya esta registrado') {
+        setError('nombre_producto', {
+          message: 'Este producto ya esta registrado',
         });
         setIsLoading(false);
         return null;
       }
 
       const dataImage = new FormData();
-      dataImage.set("file", file as File);
+      dataImage.set('file', file as File);
 
       await hrApi
-        .post("/admin/product/upload", dataImage)
+        .post('/admin/product/upload', dataImage)
         .then((res) => {
           if (res.status === 200) {
-            console.log("File uploaded successfully");
+            console.log('File uploaded successfully');
             data.file = res.data.secure_url;
           }
         })
         .catch((err) => {
-          console.log("Error uploading file", err);
+          console.log('Error uploading file', err);
         });
 
       const res = await hrApi
-        .post("/admin/product", data)
+        .post('/admin/product', data)
         .then(() => {
-          toast("Producto agregado con éxito", SUCCESS_TOAST);
+          toast('Producto agregado con éxito', SUCCESS_TOAST);
           onClose();
           window.location.reload();
           router.refresh();
           return true;
         })
         .catch((err) => {
-          toast("Hubo un error al agregar el producto", DANGER_TOAST);
+          toast('Hubo un error al agregar el producto', DANGER_TOAST);
           setIsLoading(false);
           console.log(err);
           return null;
         });
       if (res) {
-        console.log("Producto agregado");
+        console.log('Producto agregado');
       } else {
-        console.log("Hubo un error data");
+        console.log('Hubo un error data');
       }
     } catch (error) {
       console.log(error);
-      console.log("Hubo un error");
+      console.log('Hubo un error');
     }
   };
 
@@ -145,7 +150,7 @@ export const AddProductAdminModal = () => {
                   <div className="flex flex-col gap-4">
                     <Input
                       type="text"
-                      {...register("nombre_producto")}
+                      {...register('nombre_producto')}
                       label="Nombre del producto"
                     />
                     {errors?.nombre_producto && (
@@ -180,7 +185,7 @@ export const AddProductAdminModal = () => {
                     </div>
                     <Input
                       type="text"
-                      {...register("descripcion")}
+                      {...register('descripcion')}
                       label="Descripción"
                     />
                     {errors?.descripcion && (
@@ -194,7 +199,7 @@ export const AddProductAdminModal = () => {
                         isSelected={isSelected}
                         onValueChange={setIsSelected}
                       >
-                        {isSelected ? "Si" : "No"}
+                        {isSelected ? 'Si' : 'No'}
                       </Checkbox>
                       {errors?.enTemporada && (
                         <p className="text-red-500 dark:text-red-400 text-sm">
@@ -202,13 +207,12 @@ export const AddProductAdminModal = () => {
                         </p>
                       )}
                     </div>
-                    <Select {...register("categoria")} label="Categoria">
-                      <SelectItem key="VERDURA" value="VERDURA">
-                        Verdura
-                      </SelectItem>
-                      <SelectItem key="FRUTA" value="FRUTA">
-                        Fruta
-                      </SelectItem>
+                    <Select {...register('categoria')} label="Categoria">
+                      {Object.values(Category).map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
                     </Select>
                     {errors?.categoria && (
                       <p className="text-red-500 dark:text-red-400 text-sm">
@@ -231,8 +235,8 @@ export const AddProductAdminModal = () => {
                     type="submit"
                     isLoading={isLoading}
                     onClick={() => {
-                      setValue("imagen_producto", file as File);
-                      setValue("enTemporada", isSelected);
+                      setValue('imagen_producto', file as File);
+                      setValue('enTemporada', isSelected);
                     }}
                   >
                     Agregar

@@ -59,6 +59,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   'tipo_almacenaje',
   'fecha_entrada',
   'cantidad_producto',
+  'last_cantidad',
   'fecha_vencimiento',
   'acciones',
 ];

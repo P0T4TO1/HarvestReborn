@@ -52,7 +52,7 @@ export const ProductCard: FC<Props> = ({ lote, product, children, route }) => {
               </h4>
               <div className="flex flex-col">
                 <p className="text-sm text-gray-500">
-                  Quedan {lote?.cantidad_producto} kg
+                  Quedan {lote?.last_cantidad} kg
                 </p>
                 <p className="text-lg font-semibold text-green-800 mt-2">
                   ${lote?.precio_kg} el kg

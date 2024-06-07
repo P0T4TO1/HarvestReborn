@@ -127,11 +127,15 @@ async function updateLote(
         },
         data: {
           cantidad_producto: parseInt(cantidad_producto, 10),
+          last_cantidad: parseInt(cantidad_producto, 10),
           fecha_entrada: new Date(fecha_entrada).toISOString(),
           fecha_vencimiento: new Date(fecha_vencimiento).toISOString(),
           dias_aviso: parseInt(dias_aviso, 10),
           precio_kg: parseFloat(precio_kg),
+          last_precio_kg: parseFloat(precio_kg),
           monto_total: parseFloat(cantidad_producto) * parseFloat(precio_kg),
+          last_monto_total:
+            parseFloat(cantidad_producto) * parseFloat(precio_kg),
           tipo_almacenaje: tipo_almacenaje,
         },
       });
@@ -181,11 +185,14 @@ async function updateLote(
       },
       data: {
         cantidad_producto: parseInt(cantidad_producto, 10),
+        last_cantidad: parseInt(cantidad_producto, 10),
         fecha_entrada: new Date(fecha_entrada).toISOString(),
         fecha_vencimiento: new Date(fecha_vencimiento).toISOString(),
         dias_aviso: parseInt(dias_aviso, 10),
         precio_kg: parseFloat(precio_kg),
+        last_precio_kg: parseFloat(precio_kg),
         monto_total: parseFloat(cantidad_producto) * parseFloat(precio_kg),
+        last_monto_total: parseFloat(cantidad_producto) * parseFloat(precio_kg),
         tipo_almacenaje: tipo_almacenaje,
       },
     });

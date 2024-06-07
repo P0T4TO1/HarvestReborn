@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useCallback, ChangeEvent, Key } from "react";
+import React, { useState, useMemo, useCallback, ChangeEvent, Key } from 'react';
 import {
   Table,
   TableHeader,
@@ -22,48 +22,48 @@ import {
   Pagination,
   Input,
   Image,
-} from "@nextui-org/react";
-import { IProduct } from "@/interfaces";
+} from '@nextui-org/react';
+import { IProduct } from '@/interfaces';
 import {
   columnsProductos as columns,
   categoryColorMap as statusColorMap,
   categoryOptionsProductos as statusOptions,
-} from "@/utils/data-table";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
+} from '@/utils/data-table';
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
 import {
   DANGER_TOAST,
   EditProductAdminModal,
   SUCCESS_TOAST,
-} from "@/components";
-import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from "react-icons/fa";
-import { capitalize } from "@/utils/capitalize";
+} from '@/components';
+import { FaChevronDown, FaEdit, FaRegTrashAlt, FaSearch } from 'react-icons/fa';
+import { capitalize } from '@/utils/capitalize';
 
 interface Props {
   products: IProduct[];
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "imagen_producto",
-  "nombre_producto",
-  "descripcion",
-  "enTemporada",
-  "categoria",
-  "acciones",
+  'imagen_producto',
+  'nombre_producto',
+  'descripcion',
+  'enTemporada',
+  'categoria',
+  'acciones',
 ];
 
 export const TableProducts = ({ products }: Props) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
+  const rowsPerPage = 15;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_orden",
-    direction: "ascending",
+    column: 'nombre_producto',
+    direction: 'ascending',
   });
 
   const [loadingModal, setLoadingModal] = useState(true);
@@ -74,7 +74,7 @@ export const TableProducts = ({ products }: Props) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -92,7 +92,7 @@ export const TableProducts = ({ products }: Props) => {
       );
     }
     if (
-      statusFilter !== "all" &&
+      statusFilter !== 'all' &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredOrders = filteredOrders.filter((producto) =>
@@ -117,99 +117,105 @@ export const TableProducts = ({ products }: Props) => {
 
     return items.sort((a, b) => {
       if (
-        (a[column as keyof IProduct] ?? "") <
-        (b[column as keyof IProduct] ?? "")
+        (a[column as keyof IProduct] ?? '') <
+        (b[column as keyof IProduct] ?? '')
       ) {
-        return direction === "ascending" ? -1 : 1;
+        return direction === 'ascending' ? -1 : 1;
       }
       if (
-        (a[column as keyof IProduct] ?? "") >
-        (b[column as keyof IProduct] ?? "")
+        (a[column as keyof IProduct] ?? '') >
+        (b[column as keyof IProduct] ?? '')
       ) {
-        return direction === "ascending" ? 1 : -1;
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((producto: IProduct, columnKey: Key) => {
-    const cellValue = producto[columnKey as keyof IProduct];
+  const renderCell = useCallback(
+    (producto: IProduct, columnKey: Key) => {
+      const cellValue = producto[columnKey as keyof IProduct];
 
-    switch (columnKey) {
-      case "no. de producto":
-        return <>{columnKey + 1 + rowsPerPage * (page - 1)}</>;
-      case "imagen_producto":
-        return (
-          <Image
-            src={producto.imagen_producto}
-            alt={producto.nombre_producto}
-            className="w-12 h-12 rounded-full"
-          />
-        );
-      case "nombre_producto":
-        return cellValue;
-      case "descripcion":
-        return cellValue;
-      case "enTemporada":
-        return (
-          <Chip
-            size="sm"
-            variant="flat"
-            color={`${producto.enTemporada ? "success" : "danger"}`}
-          >
-            {producto.enTemporada ? "Si" : "No"}
-          </Chip>
-        );
-      case "categoria":
-        return (
-          <Chip
-            size="sm"
-            variant="flat"
-            color={statusColorMap[producto.categoria] as ChipProps["color"]}
-          >
-            {producto.categoria}
-          </Chip>
-        );
-      case "acciones":
-        return (
-          <div className="flex items-center gap-2">
-            <div>
-              <Tooltip content="Editar">
-                <Button
-                  type="button"
-                  variant="light"
-                  isIconOnly
-                  onPress={() => {
-                    getProduct(producto.id_producto).then(() => {});
-                    setLoadingModal(true);
-                    onOpen();
-                  }}
-                >
-                  <FaEdit className="text-blue-800 cursor-pointer" size={20} />
-                </Button>
-              </Tooltip>
+      switch (columnKey) {
+        case 'no. de producto':
+          return <>{columnKey + 1 + rowsPerPage * (page - 1)}</>;
+        case 'imagen_producto':
+          return (
+            <Image
+              src={producto.imagen_producto}
+              alt={producto.nombre_producto}
+              className="w-12 h-12 rounded-full"
+            />
+          );
+        case 'nombre_producto':
+          return cellValue;
+        case 'descripcion':
+          return cellValue;
+        case 'enTemporada':
+          return (
+            <Chip
+              size="sm"
+              variant="flat"
+              color={`${producto.enTemporada ? 'success' : 'danger'}`}
+            >
+              {producto.enTemporada ? 'Si' : 'No'}
+            </Chip>
+          );
+        case 'categoria':
+          return (
+            <Chip
+              size="sm"
+              variant="flat"
+              color={statusColorMap[producto.categoria] as ChipProps['color']}
+            >
+              {producto.categoria}
+            </Chip>
+          );
+        case 'acciones':
+          return (
+            <div className="flex items-center gap-2">
+              <div>
+                <Tooltip content="Editar">
+                  <Button
+                    type="button"
+                    variant="light"
+                    isIconOnly
+                    onPress={() => {
+                      getProduct(producto.id_producto).then(() => {});
+                      setLoadingModal(true);
+                      onOpen();
+                    }}
+                  >
+                    <FaEdit
+                      className="text-blue-800 cursor-pointer"
+                      size={20}
+                    />
+                  </Button>
+                </Tooltip>
+              </div>
+              <div>
+                <Tooltip content="Eliminar">
+                  <Button
+                    type="button"
+                    variant="light"
+                    isIconOnly
+                    onPress={() => handleDelete(producto.id_producto)}
+                  >
+                    <FaRegTrashAlt
+                      className="text-red-800 cursor-pointer"
+                      size={20}
+                    />
+                  </Button>
+                </Tooltip>
+              </div>
             </div>
-            <div>
-              <Tooltip content="Eliminar">
-                <Button
-                  type="button"
-                  variant="light"
-                  isIconOnly
-                  onPress={() => handleDelete(producto.id_producto)}
-                >
-                  <FaRegTrashAlt
-                    className="text-red-800 cursor-pointer"
-                    size={20}
-                  />
-                </Button>
-              </Tooltip>
-            </div>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, [onOpen, page, rowsPerPage]);
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [onOpen, page, rowsPerPage]
+  );
 
   const onNextPage = useCallback(() => {
     if (page < pages) {
@@ -223,25 +229,17 @@ export const TableProducts = ({ products }: Props) => {
     }
   }, [page]);
 
-  const onRowsPerPageChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
-    },
-    []
-  );
-
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -323,8 +321,8 @@ export const TableProducts = ({ products }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los productos seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los productos seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} productos seleccionados`}
         </span>
         <Pagination
@@ -356,7 +354,14 @@ export const TableProducts = ({ products }: Props) => {
         </div>
       </div>
     );
-  }, [selectedKeys, page, pages, filteredItems.length, onNextPage, onPreviousPage]);
+  }, [
+    selectedKeys,
+    page,
+    pages,
+    filteredItems.length,
+    onNextPage,
+    onPreviousPage,
+  ]);
 
   const getProduct = async (id: number) => {
     setLoadingModal(true);
@@ -364,21 +369,21 @@ export const TableProducts = ({ products }: Props) => {
       if (res.status === 200) {
         setProduct(res.data);
       } else {
-        toast("Hubo un error al obtener el producto", DANGER_TOAST);
-        console.log("Error al obtener producto", res.data);
+        toast('Hubo un error al obtener el producto', DANGER_TOAST);
+        console.log('Error al obtener producto', res.data);
       }
       setLoadingModal(false);
     });
   };
 
   const handleDelete = async (id: number) => {
-    await hrApi.delete("/admin/product", { data: { id } }).then((res) => {
+    await hrApi.delete('/admin/product', { data: { id } }).then((res) => {
       if (res.status === 200) {
-        toast("Producto eliminado con éxito", SUCCESS_TOAST);
+        toast('Producto eliminado con éxito', SUCCESS_TOAST);
         window.location.reload();
       } else {
-        toast("Hubo un error al borrar el producto", DANGER_TOAST);
-        console.log("Error al borrar producto", res.data);
+        toast('Hubo un error al borrar el producto', DANGER_TOAST);
+        console.log('Error al borrar producto', res.data);
       }
     });
   };
@@ -411,7 +416,7 @@ export const TableProducts = ({ products }: Props) => {
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
+                align={column.uid === 'actions' ? 'center' : 'start'}
                 allowsSorting={column.sortable}
               >
                 {column.name}
@@ -419,7 +424,7 @@ export const TableProducts = ({ products }: Props) => {
             )}
           </TableHeader>
           <TableBody
-            emptyContent={"No hay productos en la aplicación"}
+            emptyContent={'No hay productos en la aplicación'}
             items={sortedItems}
           >
             {(item) => (

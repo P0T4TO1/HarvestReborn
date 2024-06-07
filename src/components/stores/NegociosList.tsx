@@ -115,32 +115,6 @@ export const NegociosList = ({
       </div>
       <div className="grid grid-cols-5 mt-10 gap-8">
         <div className="col-span-2">
-          {/* {results.map((negocio) => (
-            <Card
-              aria-label="Negocio"
-              isPressable
-              isHoverable
-              shadow="lg"
-              key={negocio.id_negocio}
-              className="mb-6 w-full"
-              classNames={{
-                base: 'hover:border-green-700 border-2 border-gray-300',
-              }}
-              onPress={() => getNegocio(negocio.id_negocio)}
-            >
-              <CardHeader className="flex justify-between flex-row items-center px-5 pt-4">
-                <div className="flex gap-2 justify-center items-center">
-                  <MdOutlineStorefront size={25} />
-                  <h2 className="text-2xl font-bold">
-                    {negocio.nombre_negocio}
-                  </h2>
-                </div>
-              </CardHeader>
-              <CardBody className="overflow-visible px-5 pb-2">
-                <p className="mb-4">{negocio.direccion_negocio}</p>
-              </CardBody>
-            </Card>
-          ))} */}
           {!isSession ? (
             resultsWithoutDistance?.map((negocio) => (
               <Card

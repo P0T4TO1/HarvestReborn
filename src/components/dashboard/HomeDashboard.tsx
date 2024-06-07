@@ -1,30 +1,31 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { hrApi } from "@/api";
-import { IUser, IProduct, INegocio, ICliente } from "@/interfaces";
-import { CircularProgress } from "@nextui-org/react";
+import React, { useState, useEffect } from 'react';
+import { hrApi } from '@/api';
+import { IUser, IProduct, INegocio, ICliente } from '@/interfaces';
+import { CircularProgress } from '@nextui-org/react';
 
 import {
   CardNegociosAdmin,
   CardUsersAdmin,
   CardClientesAdmin,
   CardProductsAdmin,
-} from "@/components";
-import { FaHome } from "react-icons/fa";
+} from '@/components';
+import { FaHome } from 'react-icons/fa';
 
-export const HomeDashboard = () => {
-  const [negocios, setNegocios] = useState<INegocio[]>([]);
-  const [users, setUsers] = useState<IUser[]>([]);
+interface Props {
+  negocios: INegocio[];
+  users: IUser[];
+}
+
+export const HomeDashboard = ({ negocios, users }: Props) => {
   const [clientes, setClientes] = useState<ICliente[]>([]);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    hrApi.get("/store").then((res) => setNegocios(res.data));
-    hrApi.get("/admin/users").then((res) => setUsers(res.data));
-    hrApi.get("/admin/users/customers").then((res) => setClientes(res.data));
-    hrApi.get("/admin/product").then((res) => {
+    hrApi.get('/admin/users/customers').then((res) => setClientes(res.data));
+    hrApi.get('/admin/product').then((res) => {
       setProducts(res.data);
       setLoading(false);
     });

@@ -3,7 +3,7 @@ import { IProduct, IPublicacion, IInventario } from "@/interfaces";
 export interface ILote {
   id_lote: number;
   cantidad_producto: number;
-  last_cantidad?: number;
+  last_cantidad: number; 
   fecha_entrada: string;
   fecha_vencimiento: string;
   precio_kg: number;

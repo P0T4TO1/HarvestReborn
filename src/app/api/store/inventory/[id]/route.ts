@@ -78,13 +78,17 @@ async function addProductToInventory(
       const product = await prisma.m_lote.create({
         data: {
           cantidad_producto: parseInt(cantidad_producto, 10),
+          last_cantidad: parseInt(cantidad_producto, 10),
           fecha_entrada:
             new Date(fecha_entrada).toISOString() ||
             now(getLocalTimeZone()).toDate().toISOString(),
           fecha_vencimiento: new Date(`${year}-${month}-${day}`).toISOString(),
           dias_aviso: parseInt(dias_aviso, 10),
           precio_kg: parseFloat(precio_kg),
+          last_precio_kg: parseFloat(precio_kg),
           monto_total: parseFloat(precio_kg) * parseInt(cantidad_producto, 10),
+          last_monto_total:
+            parseFloat(precio_kg) * parseInt(cantidad_producto, 10),
           tipo_almacenaje: tipo_almacenaje,
           inventario: {
             connect: {
@@ -157,13 +161,17 @@ async function addProductToInventory(
     const product = await prisma.m_lote.create({
       data: {
         cantidad_producto: parseInt(cantidad_producto, 10),
+        last_cantidad: parseInt(cantidad_producto, 10),
         fecha_entrada:
           new Date(fecha_entrada).toISOString() ||
           now(getLocalTimeZone()).toDate().toISOString(),
         fecha_vencimiento: new Date(fecha_vencimiento).toISOString(),
         dias_aviso: parseInt(dias_aviso, 10),
         precio_kg: parseFloat(precio_kg),
+        last_precio_kg: parseFloat(precio_kg),
         monto_total: parseFloat(precio_kg) * parseInt(cantidad_producto, 10),
+        last_monto_total:
+          parseFloat(precio_kg) * parseInt(cantidad_producto, 10),
         tipo_almacenaje: tipo_almacenaje,
         inventario: {
           connect: {

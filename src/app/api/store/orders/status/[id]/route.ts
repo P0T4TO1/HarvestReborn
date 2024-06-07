@@ -42,6 +42,12 @@ async function changeEstadoOrder(
     const { estado } = body;
 
     try {
+      const orderBefore = await prisma.d_orden.findUnique({
+        where: {
+          id_orden: id,
+        },
+      });
+
       const order = await prisma.d_orden.update({
         where: {
           id_orden: id,
@@ -72,28 +78,73 @@ async function changeEstadoOrder(
         },
       });
 
-      if (order.estado_orden === EstadoOrden.FINALIZADO) {
-        try {
-          const { productoOrden } = order;
-          for (const product of productoOrden) {
-            const { id_lote } = product.lote;
-            await prisma.m_lote.update({
-              where: {
-                id_lote,
+      if (!orderBefore) {
+        return NextResponse.json(
+          { message: 'Error al cambiar estado de la orden' },
+          { status: 400 }
+        );
+      }
+
+      if (
+        orderBefore.estado_orden === EstadoOrden.FINALIZADO &&
+        order.estado_orden !== EstadoOrden.FINALIZADO
+      ) {
+        const { productoOrden } = order;
+        for (const product of productoOrden) {
+          const { id_lote, last_cantidad, last_precio_kg, last_monto_total } =
+            product.lote;
+          if (!last_cantidad || !last_precio_kg || !last_monto_total) {
+            return NextResponse.json(
+              {
+                message: 'Error al cambiar estado de la orden',
               },
-              data: {
-                last_cantidad: {
-                  decrement: product.cantidad_orden,
-                },
-              },
-            });
+              { status: 400 }
+            );
           }
-        } catch (error) {
-          console.error(error);
-          return NextResponse.json(
-            { message: 'Error al cambiar estado de la orden' },
-            { status: 500 }
-          );
+          await prisma.m_lote.update({
+            where: {
+              id_lote,
+            },
+            data: {
+              last_cantidad: last_cantidad + product.cantidad_orden,
+              last_monto_total:
+                last_monto_total + last_precio_kg * product.cantidad_orden,
+            },
+          });
+        }
+      }
+
+      if (order.estado_orden === EstadoOrden.FINALIZADO) {
+        const { productoOrden } = order;
+        for (const product of productoOrden) {
+          const { id_lote, last_cantidad, last_precio_kg, last_monto_total } =
+            product.lote;
+          if (!last_cantidad || last_cantidad < product.cantidad_orden) {
+            return NextResponse.json(
+              {
+                message: 'No hay suficiente cantidad en el lote',
+              },
+              { status: 400 }
+            );
+          }
+          if (!last_precio_kg || !last_monto_total) {
+            return NextResponse.json(
+              {
+                message: 'Error al cambiar estado de la orden',
+              },
+              { status: 400 }
+            );
+          }
+          await prisma.m_lote.update({
+            where: {
+              id_lote,
+            },
+            data: {
+              last_cantidad: last_cantidad - product.cantidad_orden,
+              last_monto_total:
+                last_monto_total - last_precio_kg * product.cantidad_orden,
+            },
+          });
         }
       }
 
@@ -143,6 +194,12 @@ async function changeEstadoOrder(
   const { estado } = body;
 
   try {
+    const orderBefore = await prisma.d_orden.findUnique({
+      where: {
+        id_orden: id,
+      },
+    });
+
     const order = await prisma.d_orden.update({
       where: {
         id_orden: id,
@@ -173,28 +230,73 @@ async function changeEstadoOrder(
       },
     });
 
-    if (order.estado_orden === EstadoOrden.FINALIZADO) {
-      try {
-        const { productoOrden } = order;
-        for (const product of productoOrden) {
-          const { id_lote } = product.lote;
-          await prisma.m_lote.update({
-            where: {
-              id_lote,
+    if (!orderBefore) {
+      return NextResponse.json(
+        { message: 'Error al cambiar estado de la orden' },
+        { status: 400 }
+      );
+    }
+
+    if (
+      orderBefore.estado_orden === EstadoOrden.FINALIZADO &&
+      order.estado_orden !== EstadoOrden.FINALIZADO
+    ) {
+      const { productoOrden } = order;
+      for (const product of productoOrden) {
+        const { id_lote, last_cantidad, last_precio_kg, last_monto_total } =
+          product.lote;
+        if (!last_cantidad || !last_precio_kg || !last_monto_total) {
+          return NextResponse.json(
+            {
+              message: 'Error al cambiar estado de la orden',
             },
-            data: {
-              last_cantidad: {
-                decrement: product.cantidad_orden,
-              },
-            },
-          });
+            { status: 400 }
+          );
         }
-      } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-          { message: 'Error al cambiar estado de la orden' },
-          { status: 500 }
-        );
+        await prisma.m_lote.update({
+          where: {
+            id_lote,
+          },
+          data: {
+            last_cantidad: last_cantidad + product.cantidad_orden,
+            last_monto_total:
+              last_monto_total + last_precio_kg * product.cantidad_orden,
+          },
+        });
+      }
+    }
+
+    if (order.estado_orden === EstadoOrden.FINALIZADO) {
+      const { productoOrden } = order;
+      for (const product of productoOrden) {
+        const { id_lote, last_cantidad, last_precio_kg, last_monto_total } =
+          product.lote;
+        if (!last_cantidad || last_cantidad < product.cantidad_orden) {
+          return NextResponse.json(
+            {
+              message: 'No hay suficiente cantidad en el lote',
+            },
+            { status: 400 }
+          );
+        }
+        if (!last_precio_kg || !last_monto_total) {
+          return NextResponse.json(
+            {
+              message: 'Error al cambiar estado de la orden',
+            },
+            { status: 400 }
+          );
+        }
+        await prisma.m_lote.update({
+          where: {
+            id_lote,
+          },
+          data: {
+            last_cantidad: last_cantidad - product.cantidad_orden,
+            last_monto_total:
+              last_monto_total - last_precio_kg * product.cantidad_orden,
+          },
+        });
       }
     }
 

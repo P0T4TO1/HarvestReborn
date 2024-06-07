@@ -1,32 +1,27 @@
 'use client';
 
-import React, {
-  ChangeEvent,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-} from 'react';
-import { ILote, IProductoOrden } from '@/interfaces';
+import React, { useContext, useState, useMemo, useCallback } from 'react';
+import { ILote, IProductoOrden, INegocio } from '@/interfaces';
 import { Input, Button, Checkbox } from '@nextui-org/react';
-import { ProductCard, DANGER_TOAST } from '@/components';
+import { ProductCard } from '@/components';
 import { BagContext } from '@/context/order';
 import { FaSearch } from 'react-icons/fa';
-import { toast } from 'sonner';
 
 interface NegocioProductsProps {
   lotes: ILote[];
   nombre_negocio: string;
+  negocio: INegocio;
 }
 
 export const NegocioProducts = ({
   nombre_negocio,
+  negocio,
   lotes,
 }: NegocioProductsProps) => {
   const { addProductToBag } = useContext(BagContext);
   const [isSeletedFrutas, setIsSelectedFrutas] = useState(false);
   const [isSeletedVerduras, setIsSelectedVerduras] = useState(false);
+  const [isSelectedOtros, setIsSelectedOtros] = useState(false);
   const [filterValue, setFilterValue] = useState('');
   const hasSearchFilter = Boolean(filterValue);
 
@@ -50,10 +45,21 @@ export const NegocioProducts = ({
       return filteredLotes.filter(
         (lote) => lote.producto.categoria === 'VERDURA'
       );
+    } else if (isSelectedOtros) {
+      return filteredLotes.filter(
+        (lote) => lote.producto.categoria === 'OTROS'
+      );
     } else {
       return filteredLotes;
     }
-  }, [filterValue, hasSearchFilter, isSeletedFrutas, isSeletedVerduras, lotes]);
+  }, [
+    filterValue,
+    hasSearchFilter,
+    isSeletedFrutas,
+    isSeletedVerduras,
+    lotes,
+    isSelectedOtros,
+  ]);
 
   const itemsToDisplay = useMemo(() => {
     return filteredItems;
@@ -77,12 +83,18 @@ export const NegocioProducts = ({
 
   return (
     <div className="pt-16 container mx-auto">
-      <h1 className="font-bebas-neue uppercase text-4xl font-black flex flex-col leading-none dark:text-green-600 text-green-900">
-        {nombre_negocio.replace('%20', ' ')}
-        <span className="text-xl dark:text-gray-300 text-gray-900 font-semibold">
-          Aquí puedes ver los productos disponibles en este negocio
-        </span>
-      </h1>
+      <div>
+        <h1 className="font-bebas-neue uppercase text-4xl font-black flex flex-col leading-none dark:text-green-600 text-green-900">
+          {decodeURIComponent(nombre_negocio)}
+          <span className="text-xl dark:text-gray-300 text-gray-900 font-semibold">
+            Aquí puedes ver los productos disponibles en este negocio
+          </span>
+        </h1>
+        <p className="text-gray-500 dark:text-gray-300">
+          Dirección de la tienda: {negocio.direccion_negocio}
+        </p>
+      </div>
+
       <div className="flex mt-2 w-2/5">
         <Input
           isClearable
@@ -111,6 +123,12 @@ export const NegocioProducts = ({
               onValueChange={setIsSelectedVerduras}
             >
               Verduras
+            </Checkbox>
+            <Checkbox
+              isSelected={isSelectedOtros}
+              onValueChange={setIsSelectedOtros}
+            >
+              Otros
             </Checkbox>
           </div>
         </div>

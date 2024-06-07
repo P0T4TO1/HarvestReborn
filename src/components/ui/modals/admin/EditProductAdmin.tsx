@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Button,
@@ -12,16 +12,16 @@ import {
   Select,
   SelectItem,
   CircularProgress,
-} from "@nextui-org/react";
-import React, { useState } from "react";
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { adminEditProductValidation } from "@/validations/admin.validation";
-import { DANGER_TOAST, SUCCESS_TOAST } from "@/components";
-import { useForm } from "react-hook-form";
-import { IProduct } from "@/interfaces";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FaEdit } from "react-icons/fa";
+} from '@nextui-org/react';
+import React, { useState } from 'react';
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
+import { adminEditProductValidation } from '@/validations/admin.validation';
+import { DANGER_TOAST, SUCCESS_TOAST } from '@/components';
+import { useForm } from 'react-hook-form';
+import { IProduct, Category } from '@/interfaces';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FaEdit } from 'react-icons/fa';
 
 interface IFormData {
   nombre_producto: string;
@@ -74,22 +74,22 @@ export const EditProductAdminModal = ({
     try {
       if (file) {
         const dataImage = new FormData();
-        dataImage.set("file", file as File);
+        dataImage.set('file', file as File);
 
         await hrApi
-          .post("/admin/product/upload", dataImage)
+          .post('/admin/product/upload', dataImage)
           .then((res) => {
             if (res.status === 200) {
-              console.log("File uploaded successfully");
+              console.log('File uploaded successfully');
               data.file = res.data.secure_url;
             }
           })
           .catch((error) => {
-            toast("Ocurrió un error al subir la imagen", DANGER_TOAST);
-            setError("imagen_producto", {
-              message: "Hubo un error al subir la imagen",
+            toast('Ocurrió un error al subir la imagen', DANGER_TOAST);
+            setError('imagen_producto', {
+              message: 'Hubo un error al subir la imagen',
             });
-            console.log("Hubo un error al subir la imagen", error);
+            console.log('Hubo un error al subir la imagen', error);
             return null;
           });
       }
@@ -99,13 +99,13 @@ export const EditProductAdminModal = ({
         ...data,
       });
       if (res.status === 200) {
-        toast("Producto editado correctamente", SUCCESS_TOAST);
+        toast('Producto editado correctamente', SUCCESS_TOAST);
         onClose();
         window.location.reload();
       }
     } catch (error) {
-      console.log("Error al editar producto", error);
-      toast("Ocurrió un error al editar el producto", DANGER_TOAST);
+      console.log('Error al editar producto', error);
+      toast('Ocurrió un error al editar el producto', DANGER_TOAST);
     } finally {
       setIsEditing(false);
     }
@@ -132,14 +132,14 @@ export const EditProductAdminModal = ({
                     onClick={() => setIsEditing(!isEditing)}
                     startContent={<FaEdit size={20} />}
                   >
-                    {isEditing ? "Cancelar" : "Editar"}
+                    {isEditing ? 'Cancelar' : 'Editar'}
                   </Button>
                 </ModalHeader>
                 <ModalBody>
                   <div className="flex flex-col gap-4">
                     <Input
                       type="text"
-                      {...register("nombre_producto")}
+                      {...register('nombre_producto')}
                       label="Nombre del producto"
                       isDisabled={!isEditing}
                       defaultValue={product?.nombre_producto}
@@ -177,7 +177,7 @@ export const EditProductAdminModal = ({
                     </div>
                     <Input
                       type="text"
-                      {...register("descripcion")}
+                      {...register('descripcion')}
                       label="Descripción"
                       isDisabled={!isEditing}
                       defaultValue={product?.descripcion}
@@ -194,7 +194,7 @@ export const EditProductAdminModal = ({
                         isDisabled={!isEditing}
                         onValueChange={setIsSelected}
                       >
-                        {product?.enTemporada || isSelected ? "Si" : "No"}
+                        {product?.enTemporada || isSelected ? 'Si' : 'No'}
                       </Checkbox>
                       {errors?.enTemporada && (
                         <p className="text-red-500 dark:text-red-400 text-sm">
@@ -204,16 +204,15 @@ export const EditProductAdminModal = ({
                     </div>
                     <Select
                       isDisabled={!isEditing}
-                      {...register("categoria")}
+                      {...register('categoria')}
                       label="Categoria"
-                      defaultSelectedKeys={[product?.categoria || "VERDURA"]}
+                      defaultSelectedKeys={[product?.categoria || 'VERDURA']}
                     >
-                      <SelectItem key="VERDURA" value="VERDURA">
-                        Verdura
-                      </SelectItem>
-                      <SelectItem key="FRUTA" value="FRUTA">
-                        Fruta
-                      </SelectItem>
+                      {Object.values(Category).map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
                     </Select>
                     {errors?.categoria && (
                       <p className="text-red-500 dark:text-red-400 text-sm">
@@ -231,8 +230,8 @@ export const EditProductAdminModal = ({
                     type="submit"
                     isDisabled={!isEditing}
                     onClick={() => {
-                      setValue("imagen_producto", file as File);
-                      setValue("enTemporada", isSelected);
+                      setValue('imagen_producto', file as File);
+                      setValue('enTemporada', isSelected);
                     }}
                   >
                     Editar

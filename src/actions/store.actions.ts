@@ -130,6 +130,19 @@ export const getAllActiveStores = async () => {
   }
 };
 
+export const getAllNegocios = async () => {
+  try {
+    const { data } = await axios.get<INegocio[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}/store?api_key=${process.env.API_KEY}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+}
+
 export const getBatchsByStore = async (id_negocio: number) => {
   if (!id_negocio) return;
 

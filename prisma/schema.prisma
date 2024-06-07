@@ -192,6 +192,7 @@ model m_producto {
 enum Categoria {
   FRUTA
   VERDURA
+  OTROS
 }
 
 model c_proveedor {

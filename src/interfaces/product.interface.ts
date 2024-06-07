@@ -15,4 +15,5 @@ export interface IProduct {
 export enum Category {
   FRUTA = "FRUTA",
   VERDURA = "VERDURA",
+  OTROS = "OTROS",
 }

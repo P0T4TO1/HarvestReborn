@@ -103,7 +103,7 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
 
     if (
       product.cantidad_orden >
-      product.lote.cantidad_producto - availableQuantity
+      product.lote.last_cantidad! - availableQuantity
     ) {
       toast(
         `No hay suficiente cantidad de ${product.producto?.nombre_producto} en el inventario`,
@@ -160,9 +160,9 @@ export const BagProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (product.cantidad_orden > product.lote.cantidad_producto) {
+    if (product.cantidad_orden > product.lote.last_cantidad!) {
       toast(
-        `No hay suficiente cantidad de ${product.producto?.nombre_producto} en el inventario`,
+        `No hay suficiente cantidad de ${product.producto?.nombre_producto} en el negocio`,
         WARNING_TOAST
       );
       return;

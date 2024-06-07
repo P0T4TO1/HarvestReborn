@@ -48,28 +48,28 @@ async function getLotesFromInventory(
           },
         },
       },
+      orderBy: {
+        fecha_entrada: 'desc',
+      },
+      distinct: ['id_producto'],
     });
 
-    const distinctProducts = lotes.reduce((acc: any, lote) => {
-      const existingProduct = acc.find(
-        (product: any) =>
-          product.producto.id_producto === lote.producto.id_producto
-      );
+    // const distinctLotes = lotes.reduce((acc: any, lote) => {
+    //   const sameProduct = acc.find(
+    //     (item: any) => item.id_producto === lote.id_producto
+    //   );
 
-      if (existingProduct) {
-        existingProduct.cantidad_producto += lote.cantidad_producto;
-      } else {
-        acc.push({
-          ...lote,
-          cantidad_producto: lote.cantidad_producto,
-        });
-      }
+    //   if (sameProduct) {
+    //     sameProduct.last_cantidad += lote.last_cantidad;
+    //     return acc;
+    //   } else {
+    //     return [...acc, lote];
+    //   }
+    // }, []);
 
-      return acc;
-    }, []);
-
-    return NextResponse.json(distinctProducts, { status: 200 });
+    return NextResponse.json(lotes, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { message: 'Error al buscar el inventario' },
       { status: 500 }
