@@ -64,8 +64,38 @@ async function changeEstadoOrder(
               nombre_negocio: true,
             },
           },
+          productoOrden: {
+            include: {
+              lote: true,
+            },
+          },
         },
       });
+
+      if (order.estado_orden === EstadoOrden.FINALIZADO) {
+        try {
+          const { productoOrden } = order;
+          for (const product of productoOrden) {
+            const { id_lote } = product.lote;
+            await prisma.m_lote.update({
+              where: {
+                id_lote,
+              },
+              data: {
+                last_cantidad: {
+                  decrement: product.cantidad_orden,
+                },
+              },
+            });
+          }
+        } catch (error) {
+          console.error(error);
+          return NextResponse.json(
+            { message: 'Error al cambiar estado de la orden' },
+            { status: 500 }
+          );
+        }
+      }
 
       const { email } = order.cliente.user;
       const { nombre_negocio } = order.negocio;
@@ -135,8 +165,38 @@ async function changeEstadoOrder(
             nombre_negocio: true,
           },
         },
+        productoOrden: {
+          include: {
+            lote: true,
+          },
+        },
       },
     });
+
+    if (order.estado_orden === EstadoOrden.FINALIZADO) {
+      try {
+        const { productoOrden } = order;
+        for (const product of productoOrden) {
+          const { id_lote } = product.lote;
+          await prisma.m_lote.update({
+            where: {
+              id_lote,
+            },
+            data: {
+              last_cantidad: {
+                decrement: product.cantidad_orden,
+              },
+            },
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        return NextResponse.json(
+          { message: 'Error al cambiar estado de la orden' },
+          { status: 500 }
+        );
+      }
+    }
 
     const { email } = order.cliente.user;
     const { nombre_negocio } = order.negocio;

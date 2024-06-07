@@ -1,4 +1,4 @@
-import { INegocio, Estado, ILote } from "@/interfaces";
+import { INegocio, Estado, ILote, IMensaje } from '@/interfaces';
 
 export interface IPublicacion {
   id_publicacion: number;
@@ -15,6 +15,8 @@ export interface IPublicacion {
   estado_publicacion: EstadoPublicacion;
   estado_general: Estado;
 
+  linkedMensajes: IMensaje[];
+
   lotes?: ILote[];
 
   createdAt: string;
@@ -23,15 +25,15 @@ export interface IPublicacion {
 }
 
 export enum DisponibilidadPublicacion {
-  En_venta = "EN_VENTA",
-  Donacion = "DONACION",
+  En_venta = 'EN_VENTA',
+  Donacion = 'DONACION',
 }
 
 export enum EstadoPublicacion {
-  Activo = "ACTIVO",
-  Inactiva = "INACTIVA",
-  Pendiente = "PENDIENTE",
-  Rechazada = "RECHAZADA",
-  Vendido = "VENDIDO",
-  Donado = "DONADO",
+  Activo = 'ACTIVO',
+  Inactiva = 'INACTIVA',
+  Pendiente = 'PENDIENTE',
+  Rechazada = 'RECHAZADA',
+  Vendido = 'VENDIDO',
+  Donado = 'DONADO',
 }

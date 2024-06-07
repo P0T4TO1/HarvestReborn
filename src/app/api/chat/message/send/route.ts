@@ -10,6 +10,13 @@ import { IMensaje, tipo_mensaje } from '@/interfaces';
 import { headers } from 'next/headers';
 import { isValidToken } from '@/lib/jwt';
 
+interface Data {
+  text: string;
+  chatId: string;
+  isLinkedPublication?: boolean;
+  publicationId?: number;
+}
+
 async function sendMessage(req: NextRequest) {
   const headersList = headers();
   const referer = headersList.get('authorization');
@@ -28,7 +35,8 @@ async function sendMessage(req: NextRequest) {
       );
     }
 
-    const { text, chatId }: { text: string; chatId: string } = await req.json();
+    const { text, chatId, isLinkedPublication, publicationId } =
+      (await req.json()) as Data;
     const [userId1, userId2] = chatId.split('--');
 
     const friendList = (await prisma.d_participantes.findMany({
@@ -54,24 +62,40 @@ async function sendMessage(req: NextRequest) {
 
     const timestamp = Date.now();
 
-    const messageData: IMensaje = {
-      id_mensaje: nanoid(),
-      id_chat: chatId,
-      id_user: userId1,
-      cuerpo_mensaje: text,
-      createdAt: new Date(timestamp) as any,
-      tipo_mensaje: tipo_mensaje.texto,
-      leido: false,
-    };
+    let messageData: IMensaje;
+
+    if (isLinkedPublication) {
+      messageData = {
+        id_mensaje: nanoid(),
+        id_chat: chatId,
+        id_user: userId1,
+        cuerpo_mensaje: text,
+        createdAt: new Date(timestamp) as any,
+        tipo_mensaje: tipo_mensaje.texto,
+        leido: false,
+        isLinkedPublication: true,
+        id_publicacion: publicationId,
+      };
+    } else {
+      messageData = {
+        id_mensaje: nanoid(),
+        id_chat: chatId,
+        id_user: userId1,
+        cuerpo_mensaje: text,
+        createdAt: new Date(timestamp) as any,
+        tipo_mensaje: tipo_mensaje.texto,
+        leido: false,
+      };
+    }
 
     const message = messageValidator.parse(messageData);
-
+    
     await pusherServer.trigger(
       toPusherKey(`chat:${chatId}`),
       'incoming-message',
       message
     );
-
+    
     await pusherServer.trigger(
       toPusherKey(`user:${friendId}:chats`),
       'new_message',
@@ -81,7 +105,7 @@ async function sendMessage(req: NextRequest) {
         senderName: sender.name,
       }
     );
-
+    
     await prisma.d_mensajes.create({
       data: message,
     });
@@ -90,7 +114,8 @@ async function sendMessage(req: NextRequest) {
   }
 
   try {
-    const { text, chatId }: { text: string; chatId: string } = await req.json();
+    const { text, chatId, isLinkedPublication, publicationId } =
+      (await req.json()) as Data;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -125,15 +150,31 @@ async function sendMessage(req: NextRequest) {
 
     const timestamp = Date.now();
 
-    const messageData: IMensaje = {
-      id_mensaje: nanoid(),
-      id_chat: chatId,
-      id_user: session.user.id,
-      cuerpo_mensaje: text,
-      createdAt: new Date(timestamp) as any,
-      tipo_mensaje: tipo_mensaje.texto,
-      leido: false,
-    };
+    let messageData: IMensaje;
+
+    if (isLinkedPublication) {
+      messageData = {
+        id_mensaje: nanoid(),
+        id_chat: chatId,
+        id_user: session.user.id,
+        cuerpo_mensaje: text,
+        createdAt: new Date(timestamp) as any,
+        tipo_mensaje: tipo_mensaje.texto,
+        leido: false,
+        isLinkedPublication: true,
+        id_publicacion: publicationId,
+      };
+    } else {
+      messageData = {
+        id_mensaje: nanoid(),
+        id_chat: chatId,
+        id_user: session.user.id,
+        cuerpo_mensaje: text,
+        createdAt: new Date(timestamp) as any,
+        tipo_mensaje: tipo_mensaje.texto,
+        leido: false,
+      };
+    }
 
     const message = messageValidator.parse(messageData);
 

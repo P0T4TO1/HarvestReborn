@@ -99,6 +99,7 @@ async function createChat(req: NextRequest) {
     if (chatExists) {
       return NextResponse.json(
         {
+          id_chat: chatExists.id_chat,
           error: 'Internal Server Error',
           message: 'El chat ya existe',
         },

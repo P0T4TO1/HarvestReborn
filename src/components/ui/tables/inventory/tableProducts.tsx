@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useCallback, Key } from "react";
+import React, { useState, useMemo, useCallback, Key } from 'react';
 import {
   Table,
   TableHeader,
@@ -25,16 +25,16 @@ import {
   ModalContent,
   Chip,
   ChipProps,
-} from "@nextui-org/react";
-import { today, getLocalTimeZone } from "@internationalized/date";
+} from '@nextui-org/react';
+import { today, getLocalTimeZone } from '@internationalized/date';
 
-import { ILote } from "@/interfaces";
+import { ILote } from '@/interfaces';
 import {
   columnsLotes as columns,
   storageOptionsLotes,
   fechasVencimientoOptionsLotes,
   storageColorMapLotes as storageColorMap,
-} from "@/utils/data-table";
+} from '@/utils/data-table';
 
 import {
   FaChevronDown,
@@ -42,25 +42,25 @@ import {
   FaEdit,
   FaQuestion,
   FaCircle,
-} from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
-import { capitalize } from "@/utils/capitalize";
+} from 'react-icons/fa';
+import { IoMdClose } from 'react-icons/io';
+import { capitalize } from '@/utils/capitalize';
 
-import { hrApi } from "@/api";
-import { toast } from "sonner";
-import { DANGER_TOAST, EditLoteModal, SUCCESS_TOAST } from "@/components";
+import { hrApi } from '@/api';
+import { toast } from 'sonner';
+import { DANGER_TOAST, EditLoteModal, SUCCESS_TOAST } from '@/components';
 
 interface Props {
   lotes: ILote[];
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "no_lote",
-  "tipo_almacenaje",
-  "fecha_entrada",
-  "cantidad_producto",
-  "fecha_vencimiento",
-  "acciones",
+  'no_lote',
+  'tipo_almacenaje',
+  'fecha_entrada',
+  'cantidad_producto',
+  'fecha_vencimiento',
+  'acciones',
 ];
 
 export const TableProductsInventory = ({ lotes }: Props) => {
@@ -73,19 +73,19 @@ export const TableProductsInventory = ({ lotes }: Props) => {
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [storageFilter, setStorageFilter] = useState<Selection>("all");
+  const [storageFilter, setStorageFilter] = useState<Selection>('all');
   const [fechaVencimientoFilter, setFechaVencimientoFilter] =
-    useState<Selection>("all");
+    useState<Selection>('all');
   const rowsPerPage = 5;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_orden",
-    direction: "ascending",
+    column: 'fecha_orden',
+    direction: 'ascending',
   });
 
   const [page, setPage] = useState(1);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns === 'all') return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -96,7 +96,7 @@ export const TableProductsInventory = ({ lotes }: Props) => {
     let filteredOrders = [...lotes];
 
     if (
-      storageFilter !== "all" &&
+      storageFilter !== 'all' &&
       Array.from(storageFilter).length !== storageOptionsLotes.length
     ) {
       filteredOrders = filteredOrders.filter((lote) => {
@@ -105,7 +105,7 @@ export const TableProductsInventory = ({ lotes }: Props) => {
     }
 
     if (
-      fechaVencimientoFilter !== "all" &&
+      fechaVencimientoFilter !== 'all' &&
       Array.from(fechaVencimientoFilter).length !==
         fechasVencimientoOptionsLotes.length
     ) {
@@ -130,11 +130,11 @@ export const TableProductsInventory = ({ lotes }: Props) => {
     const { column, direction } = sortDescriptor;
 
     return items.sort((a, b) => {
-      if ((a[column as keyof ILote] ?? "") < (b[column as keyof ILote] ?? "")) {
-        return direction === "ascending" ? -1 : 1;
+      if ((a[column as keyof ILote] ?? '') < (b[column as keyof ILote] ?? '')) {
+        return direction === 'ascending' ? -1 : 1;
       }
-      if ((a[column as keyof ILote] ?? "") > (b[column as keyof ILote] ?? "")) {
-        return direction === "ascending" ? 1 : -1;
+      if ((a[column as keyof ILote] ?? '') > (b[column as keyof ILote] ?? '')) {
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -146,7 +146,7 @@ export const TableProductsInventory = ({ lotes }: Props) => {
       if (res.status === 200) {
         setLote(res.data);
       } else {
-        console.log("Error al obtener producto", res.data);
+        console.log('Error al obtener producto', res.data);
       }
       setLoading(false);
     });
@@ -155,11 +155,11 @@ export const TableProductsInventory = ({ lotes }: Props) => {
   const handleDelete = async (id: number) => {
     await hrApi.delete(`/store/inventory/${id}`).then((res) => {
       if (res.status === 200) {
-        toast("Producto eliminado con éxito", SUCCESS_TOAST);
+        toast('Producto eliminado con éxito', SUCCESS_TOAST);
         window.location.reload();
       } else {
-        toast("Hubo un error al borrar el producto", DANGER_TOAST);
-        console.log("Error al borrar producto", res.data);
+        toast('Hubo un error al borrar el producto', DANGER_TOAST);
+        console.log('Error al borrar producto', res.data);
       }
     });
   };
@@ -170,18 +170,18 @@ export const TableProductsInventory = ({ lotes }: Props) => {
       let key = 1;
 
       switch (columnKey) {
-        case "id_lote":
+        case 'id_lote':
           return <div className="dark:text-gray-300">{lote.id_lote}</div>;
-        case "no_lote":
-          return <div className="dark:text-gray-300">{key++}</div>;
-        case "tipo_almacenaje":
+        case 'no_lote':
+          return <div className="dark:text-gray-300">{lote.id_lote}</div>;
+        case 'tipo_almacenaje':
           return (
             <>
               <Chip
                 size="md"
                 variant="flat"
                 color={
-                  storageColorMap[lote.tipo_almacenaje] as ChipProps["color"]
+                  storageColorMap[lote.tipo_almacenaje] as ChipProps['color']
                 }
               >
                 {lote.tipo_almacenaje.charAt(0) +
@@ -189,56 +189,60 @@ export const TableProductsInventory = ({ lotes }: Props) => {
               </Chip>
             </>
           );
-        case "fecha_entrada":
+        case 'fecha_entrada':
           return (
             <div className="dark:text-gray-300">
               {new Date(
-                lote.fecha_entrada.replace(/-/g, "/").replace(/T.+/, "")
-              ).toLocaleDateString("es-MX", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+                lote.fecha_entrada.replace(/-/g, '/').replace(/T.+/, '')
+              ).toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </div>
           );
-        case "hora_entrada":
+        case 'hora_entrada':
           return (
             <div className="dark:text-gray-300">
               {new Date(
-                lote.fecha_entrada.replace(/-/g, "/").replace(/T.+/, "")
-              ).toLocaleTimeString("es-MX", {
-                hour: "numeric",
-                minute: "numeric",
+                lote.fecha_entrada.replace(/-/g, '/').replace(/T.+/, '')
+              ).toLocaleTimeString('es-MX', {
+                hour: 'numeric',
+                minute: 'numeric',
               })}
             </div>
           );
-        case "cantidad_producto":
+        case 'cantidad_producto':
           return (
             <div className="dark:text-gray-300">
               {lote.cantidad_producto} kg
             </div>
           );
-        case "fecha_vencimiento":
+        case 'last_cantidad':
+          return (
+            <div className="dark:text-gray-300">{lote.last_cantidad} kg</div>
+          );
+        case 'fecha_vencimiento':
           return (
             <div className="dark:text-gray-300 flex items-center">
               <p>
                 {new Date(
-                  lote.fecha_vencimiento.replace(/-/g, "/").replace(/T.+/, "")
+                  lote.fecha_vencimiento.replace(/-/g, '/').replace(/T.+/, '')
                 )
-                  .toLocaleDateString("es-MX", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
+                  .toLocaleDateString('es-MX', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
                   })
                   .toString()}
               </p>
               <span className="flex items-center gap-2 ml-2">
                 {new Date(
-                  lote.fecha_vencimiento.replace(/-/g, "/").replace(/T.+/, "")
+                  lote.fecha_vencimiento.replace(/-/g, '/').replace(/T.+/, '')
                 ) < today(getLocalTimeZone()).toDate(getLocalTimeZone()) ? (
                   <FaCircle className="text-red-500" size={20} />
                 ) : new Date(
-                    lote.fecha_vencimiento.replace(/-/g, "/").replace(/T.+/, "")
+                    lote.fecha_vencimiento.replace(/-/g, '/').replace(/T.+/, '')
                   ) <
                   new Date(
                     new Date(
@@ -251,7 +255,7 @@ export const TableProductsInventory = ({ lotes }: Props) => {
                   ) ? (
                   <FaCircle className="text-[#CC4E00]" size={20} />
                 ) : new Date(
-                    lote.fecha_vencimiento.replace(/-/g, "/").replace(/T.+/, "")
+                    lote.fecha_vencimiento.replace(/-/g, '/').replace(/T.+/, '')
                   ) <
                   new Date(
                     new Date().setDate(
@@ -267,7 +271,7 @@ export const TableProductsInventory = ({ lotes }: Props) => {
               </span>
             </div>
           );
-        case "acciones":
+        case 'acciones':
           return (
             <div className="flex items-center gap-2">
               <div>
@@ -444,8 +448,8 @@ export const TableProductsInventory = ({ lotes }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los lotes seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los lotes seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} lotes seleccionados`}
         </span>
         <Pagination
@@ -585,14 +589,14 @@ export const TableProductsInventory = ({ lotes }: Props) => {
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
+                align={column.uid === 'actions' ? 'center' : 'start'}
                 allowsSorting={column.sortable}
               >
                 {column.name}
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={"No hay lotes 😭"} items={sortedItems}>
+          <TableBody emptyContent={'No hay lotes 😭'} items={sortedItems}>
             {(item) => (
               <TableRow key={item.id_lote}>
                 {(columnKey) => (

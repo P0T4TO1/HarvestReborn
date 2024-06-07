@@ -3,3 +3,4 @@ export * from "./admin";
 export * from "./orders";
 export * from "./OrderModal";
 export * from "./PublicacionModal";
+export * from "./SendMessage";

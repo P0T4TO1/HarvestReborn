@@ -1,11 +1,11 @@
-import { ChatInput, Messages } from "@/components";
-import prisma from "@/lib/prisma";
-import { authOptions } from "@/lib/authOptions";
-import { messageArrayValidator } from "@/validations/chat.validation";
-import { getServerSession } from "next-auth";
-import { redirect, notFound } from "next/navigation";
-import { IUser } from "@/interfaces";
-import { NavbarWrapperChats } from "@/components";
+import { ChatInput, Messages } from '@/components';
+import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/authOptions';
+import { getServerSession } from 'next-auth';
+import { redirect, notFound } from 'next/navigation';
+import { IUser } from '@/interfaces';
+import { NavbarWrapperChats } from '@/components';
+import { Message } from '@/validations/chat.validation';
 
 export async function generateMetadata({
   params,
@@ -13,8 +13,8 @@ export async function generateMetadata({
   params: { chatId: string };
 }) {
   const session = await getServerSession(authOptions);
-  if (!session) return redirect("/auth/login");
-  const [userId1, userId2] = params.chatId.split("--");
+  if (!session) return redirect('/auth/login');
+  const [userId1, userId2] = params.chatId.split('--');
   const { user } = session;
 
   const chatPartnerId = user.id === userId1 ? userId2 : userId1;
@@ -52,12 +52,14 @@ async function getChatMessages(chatId: string) {
       where: {
         id_chat: chatId,
       },
+      include: {
+        linkedPublication: true,
+      },
     });
     const dbMessages = JSON.parse(JSON.stringify(results));
     const reversedMessages = dbMessages.reverse();
-    const messages = messageArrayValidator.parse(reversedMessages);
 
-    return messages;
+    return reversedMessages;
   } catch (error) {
     console.error(error);
     notFound();
@@ -71,10 +73,10 @@ const page = async ({ params }: PageProps) => {
 
   const { user } = session;
 
-  const [userId1, userId2] = chatId.split("--");
+  const [userId1, userId2] = chatId.split('--');
 
   if (user.id !== userId1 && user.id !== userId2) {
-    console.log("-----User not in chat-----");
+    console.log('-----User not in chat-----');
     notFound();
   }
 
@@ -118,7 +120,7 @@ const page = async ({ params }: PageProps) => {
           chatPartner={chatPartner}
           sessionImg={session.user.image}
           sessionId={session.user.id}
-          initialMessages={initialMessages}
+          initialMessages={initialMessages as Message[]}
         />
         <ChatInput chatId={chatId} chatPartner={chatPartner} />
       </div>

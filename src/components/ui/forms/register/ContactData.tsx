@@ -10,6 +10,7 @@ import { Input } from "@nextui-org/input";
 import axios from "axios";
 import { DANGER_TOAST, SUCCESS_TOAST } from "@/components/ui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@nextui-org/react";
 
 interface IFormData {
   nombreNegocio: string;
@@ -50,6 +51,7 @@ export const ContactDataForm = () => {
   const [postalCode, setPostalCode] = useState("");
   const [alcaldia, setAlcaldia] = useState("");
   const [colonia, setColonia] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -107,6 +109,7 @@ export const ContactDataForm = () => {
   }, [postalCode, setError]);
 
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
+    setLoading(true);
     try {
       setContactData(data);
       const res = await registerContext({
@@ -116,6 +119,7 @@ export const ContactDataForm = () => {
       });
       if (res.hasError) {
         toast(res.message, DANGER_TOAST);
+        setLoading(false);
         return;
       } else {
         toast("¡Registro exitoso!", SUCCESS_TOAST);
@@ -129,6 +133,7 @@ export const ContactDataForm = () => {
       }
     } catch (error) {
       toast.error("Error al registrar usuario", DANGER_TOAST);
+      setLoading(false);
     }
   };
 
@@ -223,16 +228,17 @@ export const ContactDataForm = () => {
             )}
           </div>
         </div>
-        <button
+        <Button
           type="submit"
           onClick={() => {
             setValue("colonia", colonia);
             setValue("alcaldia", alcaldia);
           }}
+          isLoading={loading}
           className="w-full flex justify-center bg-green-800 hover:bg-green-700 text-gray-100 p-3  rounded-lg tracking-wide font-semibold  cursor-pointer transition ease-in duration-500"
         >
           Registrarse
-        </button>
+        </Button>
         <button
           type="button"
           onClick={() => {

@@ -10,9 +10,9 @@ import {
   Preview,
   Section,
   Text,
-} from "@react-email/components";
-import { Tailwind } from "@react-email/tailwind";
-import * as React from "react";
+} from '@react-email/components';
+import { Tailwind } from '@react-email/tailwind';
+import * as React from 'react';
 
 interface OrderStatusEmailProps {
   id_orden: string;
@@ -22,7 +22,13 @@ interface OrderStatusEmailProps {
   estado_orden: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+const statusOptions: { [key: string]: string } = {
+  EN_PROCESO: 'aceptada',
+  RECHAZADO: 'rechazada',
+  FINALIZADO: 'finalizada',
+};
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
 
 export const OrderStatusEmail = ({
   id_orden,
@@ -48,21 +54,21 @@ export const OrderStatusEmail = ({
               />
             </Section>
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-              Tu orden ha sido{" "}
-              {estado_orden === "EN_PROCESO" ? "aceptada" : "rechazada"}
+              Tu orden ha sido{' '}
+              {estado_orden === 'EN_PROCESO' ? 'aceptada' : 'rechazada'}
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">
-              Hola {email_cliente}, tu orden con el número de folio{" "}
-              <strong>{id_orden}</strong> en el negocio{" "}
-              <strong>{nombre_negocio}</strong> ha sido{" "}
-              {estado_orden === "EN_PROCESO" ? "aceptada" : "rechazada"}.
+              Hola {email_cliente}, tu orden con el número de folio{' '}
+              <strong>{id_orden}</strong> en el negocio{' '}
+              <strong>{nombre_negocio}</strong> ha sido{' '}
+              {statusOptions[estado_orden]}.
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Fecha de la orden:{" "}
-              {fecha_orden.toLocaleDateString("es-MX", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
+              Fecha de la orden:{' '}
+              {fecha_orden.toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
               })}
               .
             </Text>

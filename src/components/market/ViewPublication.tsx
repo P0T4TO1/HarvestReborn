@@ -14,15 +14,13 @@ import {
   DropdownTrigger,
   Accordion,
   AccordionItem,
+  useDisclosure,
 } from '@nextui-org/react';
-import { toast } from 'sonner';
 import { IoMdMore } from 'react-icons/io';
 import Carousel from 'react-material-ui-carousel';
-import { DANGER_TOAST } from '../ui';
+import { SendMessageModal } from '@/components';
 import { IoChatbubbleEllipsesOutline, IoBookmark } from 'react-icons/io5';
 
-import { hrApi } from '@/api';
-import { chatHrefConstructor } from '@/utils/cn';
 import { DisponibilidadPublicacion, IPublicacion } from '@/interfaces';
 
 interface Props {
@@ -31,36 +29,27 @@ interface Props {
 
 export const ViewPublication = ({ publication }: Props) => {
   const { data: session } = useSession();
+  const { onOpen, onClose, isOpen } = useDisclosure();
   const pathname = usePathname();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
 
-  const onContact = async (id_user: string, id_dueneg: string) => {
-    setIsLoading(true);
+  const onContact = async () => {
     if (!session) {
       router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`);
       return;
     }
-    await hrApi
-      .post(`/chat`, {
-        userId: id_user,
-        userId2: id_dueneg,
-        chatName: `Chat entre ${id_user} y ${id_dueneg}`,
-        chatId: chatHrefConstructor(id_user, id_dueneg),
-      })
-      .then(() => {
-        router.push(`/chats/chat/${chatHrefConstructor(id_user, id_dueneg)}`);
-      })
-      .catch(() => {
-        return toast(
-          'Ocurrió un error al intentar enviar el mensaje',
-          DANGER_TOAST
-        );
-      });
+    onOpen();
   };
 
   return (
     <div className="md:flex h-full">
+      {session && (
+        <SendMessageModal
+          publication={publication}
+          useDisclosure={{ isOpen, onClose }}
+          id_user={session.user.id}
+        />
+      )}
       <div className="lg:w-4/5 mx-auto h-full">
         <Carousel
           autoPlay={false}
@@ -97,10 +86,7 @@ export const ViewPublication = ({ publication }: Props) => {
             <Button
               className="mr-2"
               startContent={<IoChatbubbleEllipsesOutline size={21} />}
-              onClick={() =>
-                onContact(session?.user.id!, publication.negocio.dueneg.id_user)
-              }
-              isLoading={isLoading}
+              onClick={() => onContact()}
             >
               Enviar mensaje
             </Button>

@@ -361,6 +361,10 @@ model d_mensajes {
   createdAt      DateTime     @default(now())
   deletedAt      DateTime?
 
+  isLinkedPublication Boolean @default(false)
+  id_publicacion      Int?
+  linkedPublication  m_publicaciones? @relation(fields: [id_publicacion], references: [id_publicacion])
+
   id_chat String
   chat    m_chat? @relation(fields: [id_chat], references: [id_chat], onDelete: Cascade)
 
@@ -369,6 +373,7 @@ model d_mensajes {
 
   @@index([id_chat])
   @@index([id_user])
+  @@index([id_publicacion])
 }
 
 enum tipo_mensaje {
@@ -394,6 +399,7 @@ model m_publicaciones {
 
   estado_general EstadoGeneral @default(PENDIENTE)
 
+  linkedMensajes d_mensajes[]
   lotes m_lote[]
 
   createdAt DateTime  @default(now())

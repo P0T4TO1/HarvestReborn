@@ -137,7 +137,8 @@ export const columnsLotes = [
   { name: 'ID', uid: 'id_lote', sortable: true },
   { name: 'NO. DE LOTE', uid: 'no_lote', sortable: true },
   { name: 'TIPO DE ALMACENAMIENTO', uid: 'tipo_almacenaje', sortable: true },
-  { name: 'CANTIDAD EN KG', uid: 'cantidad_producto', sortable: true },
+  { name: 'CANTIDAD INICIAL EN KG', uid: 'cantidad_producto', sortable: true },
+  { name: 'CANTIDAD ACTUAL EN KG', uid: 'last_cantidad', sortable: true },
   { name: 'FECHA DE ENTRADA', uid: 'fecha_entrada', sortable: true },
   { name: 'HORA DE ENTRADA', uid: 'hora_entrada', sortable: true },
   {
@@ -174,6 +175,7 @@ export const storageColorMapLotes = {
 export const columnsPublications = [
   { name: 'ID', uid: 'id_publicacion', sortable: true },
   { name: 'USUARIO', uid: 'negocio.dueneg.user?.email', sortable: true },
+  { name: 'NEGOCIO', uid: 'negocio.nombre_negocio', sortable: true },
   { name: 'TÍTULO', uid: 'titulo_publicacion', sortable: true },
   { name: 'DISPONIBILIDAD', uid: 'disponibilidad', sortable: true },
   { name: 'ESTADO', uid: 'estado_publicacion', sortable: true },

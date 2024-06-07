@@ -54,7 +54,7 @@ interface Props {
 }
 
 const INITIAL_VISIBLE_COLUMNS = [
-  'negocio.dueneg.user?.email',
+  'negocio.nombre_negocio',
   'titulo_publicacion',
   'disponibilidad',
   'estado_publicacion',
@@ -176,6 +176,8 @@ export const TablePublications = ({ publications }: Props) => {
       switch (columnKey) {
         case 'id_publicacion':
           return cellValue;
+        case 'negocio.nombre_negocio':
+          return <>{publication.negocio.nombre_negocio}</>;
         case 'negocio.dueneg.user?.email':
           return <>{publication.negocio.dueneg.user?.email}</>;
         case 'titulo_publicacion':

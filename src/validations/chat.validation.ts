@@ -13,6 +13,8 @@ export const messageValidator = z.object({
   deletedAt: z.string().or(z.null()).optional(),
   id_chat: z.string(),
   id_user: z.string(),
+  isLinkedPublication: z.boolean().optional(),
+  id_publicacion: z.number().optional(),
 })
 
 export const messageArrayValidator = z.array(messageValidator)

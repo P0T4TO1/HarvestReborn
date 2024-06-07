@@ -1,3 +1,4 @@
+import { IPublicacion } from "./publicaciones.interface";
 import { IUser } from "./user.interface";
 
 export interface IMensaje {
@@ -5,6 +6,10 @@ export interface IMensaje {
   cuerpo_mensaje: string;
   tipo_mensaje: tipo_mensaje;
   leido: boolean;
+
+  isLinkedPublication?: boolean;
+  id_publicacion?: number;
+  linkedPublication?: IPublicacion;
 
   createdAt?: string;
   deletedAt?: string;

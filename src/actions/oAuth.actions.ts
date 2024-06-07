@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import bcrypt from "bcrypt";
-import prisma from "@/lib/prisma";
+import bcrypt from 'bcrypt';
+import prisma from '@/lib/prisma';
 
 export const oAuthToDb = async (
   oAuthEmail: string,
@@ -35,7 +35,7 @@ export const oAuthToDb = async (
       },
     },
   });
-  const [name, lastName] = oAuthName?.split(" ") || ["", ""];
+  const [name, lastName] = oAuthName?.split(' ') || ['', ''];
 
   if (user) {
     await prisma.m_user.update({
@@ -83,9 +83,9 @@ export const oAuthToDb = async (
   }
 
   const role =
-    oAuthEmail === "jaretgarciagomez@gmail.com" ||
-    oAuthEmail === "saulchanona@yahoo.com" ||
-    oAuthEmail === "elbonixd5@gmail.com"
+    oAuthEmail === 'jaretgarciagomez@gmail.com' ||
+    oAuthEmail === 'saulchanona@yahoo.com' ||
+    oAuthEmail === 'elbonixd5@gmail.com'
       ? 1
       : 2 || 3;
 

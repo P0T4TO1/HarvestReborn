@@ -86,7 +86,30 @@ async function changeEstadoPublicacion(
       data: {
         estado_publicacion: estado,
       },
+      include: {
+        lotes: true,
+      },
     });
+
+    if (publicacion.estado_publicacion === 'VENDIDO') {
+      await prisma.m_lote.updateMany({
+        where: {
+          id_publicacion: parseInt(id as string),
+        },
+        data: {
+          estado_lote: 'VENDIDO',
+        },
+      });
+    } else if (publicacion.estado_publicacion === 'DONADO') {
+      await prisma.m_lote.updateMany({
+        where: {
+          id_publicacion: parseInt(id as string),
+        },
+        data: {
+          estado_lote: 'TERMINADO',
+        },
+      });
+    }
 
     return NextResponse.json(publicacion, { status: 200 });
   } catch (error) {

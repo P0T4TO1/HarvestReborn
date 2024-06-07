@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useCallback, Key, useEffect } from "react";
+import React, { useState, useMemo, useCallback, Key, useEffect } from 'react';
 
 import {
   Table,
@@ -23,46 +23,46 @@ import {
   Tooltip,
   useDisclosure,
   User,
-} from "@nextui-org/react";
-import { toast } from "sonner";
+} from '@nextui-org/react';
+import { toast } from 'sonner';
 import {
   OrderModal,
   SUCCESS_TOAST,
   DANGER_TOAST,
   ChangeStatus,
-} from "@/components";
-import { FaX } from "react-icons/fa6";
-import { FaChevronDown, FaSearch, FaEye, FaCheck } from "react-icons/fa";
-import { MdCancelPresentation } from "react-icons/md";
+} from '@/components';
+import { FaX } from 'react-icons/fa6';
+import { FaChevronDown, FaSearch, FaEye, FaCheck } from 'react-icons/fa';
+import { MdCancelPresentation } from 'react-icons/md';
 
-import { hrApi } from "@/api";
-import { IOrden, IProductoOrden } from "@/interfaces";
+import { hrApi } from '@/api';
+import { IOrden, IProductoOrden } from '@/interfaces';
 import {
   columnsOrders,
   statusOptionsOrders,
   statusColorMapOrders as statusColorMap,
   INITIAL_VISIBLE_COLUMNS,
-} from "@/utils/data-table";
-import { capitalize } from "@/utils/capitalize";
-import { EstadoOrden } from "@/interfaces";
+} from '@/utils/data-table';
+import { capitalize } from '@/utils/capitalize';
+import { EstadoOrden } from '@/interfaces';
 
 type Props = {
   orders: IOrden[];
 };
 
 export const OrdersTable = ({ orders }: Props) => {
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = useState<Selection>("all");
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
   const rowsPerPage = 10;
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "fecha_orden",
-    direction: "ascending",
+    column: 'fecha_orden',
+    direction: 'ascending',
   });
-  const [tipoModal, setTipoModal] = useState("");
+  const [tipoModal, setTipoModal] = useState('');
   const [orderModal, setOrderModal] = useState<IOrden | undefined>();
   const [productsModal, setProductsModal] = useState<IProductoOrden[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,7 +73,7 @@ export const OrdersTable = ({ orders }: Props) => {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columnsOrders;
+    if (visibleColumns === 'all') return columnsOrders;
 
     return columnsOrders.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
@@ -91,7 +91,7 @@ export const OrdersTable = ({ orders }: Props) => {
       );
     }
     if (
-      statusFilter !== "all" &&
+      statusFilter !== 'all' &&
       Array.from(statusFilter).length !== statusOptionsOrders.length
     ) {
       filteredOrders = filteredOrders.filter((orden) =>
@@ -116,14 +116,14 @@ export const OrdersTable = ({ orders }: Props) => {
 
     return items.sort((a, b) => {
       if (
-        (a[column as keyof IOrden] ?? "") < (b[column as keyof IOrden] ?? "")
+        (a[column as keyof IOrden] ?? '') < (b[column as keyof IOrden] ?? '')
       ) {
-        return direction === "ascending" ? -1 : 1;
+        return direction === 'ascending' ? -1 : 1;
       }
       if (
-        (a[column as keyof IOrden] ?? "") > (b[column as keyof IOrden] ?? "")
+        (a[column as keyof IOrden] ?? '') > (b[column as keyof IOrden] ?? '')
       ) {
-        return direction === "ascending" ? 1 : -1;
+        return direction === 'ascending' ? 1 : -1;
       }
       return 0;
     });
@@ -131,24 +131,24 @@ export const OrdersTable = ({ orders }: Props) => {
 
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  const handleAcceptOrder = (id_orden: string) => {
+  const handleChangeStatus = (id_orden: string, status: string) => {
     try {
       hrApi
         .put(`/store/orders/status/${id_orden}`, {
-          estado: "EN_PROCESO",
+          estado: status,
         })
         .then((res) => {
           if (res.status === 200) {
-            toast("Pedido aceptado", SUCCESS_TOAST);
+            toast('Pedido finalizado', SUCCESS_TOAST);
           }
           window.location.reload();
         })
         .catch(() => {
-          toast("Error al aceptar el pedido", DANGER_TOAST);
+          toast('Error al finalizar el pedido', DANGER_TOAST);
         });
     } catch (error) {
       console.error(error);
-      toast("Error al aceptar el pedido", DANGER_TOAST);
+      toast('Error al finalizar el pedido', DANGER_TOAST);
     }
   };
 
@@ -157,9 +157,9 @@ export const OrdersTable = ({ orders }: Props) => {
       const cellValue = order[columnKey as keyof IOrden];
 
       switch (columnKey) {
-        case "id_orden":
+        case 'id_orden':
           return <>#{order.id_orden}</>;
-        case "cliente.nombre_cliente":
+        case 'cliente.nombre_cliente':
           return (
             <>
               <User
@@ -168,32 +168,32 @@ export const OrdersTable = ({ orders }: Props) => {
               />
             </>
           );
-        case "fecha_orden":
+        case 'fecha_orden':
           return (
             <div>
-              {new Date(order.fecha_orden).toLocaleDateString("es-ES", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
+              {new Date(order.fecha_orden).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
               })}
             </div>
           );
-        case "monto_total":
+        case 'monto_total':
           return (
             <div>
-              ${order.productoOrden?.reduce((acc, curr) => acc + curr.monto, 0)}{" "}
+              ${order.productoOrden?.reduce((acc, curr) => acc + curr.monto, 0)}{' '}
               MXN
             </div>
           );
-        case "estado_orden":
+        case 'estado_orden':
           return (
             <Chip
               color={
                 statusColorMap[
                   order.estado_orden as keyof typeof statusColorMap
-                ] as ChipProps["color"]
+                ] as ChipProps['color']
               }
               variant="flat"
               size="md"
@@ -202,7 +202,7 @@ export const OrdersTable = ({ orders }: Props) => {
                 order.estado_orden.slice(1).toLowerCase()}
             </Chip>
           );
-        case "acciones":
+        case 'acciones':
           return (
             <div className="flex items-center gap-4">
               <Tooltip content="Ver detalles">
@@ -222,7 +222,13 @@ export const OrdersTable = ({ orders }: Props) => {
               {order.estado_orden === EstadoOrden.EN_PROCESO ? (
                 <>
                   <Tooltip content="Completar pedido" color="success">
-                    <Button isIconOnly variant="light">
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      onPress={() =>
+                        handleChangeStatus(order.id_orden, 'FINALIZADO')
+                      }
+                    >
                       <FaCheck size={20} className="text-green-700" />
                     </Button>
                   </Tooltip>
@@ -231,7 +237,7 @@ export const OrdersTable = ({ orders }: Props) => {
                       isIconOnly
                       variant="light"
                       onPress={() => {
-                        setTipoModal("cancelar");
+                        setTipoModal('cancelar');
                         setOrderModal(order);
                         setOpenModal(!openModal);
                       }}
@@ -248,7 +254,9 @@ export const OrdersTable = ({ orders }: Props) => {
                   <Button
                     isIconOnly
                     variant="light"
-                    onPress={() => handleAcceptOrder(order.id_orden!)}
+                    onPress={() =>
+                      handleChangeStatus(order.id_orden, 'EN_PROCESO')
+                    }
                   >
                     <FaCheck size={20} className="text-green-700" />
                   </Button>
@@ -261,7 +269,7 @@ export const OrdersTable = ({ orders }: Props) => {
                     isIconOnly
                     variant="light"
                     onPress={() => {
-                      setTipoModal("rechazar");
+                      setTipoModal('rechazar');
                       setOrderModal(order);
                       setOpenModal(!openModal);
                     }}
@@ -296,12 +304,12 @@ export const OrdersTable = ({ orders }: Props) => {
       setFilterValue(value);
       setPage(1);
     } else {
-      setFilterValue("");
+      setFilterValue('');
     }
   }, []);
 
   const onClear = useCallback(() => {
-    setFilterValue("");
+    setFilterValue('');
     setPage(1);
   }, []);
 
@@ -383,8 +391,8 @@ export const OrdersTable = ({ orders }: Props) => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Todos los pedidos seleccionados"
+          {selectedKeys === 'all'
+            ? 'Todos los pedidos seleccionados'
             : `${selectedKeys.size} de ${filteredItems.length} pedidos seleccionados`}
         </span>
         <Pagination
@@ -427,7 +435,6 @@ export const OrdersTable = ({ orders }: Props) => {
 
   return (
     <div className=" w-full flex flex-col gap-4 mt-2 p-2 sm:p-4">
-      
       <OrderModal
         loading={loading}
         order={orderModal as IOrden}
@@ -461,7 +468,7 @@ export const OrdersTable = ({ orders }: Props) => {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
+              align={column.uid === 'actions' ? 'center' : 'start'}
               allowsSorting={column.sortable}
             >
               {column.name}
@@ -469,7 +476,7 @@ export const OrdersTable = ({ orders }: Props) => {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No hay pedidos encontrados"}
+          emptyContent={'No hay pedidos encontrados'}
           items={sortedItems}
         >
           {(item) => (
