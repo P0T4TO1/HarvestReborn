@@ -53,7 +53,7 @@ export const changePublicationStatus = async (
       `${process.env.NEXT_PUBLIC_API_URL}/store/publication/status/${id_publicacion}`,
       {
         method: 'PUT',
-        headers: headers,
+        headers: new Headers(headers),
         body: JSON.stringify({ estado }),
       }
     );
