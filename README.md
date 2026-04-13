@@ -2,12 +2,12 @@
 
 # Harvest Reborn
 
-#### URL del proyecto: [https://harvestreborn.me](https://harvestreborn.me)
+#### URL del proyecto: [https://harvest-reborn.vercel.app](https://harvest-reborn.vercel.app)
 
 ## Descripción
 
-Este es el codigo del proyecto aula del equipo zombie perteneciente al grupo 6IV6
-en el cual ...
+Aplicación web tipo Marketplace, enfocada en reducir el desperdicio de alimentos, conectando
+comercios con consumidores interesados mediante ofertas en productos próximos a vencer.
 
 ## Requisitos previos
 
