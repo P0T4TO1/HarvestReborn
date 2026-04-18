@@ -57,7 +57,7 @@ async function registerUser(req: NextRequest) {
       email === 'elbonixd5@gmail.com' ||
       email === 'saulchanona@yahoo.com'
         ? 1
-        : 2 || 3;
+        : 2;
 
     const emailVerificationToken = crypto.randomBytes(32).toString('base64url');
 
@@ -121,7 +121,7 @@ async function registerUser(req: NextRequest) {
         if (process.env.NODE_ENV === 'development') {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
-          link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
+          link = `${process.env.NEXT_PUBLIC_APP_URL}/auth/email-verification?token=${emailVerificationToken}`;
         }
 
         const emailHtml = render(
@@ -255,7 +255,7 @@ async function registerUser(req: NextRequest) {
         if (process.env.NODE_ENV === 'development') {
           link = `http://localhost:3000/auth/email-verification?token=${emailVerificationToken}`;
         } else {
-          link = `https://harvestreborn.me/auth/email-verification?token=${emailVerificationToken}`;
+          link = `${process.env.NEXT_PUBLIC_APP_URL}/auth/email-verification?token=${emailVerificationToken}`;
         }
 
         const emailHtml = render(

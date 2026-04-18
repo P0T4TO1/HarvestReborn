@@ -54,7 +54,7 @@ async function resetPassword(req: NextRequest) {
   if (process.env.NODE_ENV === 'development') {
     link = `http://localhost:3000/auth/reset-password?token=${resetPasswordToken}`;
   } else {
-    link = `https://harvestreborn.me/auth/reset-password?token=${resetPasswordToken}`;
+    link = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${resetPasswordToken}`;
   }
 
   const emailHtml = render(
