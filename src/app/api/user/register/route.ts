@@ -34,7 +34,7 @@ async function registerUser(req: NextRequest) {
         message:
           'You are not authorized to access this route. Please provide a valid API key.',
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
   const {
@@ -128,18 +128,23 @@ async function registerUser(req: NextRequest) {
           VerifyEmail({
             emailVerificationToken: link,
             email,
-          }) as React.ReactElement
+          }) as React.ReactElement,
         );
 
         try {
           await sendEmail(email, 'Verifica tu correo electrónico', emailHtml);
         } catch (error) {
+          await prisma.m_user.delete({
+            where: { email },
+          }).then(() => {
+            console.log(`Usuario con email ${email} eliminado por error en envío de correo`);
+          });
           console.error(error);
           return NextResponse.json(
             {
               message: 'Error al enviar el correo',
             },
-            { status: 500 }
+            { status: 500 },
           );
         }
       }
@@ -155,7 +160,7 @@ async function registerUser(req: NextRequest) {
           },
           message: 'Usuario creado correctamente y correo enviado',
         },
-        { status: 201 }
+        { status: 201 },
       );
     }
 
@@ -262,18 +267,23 @@ async function registerUser(req: NextRequest) {
           VerifyEmail({
             emailVerificationToken: link,
             email,
-          }) as React.ReactElement
+          }) as React.ReactElement,
         );
 
         try {
           await sendEmail(email, 'Verifica tu correo electrónico', emailHtml);
         } catch (error) {
+          await prisma.m_user.delete({
+            where: { email },
+          }).then(() => {
+            console.log(`Usuario con email ${email} eliminado por error en envío de correo`);
+          });
           console.error(error);
           return NextResponse.json(
             {
               message: 'Error al enviar el correo',
             },
-            { status: 500 }
+            { status: 500 },
           );
         }
       }
@@ -289,7 +299,7 @@ async function registerUser(req: NextRequest) {
           },
           message: 'Usuario creado correctamente y correo enviado',
         },
-        { status: 201 }
+        { status: 201 },
       );
     }
   } catch (error) {
@@ -300,7 +310,7 @@ async function registerUser(req: NextRequest) {
         error: 'Internal Server Error',
         message: 'Error al crear el usuario',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
